@@ -1,0 +1,5 @@
+name: Start tests
+
+on:
+  push:
+    branches: [dev]
