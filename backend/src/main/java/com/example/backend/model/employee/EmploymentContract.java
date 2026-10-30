@@ -1,4 +1,4 @@
-package com.example.backend.model;
+package com.example.backend.model.employee;
 
 import jakarta.persistence.*;
 
@@ -27,7 +27,7 @@ public class EmploymentContract {
     private BigDecimal bonusPercent;
 
     private int workHoursPerWeek;
-    
+
     @Column(name = "is_main_job")
     private boolean mainJob;
 }

@@ -1,4 +1,4 @@
-package com.example.backend.model;
+package com.example.backend.model.payroll;
 
 import jakarta.persistence.*;
 
@@ -15,7 +15,7 @@ public class SocialFundContribution {
     private PayrollRecord payrollRecord;
 
     @Enumerated(EnumType.STRING)
-    private FundType fundType;
+    private ContributionType contributionType;
 
     private BigDecimal baseAmount;
     private BigDecimal rate;

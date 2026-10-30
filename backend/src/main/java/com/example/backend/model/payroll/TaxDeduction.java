@@ -1,5 +1,6 @@
-package com.example.backend.model;
+package com.example.backend.model.payroll;
 
+import com.example.backend.model.employee.Employee;
 import jakarta.persistence.*;
 
 import java.math.BigDecimal;

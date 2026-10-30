@@ -1,4 +1,4 @@
-package com.example.backend.model;
+package com.example.backend.model.payroll;
 
 import jakarta.persistence.*;
 
@@ -8,7 +8,7 @@ public class PayrollType {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    
+
     @Column(unique = true, nullable = false)
     private String code;
     private String name;

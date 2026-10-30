@@ -1,5 +1,7 @@
-package com.example.backend.model;
+package com.example.backend.model.employee;
 
+import com.example.backend.model.payroll.PayrollRecord;
+import com.example.backend.model.timesheet.TimeSheetEntry;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;

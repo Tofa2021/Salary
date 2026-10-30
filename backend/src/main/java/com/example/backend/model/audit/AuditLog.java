@@ -1,5 +1,6 @@
-package com.example.backend.model;
+package com.example.backend.model.audit;
 
+import com.example.backend.model.user.User;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
