@@ -1,4 +1,6 @@
 package com.example.backend.dto.auth;
 
-public record AuthResponse(String token, String username, String role) {
+import com.example.backend.model.user.UserRole;
+
+public record AuthResponse(String token, String username, UserRole role) {
 }
