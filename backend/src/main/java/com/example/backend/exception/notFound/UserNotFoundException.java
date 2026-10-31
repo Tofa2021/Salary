@@ -1,4 +1,4 @@
-package com.example.backend.exception;
+package com.example.backend.exception.notFound;
 
 public class UserNotFoundException extends NotFoundException {
     public UserNotFoundException(String username) {

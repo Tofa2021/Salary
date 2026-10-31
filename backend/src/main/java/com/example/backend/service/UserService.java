@@ -1,10 +1,10 @@
 package com.example.backend.service;
 
 import com.example.backend.dto.user.CreateUserRequest;
-import com.example.backend.dto.user.UserResponse;
+import com.example.backend.dto.user.UserDto;
 import com.example.backend.exception.LastAdminException;
-import com.example.backend.exception.UserAlreadyExistsException;
-import com.example.backend.exception.UserNotFoundException;
+import com.example.backend.exception.alreadyExists.UserAlreadyExistsException;
+import com.example.backend.exception.notFound.UserNotFoundException;
 import com.example.backend.model.user.User;
 import com.example.backend.model.user.UserRole;
 import com.example.backend.repository.UserRepository;
@@ -22,7 +22,7 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
 
     @Transactional
-    public UserResponse create(CreateUserRequest request) {
+    public UserDto create(CreateUserRequest request) {
         if (userRepository.existsByUsername(request.username())) {
             throw new UserAlreadyExistsException(request.username());
         }
@@ -32,24 +32,24 @@ public class UserService {
         user.setPassword(passwordEncoder.encode(request.password()));
         user.setRole(request.role() == null ? UserRole.VIEWER : request.role());
         userRepository.save(user);
-        return UserResponse.fromUser(user);
+        return UserDto.fromUser(user);
     }
 
     @Transactional(readOnly = true)
-    public List<UserResponse> findAll() {
+    public List<UserDto> findAll() {
         return userRepository.findAll().stream()
-                .map(UserResponse::fromUser)
+                .map(UserDto::fromUser)
                 .toList();
     }
 
     @Transactional(readOnly = true)
-    public UserResponse findById(Long id) {
+    public UserDto findById(Long id) {
         User user = getUserById(id);
-        return UserResponse.fromUser(user);
+        return UserDto.fromUser(user);
     }
 
     @Transactional
-    public UserResponse updateRole(Long id, UserRole role) {
+    public UserDto updateRole(Long id, UserRole role) {
         User user = getUserById(id);
         long adminCount = userRepository.countByRole(UserRole.ADMIN);
 
@@ -58,7 +58,7 @@ public class UserService {
         }
 
         user.setRole(role);
-        return UserResponse.fromUser(user);
+        return UserDto.fromUser(user);
     }
 
     @Transactional

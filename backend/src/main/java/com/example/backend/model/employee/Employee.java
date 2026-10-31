@@ -3,11 +3,15 @@ package com.example.backend.model.employee;
 import com.example.backend.model.payroll.PayrollRecord;
 import com.example.backend.model.timesheet.TimeSheetEntry;
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDate;
 import java.util.List;
 
 @Entity
+@Getter
+@Setter
 @Table(name = "employees")
 public class Employee {
     @Id

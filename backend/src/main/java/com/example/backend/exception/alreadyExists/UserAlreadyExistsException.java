@@ -1,4 +1,4 @@
-package com.example.backend.exception;
+package com.example.backend.exception.alreadyExists;
 
 public class UserAlreadyExistsException extends AlreadyExistsException {
     public UserAlreadyExistsException(String username) {

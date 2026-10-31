@@ -1,5 +1,6 @@
 package com.example.backend.exception;
 
+import com.example.backend.exception.notFound.NotFoundException;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

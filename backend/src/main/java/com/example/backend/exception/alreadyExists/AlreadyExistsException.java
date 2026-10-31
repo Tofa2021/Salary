@@ -1,4 +1,6 @@
-package com.example.backend.exception;
+package com.example.backend.exception.alreadyExists;
+
+import com.example.backend.exception.BusinessException;
 
 public class AlreadyExistsException extends BusinessException {
     public AlreadyExistsException(String message) {
