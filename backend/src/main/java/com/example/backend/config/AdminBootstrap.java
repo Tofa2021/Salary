@@ -30,10 +30,7 @@ public class AdminBootstrap implements CommandLineRunner {
         if (userRepository.existsByUsername(adminUsername)) {
             return;
         }
-        User admin = new User();
-        admin.setUsername(adminUsername);
-        admin.setPassword(passwordEncoder.encode(adminPassword));
-        admin.setRole(UserRole.ADMIN);
+        User admin = new User(adminUsername, passwordEncoder.encode(adminPassword), UserRole.ADMIN);
         userRepository.save(admin);
     }
 }

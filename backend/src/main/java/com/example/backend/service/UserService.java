@@ -27,10 +27,11 @@ public class UserService {
             throw new UserAlreadyExistsException(request.username());
         }
 
-        User user = new User();
-        user.setUsername(request.username());
-        user.setPassword(passwordEncoder.encode(request.password()));
-        user.setRole(request.role() == null ? UserRole.VIEWER : request.role());
+        User user = new User(
+                request.username(),
+                passwordEncoder.encode(request.password()),
+                request.role() == null ? UserRole.VIEWER : request.role()
+        );
         userRepository.save(user);
         return UserDto.fromUser(user);
     }
