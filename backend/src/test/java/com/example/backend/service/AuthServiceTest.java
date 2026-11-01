@@ -14,6 +14,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -30,10 +31,6 @@ class AuthServiceTest {
     @InjectMocks
     private AuthService authService;
 
-    private User user(String username, UserRole role) {
-        return new User(username, "hashed", role);
-    }
-
     private Authentication authenticated(User user) {
         Authentication auth = mock(Authentication.class);
         when(auth.getPrincipal()).thenReturn(new CustomUserDetails(user));
@@ -42,7 +39,7 @@ class AuthServiceTest {
 
     @Test
     public void login_validCredentials_returnsTokenAndUserInfo() {
-        User user = user("test", UserRole.ADMIN);
+        User user = new User("test", "password", UserRole.ADMIN);
         Authentication auth = authenticated(user);
 
         when(authenticationManager.authenticate(any())).thenReturn(auth);
@@ -61,6 +58,17 @@ class AuthServiceTest {
 
         assertThatThrownBy(() -> authService.login(new LoginRequest("test", "wrong")))
                 .isInstanceOf(BadCredentialsException.class);
+
+        verify(jwtService, never()).generateToken(any(), any());
+    }
+
+    @Test
+    public void login_notFoundUser_UserNotFoundException() {
+        User user = new User("test", "password", UserRole.ADMIN);
+        when(authenticationManager.authenticate(any())).thenThrow(UsernameNotFoundException.class);
+
+        assertThatThrownBy(() -> authService.login(new LoginRequest("test", "wrong")))
+                .isInstanceOf(UsernameNotFoundException.class);
 
         verify(jwtService, never()).generateToken(any(), any());
     }
