@@ -8,9 +8,9 @@ const api = axios.create({
 });
 
 api.interceptors.request.use(async (config) => {
-    const token = await tokenStorage.getAccess();
-    if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
+    const accessToken = await tokenStorage.getAccess();
+    if (accessToken) {
+        config.headers.Authorization = `Bearer ${accessToken}`;
     }
     return config;
 });

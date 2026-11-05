@@ -10,6 +10,8 @@ import { useAuthStore } from './store/auth';
 export default function App() {
     const setInitialized = useAuthStore((s) => s.setInitialized);
     const setAuth = useAuthStore((s) => s.setAuth);
+    const clear = useAuthStore((s) => s.clear);
+    const initialized = useAuthStore((s) => s.initialized);
 
     useEffect(() => {
         (async () => {
@@ -20,11 +22,16 @@ export default function App() {
                     setAuth(data.username, data.role);
                 } catch {
                     await tokenStorage.clear();
+                    clear();
                 }
             }
             setInitialized();
         })();
-    }, []);
+    }, [setAuth, setInitialized, clear]);
+
+    if (!initialized) {
+        return <div className="min-h-screen flex items-center justify-center">Загрузка...</div>;
+    }
 
     return (
         <Routes>

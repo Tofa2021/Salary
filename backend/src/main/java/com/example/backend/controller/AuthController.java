@@ -3,14 +3,15 @@ package com.example.backend.controller;
 import com.example.backend.dto.auth.AuthResult;
 import com.example.backend.dto.auth.LoginRequest;
 import com.example.backend.dto.auth.RefreshRequest;
+import com.example.backend.dto.auth.UserInfoResult;
+import com.example.backend.model.user.User;
+import com.example.backend.security.CustomUserDetails;
 import com.example.backend.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/auth")
@@ -40,5 +41,12 @@ public class AuthController {
         return ResponseEntity.noContent().build();
     }
 
-    //  FIXME  @GetMapping("/me")
+    @GetMapping("/me")
+    public ResponseEntity<UserInfoResult> getMe(Authentication authentication) {
+        if (authentication == null || !(authentication.getPrincipal() instanceof CustomUserDetails(User user))) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        return ResponseEntity.ok(new UserInfoResult(user.getUsername(), user.getRole()));
+    }
 }

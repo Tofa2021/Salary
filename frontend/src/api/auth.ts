@@ -22,3 +22,8 @@ export async function logout(): Promise<void> {
     await api.post('/auth/logout', { refreshToken });
     tokenStorage.clear();
 }
+
+export async function me() {
+    const { data } = await api.get('auth/me');
+    return data;
+}
