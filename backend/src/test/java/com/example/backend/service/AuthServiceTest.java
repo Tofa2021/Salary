@@ -6,6 +6,7 @@ import com.example.backend.model.user.User;
 import com.example.backend.model.user.UserRole;
 import com.example.backend.security.CustomUserDetails;
 import com.example.backend.security.JwtService;
+import com.example.backend.security.RefreshTokenService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -28,6 +29,9 @@ class AuthServiceTest {
     @Mock
     private JwtService jwtService;
 
+    @Mock
+    private RefreshTokenService refreshTokenService;
+
     @InjectMocks
     private AuthService authService;
 
@@ -44,10 +48,12 @@ class AuthServiceTest {
 
         when(authenticationManager.authenticate(any())).thenReturn(auth);
         when(jwtService.generateToken(user.getUsername(), user.getRole().name())).thenReturn("jwt-token-123");
+        when(refreshTokenService.create(any())).thenReturn("refresh-token");
 
         AuthResult response = authService.login(new LoginRequest(user.getUsername(), user.getPassword()));
 
         assertThat(response.accessToken()).isEqualTo("jwt-token-123");
+        assertThat(response.refreshToken()).isEqualTo("refresh-token");
         assertThat(response.username()).isEqualTo("test");
         assertThat(response.role().name()).isEqualTo("ADMIN");
     }
