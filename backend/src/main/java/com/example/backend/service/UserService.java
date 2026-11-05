@@ -1,7 +1,7 @@
 package com.example.backend.service;
 
 import com.example.backend.dto.user.CreateUserRequest;
-import com.example.backend.dto.user.UserDto;
+import com.example.backend.dto.user.UserResult;
 import com.example.backend.exception.LastAdminException;
 import com.example.backend.exception.alreadyExists.UserAlreadyExistsException;
 import com.example.backend.exception.notFound.UserNotFoundException;
@@ -22,7 +22,7 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
 
     @Transactional
-    public UserDto create(CreateUserRequest request) {
+    public UserResult create(CreateUserRequest request) {
         if (userRepository.existsByUsername(request.username())) {
             throw new UserAlreadyExistsException(request.username());
         }
@@ -33,24 +33,24 @@ public class UserService {
                 request.role() == null ? UserRole.VIEWER : request.role()
         );
         userRepository.save(user);
-        return UserDto.fromUser(user);
+        return UserResult.fromUser(user);
     }
 
     @Transactional(readOnly = true)
-    public List<UserDto> findAll() {
+    public List<UserResult> findAll() {
         return userRepository.findAll().stream()
-                .map(UserDto::fromUser)
+                .map(UserResult::fromUser)
                 .toList();
     }
 
     @Transactional(readOnly = true)
-    public UserDto findById(Long id) {
+    public UserResult findById(Long id) {
         User user = getUserById(id);
-        return UserDto.fromUser(user);
+        return UserResult.fromUser(user);
     }
 
     @Transactional
-    public UserDto updateRole(Long id, UserRole role) {
+    public UserResult updateRole(Long id, UserRole role) {
         User user = getUserById(id);
         long adminCount = userRepository.countByRole(UserRole.ADMIN);
 
@@ -59,7 +59,7 @@ public class UserService {
         }
 
         user.setRole(role);
-        return UserDto.fromUser(user);
+        return UserResult.fromUser(user);
     }
 
     @Transactional

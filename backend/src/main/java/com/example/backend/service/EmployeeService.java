@@ -2,7 +2,7 @@ package com.example.backend.service;
 
 import com.example.backend.dto.employee.CreateEmployeeRequest;
 import com.example.backend.dto.employee.DismissRequest;
-import com.example.backend.dto.employee.EmployeeDto;
+import com.example.backend.dto.employee.EmployeeResult;
 import com.example.backend.dto.employee.UpdateEmployeeRequest;
 import com.example.backend.exception.alreadyExists.EmployeePersonnelNumberAlreadyExistsException;
 import com.example.backend.exception.notFound.DepartmentNotFoundException;
@@ -31,7 +31,7 @@ public class EmployeeService {
     private final PositionRepository positionRepository;
 
     @Transactional
-    public EmployeeDto create(CreateEmployeeRequest request) {
+    public EmployeeResult create(CreateEmployeeRequest request) {
         if (employeeRepository.existsByPersonnelNumber(request.personnelNumber())) {
             throw new EmployeePersonnelNumberAlreadyExistsException(request.personnelNumber());
         }
@@ -53,34 +53,34 @@ public class EmployeeService {
         employee.setPosition(position);
         employee.setEmploymentType(parseEmploymentType(request.employmentType()));
 
-        return EmployeeDto.fromEmployee(employeeRepository.save(employee));
+        return EmployeeResult.fromEmployee(employeeRepository.save(employee));
     }
 
     @Transactional(readOnly = true)
-    public EmployeeDto findById(Long id) {
-        return EmployeeDto.fromEmployee(getEmployee(id));
+    public EmployeeResult findById(Long id) {
+        return EmployeeResult.fromEmployee(getEmployee(id));
     }
 
     @Transactional(readOnly = true)
-    public EmployeeDto findByPersonnelNumber(String personnelNumber) {
+    public EmployeeResult findByPersonnelNumber(String personnelNumber) {
         Employee e = employeeRepository.findByPersonnelNumber(personnelNumber)
                 .orElseThrow(() -> new EmployeeNotFoundException(personnelNumber));
-        return EmployeeDto.fromEmployee(e);
+        return EmployeeResult.fromEmployee(e);
     }
 
     @Transactional(readOnly = true)
-    public Page<EmployeeDto> findAll(Pageable pageable) {
-        return employeeRepository.findAll(pageable).map(EmployeeDto::fromEmployee);
+    public Page<EmployeeResult> findAll(Pageable pageable) {
+        return employeeRepository.findAll(pageable).map(EmployeeResult::fromEmployee);
     }
 
     @Transactional(readOnly = true)
-    public Page<EmployeeDto> findByDepartment(Long departmentId, Pageable pageable) {
+    public Page<EmployeeResult> findByDepartment(Long departmentId, Pageable pageable) {
         return employeeRepository.findByDepartmentId(departmentId, pageable)
-                .map(EmployeeDto::fromEmployee);
+                .map(EmployeeResult::fromEmployee);
     }
 
     @Transactional
-    public EmployeeDto update(Long id, UpdateEmployeeRequest request) {
+    public EmployeeResult update(Long id, UpdateEmployeeRequest request) {
         Employee employee = getEmployee(id);
 
         if (request.surname() != null) employee.setSurname(request.surname());
@@ -104,25 +104,25 @@ public class EmployeeService {
             employee.setEmploymentType(parseEmploymentType(request.employmentType()));
         }
 
-        return EmployeeDto.fromEmployee(employee);
+        return EmployeeResult.fromEmployee(employee);
     }
 
     @Transactional
-    public EmployeeDto dismiss(Long id, DismissRequest request) {
+    public EmployeeResult dismiss(Long id, DismissRequest request) {
         Employee employee = getEmployee(id);
         if (request.dismissalDate().isBefore(employee.getHireDate())) {
             throw new IllegalArgumentException("dismissalDate cannot be before hireDate");
         }
         employee.setDismissalDate(request.dismissalDate());
-        return EmployeeDto.fromEmployee(employee);
+        return EmployeeResult.fromEmployee(employee);
     }
 
     @Transactional
-    public EmployeeDto rehire(Long id, LocalDate newHireDate) {
+    public EmployeeResult rehire(Long id, LocalDate newHireDate) {
         Employee employee = getEmployee(id);
         employee.setHireDate(newHireDate);
         employee.setDismissalDate(null);
-        return EmployeeDto.fromEmployee(employee);
+        return EmployeeResult.fromEmployee(employee);
     }
 
     @Transactional

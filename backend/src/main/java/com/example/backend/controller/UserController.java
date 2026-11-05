@@ -3,7 +3,7 @@ package com.example.backend.controller;
 import com.example.backend.dto.user.ChangePasswordRequest;
 import com.example.backend.dto.user.CreateUserRequest;
 import com.example.backend.dto.user.UpdateRoleRequest;
-import com.example.backend.dto.user.UserDto;
+import com.example.backend.dto.user.UserResult;
 import com.example.backend.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -20,22 +20,22 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping
-    public ResponseEntity<UserDto> create(@RequestBody CreateUserRequest request) {
+    public ResponseEntity<UserResult> create(@RequestBody CreateUserRequest request) {
         return ResponseEntity.ok(userService.create(request));
     }
 
     @GetMapping
-    public ResponseEntity<List<UserDto>> findAll() {
+    public ResponseEntity<List<UserResult>> findAll() {
         return ResponseEntity.ok(userService.findAll());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<UserDto> findById(@PathVariable Long id) {
+    public ResponseEntity<UserResult> findById(@PathVariable Long id) {
         return ResponseEntity.ok(userService.findById(id));
     }
 
     @PatchMapping("/{id}/role")
-    public ResponseEntity<UserDto> updateRole(@PathVariable Long id, @RequestBody UpdateRoleRequest request) {
+    public ResponseEntity<UserResult> updateRole(@PathVariable Long id, @RequestBody UpdateRoleRequest request) {
         return ResponseEntity.ok(userService.updateRole(id, request.role()));
     }
 

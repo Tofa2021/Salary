@@ -4,7 +4,7 @@ import com.example.backend.model.employee.Employee;
 
 import java.time.LocalDate;
 
-public record EmployeeDto(
+public record EmployeeResult(
         Long id,
         String personnelNumber,
         String surname,
@@ -20,8 +20,8 @@ public record EmployeeDto(
         Long positionId,
         String positionName
 ) {
-    public static EmployeeDto fromEmployee(Employee employee) {
-        return new EmployeeDto(
+    public static EmployeeResult fromEmployee(Employee employee) {
+        return new EmployeeResult(
                 employee.getId(),
                 employee.getPersonnelNumber(),
                 employee.getSurname(),

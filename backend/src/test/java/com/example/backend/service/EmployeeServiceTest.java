@@ -1,7 +1,7 @@
 package com.example.backend.service;
 
 import com.example.backend.dto.employee.CreateEmployeeRequest;
-import com.example.backend.dto.employee.EmployeeDto;
+import com.example.backend.dto.employee.EmployeeResult;
 import com.example.backend.exception.alreadyExists.EmployeePersonnelNumberAlreadyExistsException;
 import com.example.backend.exception.notFound.DepartmentNotFoundException;
 import com.example.backend.exception.notFound.PositionNotFoundException;
@@ -115,7 +115,7 @@ class EmployeeServiceTest {
             return saved;
         });
 
-        EmployeeDto result = employeeService.create(request);
+        EmployeeResult result = employeeService.create(request);
 
         assertThat(result).isNotNull();
         assertThat(result.id()).isEqualTo(id);

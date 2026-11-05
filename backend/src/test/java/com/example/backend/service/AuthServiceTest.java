@@ -1,6 +1,6 @@
 package com.example.backend.service;
 
-import com.example.backend.dto.auth.AuthResponse;
+import com.example.backend.dto.auth.AuthResult;
 import com.example.backend.dto.auth.LoginRequest;
 import com.example.backend.model.user.User;
 import com.example.backend.model.user.UserRole;
@@ -45,9 +45,9 @@ class AuthServiceTest {
         when(authenticationManager.authenticate(any())).thenReturn(auth);
         when(jwtService.generateToken(user.getUsername(), user.getRole().name())).thenReturn("jwt-token-123");
 
-        AuthResponse response = authService.login(new LoginRequest(user.getUsername(), user.getPassword()));
+        AuthResult response = authService.login(new LoginRequest(user.getUsername(), user.getPassword()));
 
-        assertThat(response.token()).isEqualTo("jwt-token-123");
+        assertThat(response.accessToken()).isEqualTo("jwt-token-123");
         assertThat(response.username()).isEqualTo("test");
         assertThat(response.role().name()).isEqualTo("ADMIN");
     }
