@@ -1,11 +1,19 @@
 package com.example.backend.model.employee;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Entity
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "employment_contracts")
 public class EmploymentContract {
     @Id
@@ -30,4 +38,28 @@ public class EmploymentContract {
 
     @Column(name = "is_main_job")
     private boolean mainJob;
+
+    public EmploymentContract(
+            Employee employee,
+            String contractNumber,
+            LocalDate startDate,
+            LocalDate endDate,
+            ContractType contractType,
+            BigDecimal baseSalary,
+            BigDecimal hourlyRate,
+            BigDecimal bonusPercent,
+            int workHoursPerWeek,
+            boolean mainJob
+    ) {
+        this.employee = employee;
+        this.contractNumber = contractNumber;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.contractType = contractType;
+        this.baseSalary = baseSalary;
+        this.hourlyRate = hourlyRate;
+        this.bonusPercent = bonusPercent;
+        this.workHoursPerWeek = workHoursPerWeek;
+        this.mainJob = mainJob;
+    }
 }
