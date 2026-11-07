@@ -4,9 +4,12 @@ package com.example.backend.service;
 import com.example.backend.dto.department.CreateDepartmentRequest;
 import com.example.backend.dto.department.DepartmentResult;
 import com.example.backend.dto.department.UpdateDepartmentRequest;
+import com.example.backend.exception.alreadyExists.DepartmentCodeAlreadyExistsException;
+import com.example.backend.exception.alreadyExists.DepartmentNameAlreadyExistsException;
 import com.example.backend.exception.notFound.DepartmentNotFoundException;
 import com.example.backend.model.employee.Department;
 import com.example.backend.repository.DepartmentRepository;
+import com.example.backend.repository.EmployeeRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,9 +20,18 @@ import java.util.List;
 @RequiredArgsConstructor
 public class DepartmentService {
     private final DepartmentRepository departmentRepository;
+    private final EmployeeRepository employeeRepository;
 
     @Transactional
     public DepartmentResult create(CreateDepartmentRequest request) {
+        if (departmentRepository.existsByName(request.name())) {
+            throw new DepartmentNameAlreadyExistsException(request.name());
+        }
+
+        if (departmentRepository.existsByCode(request.code())) {
+            throw new DepartmentCodeAlreadyExistsException(request.code());
+        }
+
         Department parentDepartment = null;
         if (request.parentId() != null) {
             parentDepartment = findById(request.parentId());
@@ -80,10 +92,14 @@ public class DepartmentService {
     public void delete(Long id) {
         Department department = findById(id);
 
-        /* TODO
-           - check children
-           - check employees
-         */
+        if (employeeRepository.countByDepartmentId(id) > 0) {
+            throw new IllegalArgumentException("Cannot delete department cause is has employees");
+        }
+
+        if (departmentRepository.countByParentId(id) > 0) {
+            throw new IllegalArgumentException("Cannot delete department cause it has children departments");
+        }
+
         departmentRepository.delete(department);
     }
 
