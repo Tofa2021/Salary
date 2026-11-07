@@ -3,9 +3,7 @@ package com.example.backend.service;
 import com.example.backend.dto.department.CreateDepartmentRequest;
 import com.example.backend.dto.department.DepartmentResult;
 import com.example.backend.dto.department.UpdateDepartmentRequest;
-import com.example.backend.exception.department.DepartmentCodeAlreadyExistsException;
-import com.example.backend.exception.department.DepartmentNameAlreadyExistsException;
-import com.example.backend.exception.department.DepartmentNotFoundException;
+import com.example.backend.exception.department.*;
 import com.example.backend.model.employee.Department;
 import com.example.backend.model.employee.Employee;
 import com.example.backend.repository.DepartmentRepository;
@@ -325,7 +323,7 @@ class DepartmentServiceTest {
         when(departmentRepository.findById(department.getId())).thenReturn(Optional.of(department));
 
         assertThatThrownBy(() -> departmentService.update(department.getId(), request))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(DepartmentSelfParentException.class);
 
         verify(departmentRepository, never()).save(any());
     }
@@ -343,7 +341,7 @@ class DepartmentServiceTest {
         when(departmentRepository.findById(descendant.getId())).thenReturn(Optional.of(descendant));
 
         assertThatThrownBy(() -> departmentService.update(department.getId(), request))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(DepartmentCycleException.class);
 
         verify(departmentRepository, never()).save(any());
     }
@@ -371,14 +369,14 @@ class DepartmentServiceTest {
     }
 
     @Test
-    void delete_HasChildrenDepartments_Throws() {
+    void delete_HasChildDepartments_Throws() {
         Department department = new Department(1L, "Department", "D-001", null, List.of());
         when(departmentRepository.findById(department.getId())).thenReturn(Optional.of(department));
         when(employeeRepository.countByDepartmentId(department.getId())).thenReturn(0L);
         when(departmentRepository.countByParentId(department.getId())).thenReturn(1L);
 
         assertThatThrownBy(() -> departmentService.delete(department.getId()))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(DepartmentHasChildrenException.class);
 
         verify(departmentRepository, never()).delete(any());
     }
@@ -392,7 +390,7 @@ class DepartmentServiceTest {
         when(employeeRepository.countByDepartmentId(department.getId())).thenReturn(1L);
 
         assertThatThrownBy(() -> departmentService.delete(department.getId()))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(DepartmentHasEmployeesException.class);
 
         verify(departmentRepository, never()).delete(any());
     }

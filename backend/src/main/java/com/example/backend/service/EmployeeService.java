@@ -4,10 +4,8 @@ import com.example.backend.dto.employee.CreateEmployeeRequest;
 import com.example.backend.dto.employee.DismissRequest;
 import com.example.backend.dto.employee.EmployeeResult;
 import com.example.backend.dto.employee.UpdateEmployeeRequest;
-import com.example.backend.exception.ApplicationException;
 import com.example.backend.exception.department.DepartmentNotFoundException;
-import com.example.backend.exception.employee.EmployeeNotFoundException;
-import com.example.backend.exception.employee.EmployeePersonnelNumberAlreadyExistsException;
+import com.example.backend.exception.employee.*;
 import com.example.backend.exception.position.PositionNotFoundException;
 import com.example.backend.model.employee.Department;
 import com.example.backend.model.employee.Employee;
@@ -158,7 +156,7 @@ public class EmployeeService {
         try {
             return EmploymentType.valueOf(value);
         } catch (IllegalArgumentException ex) {
-            throw new IllegalArgumentException("Unknown employmentType: " + value);
+            throw new UnknownEmploymentTypeException(value);
         }
     }
 
@@ -166,7 +164,7 @@ public class EmployeeService {
         Employee employee = findEmployee(employeeId);
 
         if (employee.getDismissalDate() != null) {
-            throw new ApplicationException("Employee dismissed"); // TODO BadRequest
+            throw new EmployeeDismissedException(employeeId);
         }
 
         Department newDepartment = findDepartment(newDepartmentId);
@@ -185,12 +183,12 @@ public class EmployeeService {
                 .orElseThrow(() -> new EmployeeNotFoundException(employeeId));
 
         if (employee.getDismissalDate() != null) {
-            throw new ApplicationException("Employee dismissed"); // TODO BadRequest
+            throw new EmployeeDismissedException(employeeId);
         }
 
         Department department = employee.getDepartment();
         if (department == null) {
-            throw new ApplicationException("Employee does not have department");
+            throw new EmployeeWithoutDepartmentException(employeeId);
         }
 
         department.getEmployees().remove(employee);
@@ -205,12 +203,12 @@ public class EmployeeService {
                 .orElseThrow(() -> new EmployeeNotFoundException(employeeId));
 
         if (employee.getDismissalDate() != null) {
-            throw new ApplicationException("Employee dismissed"); // TODO BadRequest
+            throw new EmployeeDismissedException(employeeId);
         }
 
         Department oldDepartment = employee.getDepartment();
         if (oldDepartment != null) {
-            throw new ApplicationException("Employee already in department");
+            throw new EmployeeAlreadyInDepartmentException(employeeId);
         }
 
         Department newDepartment = findDepartment(id);

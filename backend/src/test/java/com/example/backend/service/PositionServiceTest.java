@@ -2,6 +2,9 @@ package com.example.backend.service;
 
 import com.example.backend.dto.position.PositionRequest;
 import com.example.backend.dto.position.PositionResult;
+import com.example.backend.exception.position.InvalidPositionNameException;
+import com.example.backend.exception.position.InvalidTariffCategoryException;
+import com.example.backend.exception.position.InvalidTariffCoefficientException;
 import com.example.backend.exception.position.PositionNotFoundException;
 import com.example.backend.exception.tariffrate.TariffRateNotFoundException;
 import com.example.backend.model.employee.Position;
@@ -118,7 +121,7 @@ class PositionServiceTest {
                 ""
         );
 
-        assertThatThrownBy(() -> positionService.create(request)).isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> positionService.create(request)).isInstanceOf(InvalidTariffCategoryException.class);
 
         verify(positionRepository, never()).save(any());
     }
@@ -133,7 +136,7 @@ class PositionServiceTest {
                 ""
         );
 
-        assertThatThrownBy(() -> positionService.create(request)).isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> positionService.create(request)).isInstanceOf(InvalidTariffCoefficientException.class);
 
         verify(positionRepository, never()).save(any());
     }
@@ -322,7 +325,7 @@ class PositionServiceTest {
         when(positionRepository.findById(1L)).thenReturn(Optional.of(position));
 
         assertThatThrownBy(() -> positionService.update(1L, positionRequest))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(InvalidTariffCategoryException.class);
 
         verify(positionRepository, never()).save(any());
     }
@@ -335,7 +338,7 @@ class PositionServiceTest {
         when(positionRepository.findById(1L)).thenReturn(Optional.of(position));
 
         assertThatThrownBy(() -> positionService.update(1L, positionRequest))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(InvalidTariffCoefficientException.class);
 
         verify(positionRepository, never()).save(any());
     }
@@ -348,7 +351,7 @@ class PositionServiceTest {
         when(positionRepository.findById(1L)).thenReturn(Optional.of(position));
 
         assertThatThrownBy(() -> positionService.update(1L, positionRequest))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(InvalidPositionNameException.class);
 
         verify(positionRepository, never()).save(any());
     }

@@ -2,6 +2,9 @@ package com.example.backend.service;
 
 import com.example.backend.dto.position.PositionRequest;
 import com.example.backend.dto.position.PositionResult;
+import com.example.backend.exception.position.InvalidPositionNameException;
+import com.example.backend.exception.position.InvalidTariffCategoryException;
+import com.example.backend.exception.position.InvalidTariffCoefficientException;
 import com.example.backend.exception.position.PositionNotFoundException;
 import com.example.backend.model.employee.Position;
 import com.example.backend.repository.PositionRepository;
@@ -56,7 +59,7 @@ public class PositionService {
 
         if (request.name() != null) {
             if (request.name().isBlank()) {
-                throw new IllegalArgumentException("New position name cannot be blank");
+                throw new InvalidPositionNameException(request.name());
             }
             position.setName(request.name());
         }
@@ -87,13 +90,13 @@ public class PositionService {
 
     private void checkTariffCategory(int tariffCategory) {
         if (tariffCategory < 1 || tariffCategory > 27) {
-            throw new IllegalArgumentException("Tariff category must be between 1 and 27");
+            throw new InvalidTariffCategoryException(tariffCategory);
         }
     }
 
     private void checkTariffCoefficient(BigDecimal tariffCoefficient) {
         if (tariffCoefficient.compareTo(BigDecimal.ONE) < 0) {
-            throw new IllegalArgumentException("Tariff coefficient cannot be lower than 1");
+            throw new InvalidTariffCoefficientException(tariffCoefficient);
         }
     }
 
