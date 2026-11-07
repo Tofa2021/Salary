@@ -2,11 +2,19 @@ package com.example.backend.model.payroll;
 
 import com.example.backend.model.employee.Employee;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Entity
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 @Table(name = "tax_deductions")
 public class TaxDeduction {
     @Id
@@ -24,4 +32,20 @@ public class TaxDeduction {
     private LocalDate validTo;
 
     private String documentNumber;
+
+    public TaxDeduction(
+            Employee employee,
+            DeductionType type,
+            BigDecimal amount,
+            LocalDate validFrom,
+            LocalDate validTo,
+            String documentNumber
+    ) {
+        this.employee = employee;
+        this.type = type;
+        this.amount = amount;
+        this.validFrom = validFrom;
+        this.validTo = validTo;
+        this.documentNumber = documentNumber;
+    }
 }
