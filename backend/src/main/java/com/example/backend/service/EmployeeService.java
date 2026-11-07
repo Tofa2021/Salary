@@ -153,6 +153,7 @@ public class EmployeeService {
     }
 
     private EmploymentType parseEmploymentType(String value) {
+        if (value == null) throw new UnknownEmploymentTypeException(null);
         try {
             return EmploymentType.valueOf(value);
         } catch (IllegalArgumentException ex) {
@@ -160,63 +161,40 @@ public class EmployeeService {
         }
     }
 
+    @Transactional
     public void transfer(Long newDepartmentId, Long employeeId) {
         Employee employee = findEmployee(employeeId);
-
         if (employee.getDismissalDate() != null) {
             throw new EmployeeDismissedException(employeeId);
         }
-
         Department newDepartment = findDepartment(newDepartmentId);
         Department oldDepartment = employee.getDepartment();
-
-        oldDepartment.getEmployees().remove(employee);
-        newDepartment.getEmployees().add(employee);
-
-        employeeRepository.save(employee);
-        departmentRepository.save(oldDepartment);
-        departmentRepository.save(newDepartment);
+        if (oldDepartment != null && oldDepartment.getId().equals(newDepartmentId)) {
+            throw new SameDepartmentException(employeeId, newDepartmentId);
+        }
+        employee.setDepartment(newDepartment);
     }
 
+    @Transactional
     public void removeFromDepartment(Long employeeId) {
-        Employee employee = employeeRepository.findById(employeeId)
-                .orElseThrow(() -> new EmployeeNotFoundException(employeeId));
-
+        Employee employee = findEmployee(employeeId);
         if (employee.getDismissalDate() != null) {
             throw new EmployeeDismissedException(employeeId);
         }
-
-        Department department = employee.getDepartment();
-        if (department == null) {
+        if (employee.getDepartment() == null) {
             throw new EmployeeWithoutDepartmentException(employeeId);
         }
-
-        department.getEmployees().remove(employee);
         employee.setDepartment(null);
-
-        employeeRepository.save(employee);
-        departmentRepository.save(department);
     }
 
-    public void addToDepartment(Long id, Long employeeId) {
-        Employee employee = employeeRepository.findById(employeeId)
-                .orElseThrow(() -> new EmployeeNotFoundException(employeeId));
-
-        if (employee.getDismissalDate() != null) {
-            throw new EmployeeDismissedException(employeeId);
-        }
-
-        Department oldDepartment = employee.getDepartment();
-        if (oldDepartment != null) {
+    @Transactional
+    public void addToDepartment(Long departmentId, Long employeeId) {
+        Employee employee = findEmployee(employeeId);
+        if (employee.getDismissalDate() != null) throw new EmployeeDismissedException(employeeId);
+        if (employee.getDepartment() != null) {
             throw new EmployeeAlreadyInDepartmentException(employeeId);
         }
-
-        Department newDepartment = findDepartment(id);
-
-        newDepartment.getEmployees().add(employee);
+        Department newDepartment = findDepartment(departmentId);
         employee.setDepartment(newDepartment);
-
-        employeeRepository.save(employee);
-        departmentRepository.save(newDepartment);
     }
 }
