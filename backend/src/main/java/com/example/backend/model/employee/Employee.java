@@ -3,7 +3,9 @@ package com.example.backend.model.employee;
 import com.example.backend.model.payroll.PayrollRecord;
 import com.example.backend.model.timesheet.TimeSheetEntry;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
@@ -12,6 +14,8 @@ import java.util.List;
 @Entity
 @Getter
 @Setter
+@AllArgsConstructor
+@NoArgsConstructor
 @Table(name = "employees")
 public class Employee {
     @Id

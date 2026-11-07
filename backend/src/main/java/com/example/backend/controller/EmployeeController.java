@@ -29,25 +29,25 @@ public class EmployeeController {
     @GetMapping
     @PreAuthorize("hasAnyRole('ADMIN', 'HR', 'ACCOUNTANT', 'ANALYST')")
     public ResponseEntity<Page<EmployeeResult>> findAll(Pageable pageable) {
-        return ResponseEntity.ok(employeeService.findAll(pageable));
+        return ResponseEntity.ok(employeeService.getAll(pageable));
     }
 
     @GetMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMIN', 'HR', 'ACCOUNTANT', 'ANALYST')")
     public ResponseEntity<EmployeeResult> findById(@PathVariable Long id) {
-        return ResponseEntity.ok(employeeService.findById(id));
+        return ResponseEntity.ok(employeeService.getById(id));
     }
 
     @GetMapping("/by-personnel-number/{pn}")
     @PreAuthorize("hasAnyRole('ADMIN', 'HR', 'ACCOUNTANT')")
     public ResponseEntity<EmployeeResult> findByPersonnelNumber(@PathVariable String pn) {
-        return ResponseEntity.ok(employeeService.findByPersonnelNumber(pn));
+        return ResponseEntity.ok(employeeService.getByPersonnelNumber(pn));
     }
 
     @GetMapping("/by-department/{departmentId}")
     @PreAuthorize("hasAnyRole('ADMIN', 'HR', 'ACCOUNTANT', 'ANALYST')")
     public ResponseEntity<Page<EmployeeResult>> findByDepartment(@PathVariable Long departmentId, Pageable pageable) {
-        return ResponseEntity.ok(employeeService.findByDepartment(departmentId, pageable));
+        return ResponseEntity.ok(employeeService.getByDepartment(departmentId, pageable));
     }
 
     @PutMapping("/{id}")
