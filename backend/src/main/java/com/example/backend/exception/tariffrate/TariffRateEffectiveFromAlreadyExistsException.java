@@ -1,6 +1,6 @@
-package com.example.backend.exception;
+package com.example.backend.exception.tariffrate;
 
-import com.example.backend.exception.alreadyExists.AlreadyExistsException;
+import com.example.backend.exception.AlreadyExistsException;
 
 import java.time.LocalDate;
 

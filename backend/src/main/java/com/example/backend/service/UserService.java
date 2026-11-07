@@ -2,9 +2,9 @@ package com.example.backend.service;
 
 import com.example.backend.dto.user.CreateUserRequest;
 import com.example.backend.dto.user.UserResult;
-import com.example.backend.exception.LastAdminException;
-import com.example.backend.exception.alreadyExists.UserAlreadyExistsException;
-import com.example.backend.exception.notFound.UserNotFoundException;
+import com.example.backend.exception.user.LastAdminException;
+import com.example.backend.exception.user.UserAlreadyExistsException;
+import com.example.backend.exception.user.UserNotFoundException;
 import com.example.backend.model.user.User;
 import com.example.backend.model.user.UserRole;
 import com.example.backend.repository.UserRepository;
@@ -32,7 +32,7 @@ public class UserService {
                 passwordEncoder.encode(request.password()),
                 request.role() == null ? UserRole.VIEWER : request.role()
         );
-        
+
         return UserResult.fromUser(userRepository.save(user));
     }
 

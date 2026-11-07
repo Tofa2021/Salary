@@ -2,7 +2,7 @@ package com.example.backend.service;
 
 import com.example.backend.dto.position.PositionRequest;
 import com.example.backend.dto.position.PositionResult;
-import com.example.backend.exception.notFound.PositionNotFoundException;
+import com.example.backend.exception.position.PositionNotFoundException;
 import com.example.backend.model.employee.Position;
 import com.example.backend.repository.PositionRepository;
 import lombok.RequiredArgsConstructor;

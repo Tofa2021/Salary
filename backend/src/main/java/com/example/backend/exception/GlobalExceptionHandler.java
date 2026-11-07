@@ -1,49 +1,51 @@
 package com.example.backend.exception;
 
-import com.example.backend.exception.notFound.NotFoundException;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
+import com.example.backend.exception.auth.UnauthorizedException;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 
-import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
-    @ExceptionHandler({NotFoundException.class})
+
+    @ExceptionHandler(NotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public Object handleNotFoundException(NotFoundException e, WebRequest request) {
-        return newException(e, request);
+    public ErrorResponse handleNotFound(NotFoundException exception, WebRequest request) {
+        return ErrorResponse.of(exception, request.getDescription(false));
     }
 
-    private Object newException(RuntimeException exception, WebRequest request) {
-        final String message = exception.getMessage();
-        if (message == null) {
-            return new ExceptionDTO(exception.getClass().getName(), request.getDescription(false));
-        }
-
-        return new InfoExceptionDTO(exception.getClass().getName(), message, request.getDescription(false));
+    @ExceptionHandler(InvalidStateException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleInvalidState(InvalidStateException exception, WebRequest request) {
+        return ErrorResponse.of(exception, request.getDescription(false));
     }
 
-    @AllArgsConstructor
-    @Data
-    private static class ExceptionDTO {
-        final Date date = new Date();
-        String type;
-        String description;
+    @ExceptionHandler(ConflictException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ErrorResponse handleConflict(ConflictException exception, WebRequest request) {
+        return ErrorResponse.of(exception, request.getDescription(false));
     }
 
-    @AllArgsConstructor
-    @Builder
-    @Data
-    private static class InfoExceptionDTO {
-        final Date date = new Date();
-        String type;
-        String info;
-        String description;
+    @ExceptionHandler(UnauthorizedException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public ErrorResponse handleUnauthorized(UnauthorizedException exception, WebRequest request) {
+        return ErrorResponse.of(exception, request.getDescription(false));
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleValidation(MethodArgumentNotValidException exception, WebRequest request) {
+        Map<String, String> fields = new HashMap<>();
+        exception.getBindingResult().getFieldErrors()
+                .forEach(error -> fields.put(error.getField(), error.getDefaultMessage()));
+        ErrorResponse response = ErrorResponse.of(exception, request.getDescription(false));
+        response.setFields(fields);
+        return response;
     }
 }

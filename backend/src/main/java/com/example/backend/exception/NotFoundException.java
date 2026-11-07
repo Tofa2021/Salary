@@ -1,8 +1,6 @@
-package com.example.backend.exception.notFound;
+package com.example.backend.exception;
 
-import com.example.backend.exception.BusinessException;
-
-public class NotFoundException extends BusinessException {
+public abstract class NotFoundException extends ApplicationException {
     public NotFoundException(String message) {
         super(message);
     }

@@ -1,4 +1,6 @@
-package com.example.backend.exception.notFound;
+package com.example.backend.exception.tariffrate;
+
+import com.example.backend.exception.NotFoundException;
 
 public class TariffRateNotFoundException extends NotFoundException {
     public TariffRateNotFoundException(Long id) {
