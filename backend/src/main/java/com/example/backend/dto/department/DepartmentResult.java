@@ -11,7 +11,7 @@ public record DepartmentResult(Long id, String name, String code, Long parentId,
                 department.getId(),
                 department.getName(),
                 department.getCode(),
-                department.getParent().getId(),
+                department.getParent() == null ? null : department.getParent().getId(),
                 department.getEmployees().stream().map(Employee::getId).toList()
         );
     }

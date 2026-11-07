@@ -1,6 +1,6 @@
 package com.example.backend.controller;
 
-import com.example.backend.dto.department.DepartmentRequest;
+import com.example.backend.dto.department.CreateDepartmentRequest;
 import com.example.backend.dto.department.DepartmentResult;
 import com.example.backend.service.DepartmentService;
 import lombok.RequiredArgsConstructor;
@@ -26,7 +26,7 @@ public class DepartmentController {
     }
 
     @PostMapping
-    private ResponseEntity<DepartmentResult> create(@RequestBody DepartmentRequest request) {
+    private ResponseEntity<DepartmentResult> create(@RequestBody CreateDepartmentRequest request) {
         return ResponseEntity.ok(departmentService.create(request));
     }
 }
