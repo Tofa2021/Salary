@@ -22,4 +22,11 @@ public class Position {
     private BigDecimal tariffCoefficient;
 
     private String qualificationRequirements;
+
+    public Position(String name, int tariffCategory, BigDecimal tariffCoefficient, String qualificationRequirements) {
+        this.name = name;
+        this.tariffCategory = tariffCategory;
+        this.tariffCoefficient = tariffCoefficient;
+        this.qualificationRequirements = qualificationRequirements;
+    }
 }
