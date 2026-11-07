@@ -12,6 +12,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -32,6 +33,7 @@ public class AuthService {
         return new AuthResult(access, refresh, user.getUsername(), user.getRole());
     }
 
+    @Transactional
     public AuthResult refresh(String refreshToken) {
         RefreshToken rt = refreshTokenService.verify(refreshToken);
         User user = rt.getUser();

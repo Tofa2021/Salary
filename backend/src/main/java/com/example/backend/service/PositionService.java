@@ -78,6 +78,7 @@ public class PositionService {
         return PositionResult.fromPosition(positionRepository.save(position));
     }
 
+    @Transactional(readOnly = true)
     public BigDecimal calculateBaseSalary(Long positionId, LocalDate date) {
         Position position = findById(positionId);
         BigDecimal baseRate = tariffRateService.getBaseRateOn(date);

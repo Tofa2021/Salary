@@ -32,8 +32,8 @@ public class UserService {
                 passwordEncoder.encode(request.password()),
                 request.role() == null ? UserRole.VIEWER : request.role()
         );
-        userRepository.save(user);
-        return UserResult.fromUser(user);
+        
+        return UserResult.fromUser(userRepository.save(user));
     }
 
     @Transactional(readOnly = true)
