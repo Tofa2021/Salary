@@ -1,5 +1,6 @@
 package com.example.backend.security;
 
+import com.example.backend.exception.auth.UnauthorizedException;
 import com.example.backend.model.auth.RefreshToken;
 import com.example.backend.model.user.User;
 import com.example.backend.repository.RefreshTokenRepository;
@@ -39,13 +40,13 @@ public class RefreshTokenService {
     @Transactional(readOnly = true)
     public RefreshToken verify(String token) {
         RefreshToken refreshToken = refreshTokenRepository.findByToken(token)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid refresh token"));
+                .orElseThrow(() -> new UnauthorizedException("Invalid refresh token"));
 
         if (refreshToken.isRevoked()) {
-            throw new IllegalArgumentException("Refresh token revoked");
+            throw new UnauthorizedException("Refresh token revoked");
         }
         if (refreshToken.getExpiresAt().isBefore(LocalDateTime.now())) {
-            throw new IllegalArgumentException("Refresh token expired");
+            throw new UnauthorizedException("Refresh token expired");
         }
         return refreshToken;
     }

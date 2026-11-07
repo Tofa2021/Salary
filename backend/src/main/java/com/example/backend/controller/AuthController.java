@@ -27,12 +27,8 @@ public class AuthController {
 
     @PostMapping("/refresh")
     public ResponseEntity<AuthResult> refresh(@RequestBody RefreshRequest request) {
-        try {
-            AuthResult result = authService.refresh(request.refreshToken());
-            return ResponseEntity.ok(result);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
+        AuthResult result = authService.refresh(request.refreshToken());
+        return ResponseEntity.ok(result);
     }
 
     @PostMapping("/logout")

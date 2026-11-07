@@ -6,6 +6,7 @@ import com.example.backend.dto.employee.UpdateEmployeeRequest;
 import com.example.backend.exception.department.DepartmentNotFoundException;
 import com.example.backend.exception.employee.EmployeeNotFoundException;
 import com.example.backend.exception.employee.EmployeePersonnelNumberAlreadyExistsException;
+import com.example.backend.exception.employee.UnknownEmploymentTypeException;
 import com.example.backend.exception.position.PositionNotFoundException;
 import com.example.backend.model.employee.*;
 import com.example.backend.repository.DepartmentRepository;
@@ -208,7 +209,7 @@ class EmployeeServiceTest {
     }
 
     @Test
-    void create_invalidEmploymentType_throwsIllegalArgument() {
+    void create_InvalidEmploymentType_Throws() {
         when(employeeRepository.existsByPersonnelNumber(any())).thenReturn(false);
         when(departmentRepository.findById(any())).thenReturn(Optional.of(department()));
         when(positionRepository.findById(any())).thenReturn(Optional.of(position()));
@@ -218,7 +219,7 @@ class EmployeeServiceTest {
                 LocalDate.now(), 1L, 1L, "INVALID_TYPE");
 
         assertThatThrownBy(() -> employeeService.create(request))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(UnknownEmploymentTypeException.class)
                 .hasMessageContaining("INVALID_TYPE");
 
         verify(employeeRepository, never()).save(any());

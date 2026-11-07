@@ -6,6 +6,7 @@ import com.example.backend.dto.tariffRate.TariffRateResult;
 import com.example.backend.dto.tariffRate.UpdateTariffRateRequest;
 import com.example.backend.exception.tariffrate.TariffRateEffectiveFromAlreadyExistsException;
 import com.example.backend.exception.tariffrate.TariffRateNotFoundException;
+import com.example.backend.exception.tariffrate.TariffRatePeriodOverlapException;
 import com.example.backend.model.employee.TariffRate;
 import com.example.backend.repository.TariffRateRepository;
 import lombok.RequiredArgsConstructor;
@@ -32,9 +33,7 @@ public class TariffRateService {
                 .ifPresent(previous -> {
                     LocalDate newEnd = request.effectiveFrom().minusDays(1);
                     if (previous.getEffectiveFrom().isAfter(newEnd)) {
-                        throw new IllegalStateException(
-                                "New effectiveFrom " + request.effectiveFrom()
-                                        + " is before previous effectiveFrom " + previous.getEffectiveFrom());
+                        throw new TariffRatePeriodOverlapException(request.effectiveFrom(), previous.getEffectiveFrom());
                     }
                     previous.setEffectiveTo(newEnd);
                 });
