@@ -2,8 +2,16 @@ package com.example.backend.model.timesheet;
 
 import com.example.backend.model.employee.Employee;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
+@Setter
 @Table(name = "time_sheet_entries")
 public class TimeSheetEntry {
     @Id
@@ -24,4 +32,28 @@ public class TimeSheetEntry {
     private Integer absentDays;
     private Integer overtimeHours;
     private Integer nightHours;
+
+    public TimeSheetEntry(
+            TimeSheet timeSheet,
+            Employee employee,
+            Integer workedDays,
+            Integer workedHours,
+            Integer vacationDays,
+            Integer sickLeaveDays,
+            Integer businessTripDays,
+            Integer absentDays,
+            Integer overtimeHours,
+            Integer nightHours
+    ) {
+        this.timeSheet = timeSheet;
+        this.employee = employee;
+        this.workedDays = workedDays;
+        this.workedHours = workedHours;
+        this.vacationDays = vacationDays;
+        this.sickLeaveDays = sickLeaveDays;
+        this.businessTripDays = businessTripDays;
+        this.absentDays = absentDays;
+        this.overtimeHours = overtimeHours;
+        this.nightHours = nightHours;
+    }
 }
