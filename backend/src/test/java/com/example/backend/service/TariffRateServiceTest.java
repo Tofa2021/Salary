@@ -1,13 +1,14 @@
 package com.example.backend.service;
 
-import com.example.backend.dto.tariffRate.CreateTariffRateRequest;
-import com.example.backend.dto.tariffRate.TariffRateEffectiveResult;
-import com.example.backend.dto.tariffRate.TariffRateResult;
-import com.example.backend.dto.tariffRate.UpdateTariffRateRequest;
-import com.example.backend.exception.tariffrate.TariffRateEffectiveFromAlreadyExistsException;
-import com.example.backend.exception.tariffrate.TariffRateNotFoundException;
-import com.example.backend.model.employee.TariffRate;
-import com.example.backend.repository.TariffRateRepository;
+import com.example.backend.shared.dto.tariffRate.CreateTariffRateRequest;
+import com.example.backend.shared.dto.tariffRate.TariffRateEffectiveResult;
+import com.example.backend.shared.dto.tariffRate.TariffRateResult;
+import com.example.backend.shared.dto.tariffRate.UpdateTariffRateRequest;
+import com.example.backend.payroll.exception.tariffrate.TariffRateEffectiveFromAlreadyExistsException;
+import com.example.backend.payroll.exception.tariffrate.TariffRateNotFoundException;
+import com.example.backend.payroll.model.TariffRate;
+import com.example.backend.payroll.repository.TariffRateRepository;
+import com.example.backend.payroll.service.TariffRateService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;

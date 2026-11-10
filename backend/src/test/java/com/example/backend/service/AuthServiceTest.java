@@ -1,12 +1,13 @@
 package com.example.backend.service;
 
-import com.example.backend.dto.auth.AuthResult;
-import com.example.backend.dto.auth.LoginRequest;
-import com.example.backend.model.user.User;
-import com.example.backend.model.user.UserRole;
-import com.example.backend.security.CustomUserDetails;
-import com.example.backend.security.JwtService;
-import com.example.backend.security.RefreshTokenService;
+import com.example.backend.auth.model.User;
+import com.example.backend.auth.model.UserRole;
+import com.example.backend.auth.service.AuthService;
+import com.example.backend.shared.dto.auth.AuthResult;
+import com.example.backend.shared.dto.auth.LoginRequest;
+import com.example.backend.shared.security.CustomUserDetails;
+import com.example.backend.shared.security.JwtService;
+import com.example.backend.shared.security.RefreshTokenService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;

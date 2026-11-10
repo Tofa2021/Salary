@@ -1,14 +1,16 @@
 package com.example.backend.service;
 
-import com.example.backend.dto.position.PositionRequest;
-import com.example.backend.dto.position.PositionResult;
-import com.example.backend.exception.position.InvalidPositionNameException;
-import com.example.backend.exception.position.InvalidTariffCategoryException;
-import com.example.backend.exception.position.InvalidTariffCoefficientException;
-import com.example.backend.exception.position.PositionNotFoundException;
-import com.example.backend.exception.tariffrate.TariffRateNotFoundException;
-import com.example.backend.model.employee.Position;
-import com.example.backend.repository.PositionRepository;
+import com.example.backend.shared.dto.position.PositionRequest;
+import com.example.backend.shared.dto.position.PositionResult;
+import com.example.backend.payroll.exception.tariffrate.TariffRateNotFoundException;
+import com.example.backend.payroll.service.TariffRateService;
+import com.example.backend.position.Position;
+import com.example.backend.position.PositionRepository;
+import com.example.backend.position.PositionService;
+import com.example.backend.position.exception.InvalidPositionNameException;
+import com.example.backend.position.exception.InvalidTariffCategoryException;
+import com.example.backend.position.exception.InvalidTariffCoefficientException;
+import com.example.backend.position.exception.PositionNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;

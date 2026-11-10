@@ -1,11 +1,11 @@
 package com.example.backend.service.deduction;
 
-import com.example.backend.dto.deduction.DeductionResult;
-import com.example.backend.dto.deduction.UpdateDeductionRequest;
-import com.example.backend.exception.deduction.DeductionNotFoundException;
-import com.example.backend.exception.deduction.InvalidDeductionPeriodException;
-import com.example.backend.model.employee.Employee;
-import com.example.backend.model.payroll.TaxDeduction;
+import com.example.backend.employee.domain.model.Employee;
+import com.example.backend.payroll.exception.deduction.DeductionNotFoundException;
+import com.example.backend.payroll.exception.deduction.InvalidDeductionPeriodException;
+import com.example.backend.payroll.model.TaxDeduction;
+import com.example.backend.shared.dto.deduction.DeductionResult;
+import com.example.backend.shared.dto.deduction.UpdateDeductionRequest;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;

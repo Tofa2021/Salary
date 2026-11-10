@@ -1,7 +1,7 @@
 package com.example.backend.service.deduction;
 
-import com.example.backend.model.employee.Employee;
-import com.example.backend.model.payroll.TaxDeduction;
+import com.example.backend.employee.domain.model.Employee;
+import com.example.backend.payroll.model.TaxDeduction;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;

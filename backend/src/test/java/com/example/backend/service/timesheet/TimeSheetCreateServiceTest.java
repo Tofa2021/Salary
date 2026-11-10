@@ -1,11 +1,11 @@
 package com.example.backend.service.timesheet;
 
-import com.example.backend.dto.timesheet.TimeSheetResult;
-import com.example.backend.exception.department.DepartmentNotFoundException;
-import com.example.backend.exception.timesheet.TimeSheetAlreadyExistsException;
-import com.example.backend.model.employee.Department;
-import com.example.backend.model.employee.Employee;
-import com.example.backend.model.timesheet.TimeSheet;
+import com.example.backend.department.Department;
+import com.example.backend.department.exception.DepartmentNotFoundException;
+import com.example.backend.employee.domain.model.Employee;
+import com.example.backend.shared.dto.timesheet.TimeSheetResult;
+import com.example.backend.timesheet.exception.TimeSheetAlreadyExistsException;
+import com.example.backend.timesheet.model.TimeSheet;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;

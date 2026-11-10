@@ -1,13 +1,14 @@
 package com.example.backend.service;
 
-import com.example.backend.dto.user.CreateUserRequest;
-import com.example.backend.dto.user.UserResult;
-import com.example.backend.exception.user.LastAdminException;
-import com.example.backend.exception.user.UserAlreadyExistsException;
-import com.example.backend.exception.user.UserNotFoundException;
-import com.example.backend.model.user.User;
-import com.example.backend.model.user.UserRole;
-import com.example.backend.repository.UserRepository;
+import com.example.backend.auth.exception.user.LastAdminException;
+import com.example.backend.auth.exception.user.UserAlreadyExistsException;
+import com.example.backend.auth.exception.user.UserNotFoundException;
+import com.example.backend.auth.model.User;
+import com.example.backend.auth.model.UserRole;
+import com.example.backend.auth.repository.UserRepository;
+import com.example.backend.auth.service.UserService;
+import com.example.backend.shared.dto.user.CreateUserRequest;
+import com.example.backend.shared.dto.user.UserResult;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;

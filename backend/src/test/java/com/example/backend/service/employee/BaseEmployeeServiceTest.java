@@ -1,13 +1,17 @@
 package com.example.backend.service.employee;
 
-import com.example.backend.dto.employee.CreateEmployeeRequest;
-import com.example.backend.dto.employee.EmployeeResult;
-import com.example.backend.dto.employee.UpdateEmployeeRequest;
-import com.example.backend.model.employee.*;
-import com.example.backend.repository.DepartmentRepository;
-import com.example.backend.repository.EmployeeRepository;
-import com.example.backend.repository.PositionRepository;
-import com.example.backend.service.EmployeeService;
+import com.example.backend.department.Department;
+import com.example.backend.department.DepartmentRepository;
+import com.example.backend.employee.application.service.EmployeeService;
+import com.example.backend.employee.domain.model.Employee;
+import com.example.backend.employee.domain.model.EmploymentType;
+import com.example.backend.employee.domain.model.Gender;
+import com.example.backend.employee.infrastructure.repository.EmployeeRepository;
+import com.example.backend.position.Position;
+import com.example.backend.position.PositionRepository;
+import com.example.backend.shared.dto.employee.CreateEmployeeRequest;
+import com.example.backend.shared.dto.employee.EmployeeResult;
+import com.example.backend.shared.dto.employee.UpdateEmployeeRequest;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;

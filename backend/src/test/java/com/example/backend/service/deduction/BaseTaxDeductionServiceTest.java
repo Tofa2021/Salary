@@ -1,13 +1,13 @@
 package com.example.backend.service.deduction;
 
-import com.example.backend.dto.deduction.CreateDeductionRequest;
-import com.example.backend.dto.deduction.DeductionResult;
-import com.example.backend.model.employee.Employee;
-import com.example.backend.model.payroll.DeductionType;
-import com.example.backend.model.payroll.TaxDeduction;
-import com.example.backend.repository.EmployeeRepository;
-import com.example.backend.repository.TaxDeductionRepository;
-import com.example.backend.service.TaxDeductionService;
+import com.example.backend.employee.domain.model.Employee;
+import com.example.backend.employee.infrastructure.repository.EmployeeRepository;
+import com.example.backend.payroll.model.DeductionType;
+import com.example.backend.payroll.model.TaxDeduction;
+import com.example.backend.payroll.repository.TaxDeductionRepository;
+import com.example.backend.payroll.service.TaxDeductionService;
+import com.example.backend.shared.dto.deduction.CreateDeductionRequest;
+import com.example.backend.shared.dto.deduction.DeductionResult;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;

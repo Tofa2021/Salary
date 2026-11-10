@@ -1,8 +1,8 @@
 package com.example.backend.service.employee;
 
-import com.example.backend.dto.employee.EmployeeResult;
-import com.example.backend.exception.employee.EmployeeNotFoundException;
-import com.example.backend.model.employee.Employee;
+import com.example.backend.employee.domain.exception.employee.EmployeeNotFoundException;
+import com.example.backend.employee.domain.model.Employee;
+import com.example.backend.shared.dto.employee.EmployeeResult;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
