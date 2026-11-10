@@ -1,13 +1,14 @@
 package com.example.backend.service;
 
-import com.example.backend.dto.department.CreateDepartmentRequest;
-import com.example.backend.dto.department.DepartmentResult;
-import com.example.backend.dto.department.UpdateDepartmentRequest;
-import com.example.backend.exception.department.*;
-import com.example.backend.model.employee.Department;
-import com.example.backend.model.employee.Employee;
-import com.example.backend.repository.DepartmentRepository;
-import com.example.backend.repository.EmployeeRepository;
+import com.example.backend.department.Department;
+import com.example.backend.department.DepartmentRepository;
+import com.example.backend.department.DepartmentService;
+import com.example.backend.department.exception.*;
+import com.example.backend.employee.domain.model.Employee;
+import com.example.backend.employee.infrastructure.repository.EmployeeRepository;
+import com.example.backend.shared.dto.department.CreateDepartmentRequest;
+import com.example.backend.shared.dto.department.DepartmentResult;
+import com.example.backend.shared.dto.department.UpdateDepartmentRequest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;

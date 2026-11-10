@@ -1,8 +1,8 @@
 package com.example.backend.service.employmentcontract;
 
-import com.example.backend.exception.employmentcontract.EmploymentContractNotFoundException;
-import com.example.backend.model.employee.Employee;
-import com.example.backend.model.employee.EmploymentContract;
+import com.example.backend.employee.domain.exception.employmentcontract.EmploymentContractNotFoundException;
+import com.example.backend.employee.domain.model.Employee;
+import com.example.backend.employee.domain.model.EmploymentContract;
 import org.junit.jupiter.api.Test;
 
 import java.util.Optional;

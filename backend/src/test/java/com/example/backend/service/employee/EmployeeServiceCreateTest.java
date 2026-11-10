@@ -1,12 +1,12 @@
 package com.example.backend.service.employee;
 
-import com.example.backend.dto.employee.CreateEmployeeRequest;
-import com.example.backend.dto.employee.EmployeeResult;
-import com.example.backend.exception.department.DepartmentNotFoundException;
-import com.example.backend.exception.employee.EmployeePersonnelNumberAlreadyExistsException;
-import com.example.backend.exception.employee.UnknownEmploymentTypeException;
-import com.example.backend.exception.position.PositionNotFoundException;
-import com.example.backend.model.employee.Employee;
+import com.example.backend.department.exception.DepartmentNotFoundException;
+import com.example.backend.employee.domain.exception.employee.EmployeePersonnelNumberAlreadyExistsException;
+import com.example.backend.employee.domain.exception.employee.UnknownEmploymentTypeException;
+import com.example.backend.employee.domain.model.Employee;
+import com.example.backend.position.exception.PositionNotFoundException;
+import com.example.backend.shared.dto.employee.CreateEmployeeRequest;
+import com.example.backend.shared.dto.employee.EmployeeResult;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullSource;

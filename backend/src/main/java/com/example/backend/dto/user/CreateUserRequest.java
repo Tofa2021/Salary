@@ -1,6 +1,0 @@
-package com.example.backend.dto.user;
-
-import com.example.backend.model.user.UserRole;
-
-public record CreateUserRequest(String username, String password, UserRole role) {
-}

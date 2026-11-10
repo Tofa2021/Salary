@@ -1,11 +1,11 @@
 package com.example.backend.service.employee;
 
-import com.example.backend.exception.department.DepartmentNotFoundException;
-import com.example.backend.exception.employee.EmployeeDismissedException;
-import com.example.backend.exception.employee.EmployeeNotFoundException;
-import com.example.backend.exception.employee.SameDepartmentException;
-import com.example.backend.model.employee.Department;
-import com.example.backend.model.employee.Employee;
+import com.example.backend.department.Department;
+import com.example.backend.department.exception.DepartmentNotFoundException;
+import com.example.backend.employee.domain.exception.employee.EmployeeDismissedException;
+import com.example.backend.employee.domain.exception.employee.EmployeeNotFoundException;
+import com.example.backend.employee.domain.exception.employee.SameDepartmentException;
+import com.example.backend.employee.domain.model.Employee;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;

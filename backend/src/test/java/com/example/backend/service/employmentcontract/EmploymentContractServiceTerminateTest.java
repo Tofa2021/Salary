@@ -1,11 +1,11 @@
 package com.example.backend.service.employmentcontract;
 
-import com.example.backend.dto.employmentcontract.EmploymentContractResult;
-import com.example.backend.exception.employmentcontract.EmploymentContractAlreadyTerminatedException;
-import com.example.backend.exception.employmentcontract.EmploymentContractNotFoundException;
-import com.example.backend.exception.employmentcontract.InvalidEmploymentContractPeriodException;
-import com.example.backend.model.employee.Employee;
-import com.example.backend.model.employee.EmploymentContract;
+import com.example.backend.employee.domain.exception.employmentcontract.EmploymentContractAlreadyTerminatedException;
+import com.example.backend.employee.domain.exception.employmentcontract.EmploymentContractNotFoundException;
+import com.example.backend.employee.domain.exception.employmentcontract.InvalidEmploymentContractPeriodException;
+import com.example.backend.employee.domain.model.Employee;
+import com.example.backend.employee.domain.model.EmploymentContract;
+import com.example.backend.shared.dto.employmentcontract.EmploymentContractResult;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;

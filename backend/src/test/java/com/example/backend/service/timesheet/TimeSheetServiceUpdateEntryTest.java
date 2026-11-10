@@ -1,13 +1,13 @@
 package com.example.backend.service.timesheet;
 
-import com.example.backend.dto.timesheet.TimeSheetEntryResult;
-import com.example.backend.dto.timesheet.TimeSheetEntryUpdateRequest;
-import com.example.backend.exception.timesheet.InvalidTimeSheetEntryException;
-import com.example.backend.exception.timesheet.TimeSheetAlreadyApprovedException;
-import com.example.backend.exception.timesheet.TimeSheetEntryNotFoundException;
-import com.example.backend.model.employee.Employee;
-import com.example.backend.model.timesheet.TimeSheet;
-import com.example.backend.model.timesheet.TimeSheetEntry;
+import com.example.backend.employee.domain.model.Employee;
+import com.example.backend.shared.dto.timesheet.TimeSheetEntryResult;
+import com.example.backend.shared.dto.timesheet.TimeSheetEntryUpdateRequest;
+import com.example.backend.timesheet.exception.InvalidTimeSheetEntryException;
+import com.example.backend.timesheet.exception.TimeSheetAlreadyApprovedException;
+import com.example.backend.timesheet.exception.TimeSheetEntryNotFoundException;
+import com.example.backend.timesheet.model.TimeSheet;
+import com.example.backend.timesheet.model.TimeSheetEntry;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;

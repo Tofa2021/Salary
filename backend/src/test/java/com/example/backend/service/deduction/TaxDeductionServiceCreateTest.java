@@ -1,14 +1,14 @@
 package com.example.backend.service.deduction;
 
-import com.example.backend.dto.deduction.CreateDeductionRequest;
-import com.example.backend.dto.deduction.DeductionResult;
-import com.example.backend.exception.deduction.DuplicateChildDeductionException;
-import com.example.backend.exception.deduction.InvalidDeductionPeriodException;
-import com.example.backend.exception.deduction.UnknownDeductionTypeException;
-import com.example.backend.exception.employee.EmployeeNotFoundException;
-import com.example.backend.model.employee.Employee;
-import com.example.backend.model.payroll.DeductionType;
-import com.example.backend.model.payroll.TaxDeduction;
+import com.example.backend.employee.domain.exception.employee.EmployeeNotFoundException;
+import com.example.backend.employee.domain.model.Employee;
+import com.example.backend.payroll.exception.deduction.DuplicateChildDeductionException;
+import com.example.backend.payroll.exception.deduction.InvalidDeductionPeriodException;
+import com.example.backend.payroll.exception.deduction.UnknownDeductionTypeException;
+import com.example.backend.payroll.model.DeductionType;
+import com.example.backend.payroll.model.TaxDeduction;
+import com.example.backend.shared.dto.deduction.CreateDeductionRequest;
+import com.example.backend.shared.dto.deduction.DeductionResult;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullSource;

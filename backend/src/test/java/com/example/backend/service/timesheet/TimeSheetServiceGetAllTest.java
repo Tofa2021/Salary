@@ -1,7 +1,7 @@
 package com.example.backend.service.timesheet;
 
-import com.example.backend.dto.timesheet.TimeSheetSummaryResult;
-import com.example.backend.model.timesheet.TimeSheet;
+import com.example.backend.shared.dto.timesheet.TimeSheetSummaryResult;
+import com.example.backend.timesheet.model.TimeSheet;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;

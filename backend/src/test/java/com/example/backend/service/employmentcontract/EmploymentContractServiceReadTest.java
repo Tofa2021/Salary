@@ -1,9 +1,10 @@
 package com.example.backend.service.employmentcontract;
 
-import com.example.backend.dto.employmentcontract.EmploymentContractResult;
-import com.example.backend.exception.employmentcontract.EmploymentContractNotFoundException;
-import com.example.backend.model.employee.Employee;
-import com.example.backend.model.employee.EmploymentContract;
+import com.example.backend.employee.domain.exception.employmentcontract.EmploymentContractNotFoundException;
+import com.example.backend.employee.domain.model.ContractType;
+import com.example.backend.employee.domain.model.Employee;
+import com.example.backend.employee.domain.model.EmploymentContract;
+import com.example.backend.shared.dto.employmentcontract.EmploymentContractResult;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
@@ -87,7 +88,7 @@ class EmploymentContractServiceReadTest extends BaseEmploymentContractServiceTes
                 fixedTermContract(10L, employee, LocalDate.now().plusDays(15))
         );
         when(contractRepository.findExpiring(
-                com.example.backend.model.employee.ContractType.FIXED_TERM,
+                ContractType.FIXED_TERM,
                 LocalDate.now(),
                 LocalDate.now().plusDays(30))).thenReturn(contracts);
 
