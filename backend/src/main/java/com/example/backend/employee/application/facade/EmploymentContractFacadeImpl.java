@@ -1,10 +1,10 @@
 package com.example.backend.employee.application.facade;
 
 import com.example.backend.employee.api.EmploymentContractFacade;
+import com.example.backend.employee.api.dto.CreateEmploymentContractCommand;
 import com.example.backend.employee.api.dto.EmploymentContractResult;
+import com.example.backend.employee.api.dto.UpdateEmploymentContractCommand;
 import com.example.backend.employee.application.service.EmploymentContractService;
-import com.example.backend.employee.infrastructure.web.dto.CreateEmploymentContractRequest;
-import com.example.backend.employee.infrastructure.web.dto.UpdateEmploymentContractRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,7 +20,7 @@ public class EmploymentContractFacadeImpl implements EmploymentContractFacade {
 
     @Override
     @Transactional
-    public EmploymentContractResult create(Long employeeId, CreateEmploymentContractRequest request) {
+    public EmploymentContractResult create(Long employeeId, CreateEmploymentContractCommand request) {
         return employmentContractService.create(employeeId, request);
     }
 
@@ -44,7 +44,7 @@ public class EmploymentContractFacadeImpl implements EmploymentContractFacade {
 
     @Override
     @Transactional
-    public EmploymentContractResult update(Long id, UpdateEmploymentContractRequest request) {
+    public EmploymentContractResult update(Long id, UpdateEmploymentContractCommand request) {
         return employmentContractService.update(id, request);
     }
 

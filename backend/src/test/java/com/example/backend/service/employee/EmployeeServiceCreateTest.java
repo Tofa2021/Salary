@@ -1,12 +1,12 @@
 package com.example.backend.service.employee;
 
+import com.example.backend.employee.api.dto.CreateEmployeeCommand;
 import com.example.backend.employee.api.dto.EmployeeResult;
 import com.example.backend.employee.domain.exception.employee.EmployeeInvalidDepartmentException;
 import com.example.backend.employee.domain.exception.employee.EmployeeInvalidPositionException;
 import com.example.backend.employee.domain.exception.employee.EmployeePersonnelNumberAlreadyExistsException;
 import com.example.backend.employee.domain.exception.employee.UnknownEmploymentTypeException;
 import com.example.backend.employee.domain.model.Employee;
-import com.example.backend.employee.infrastructure.web.dto.CreateEmployeeRequest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullSource;
@@ -81,7 +81,7 @@ class EmployeeServiceCreateTest extends BaseEmployeeServiceTest {
         when(departmentLookup.findById(any())).thenReturn(Optional.of(departmentResult()));
         when(positionLookup.findById(any())).thenReturn(Optional.of(positionResult()));
 
-        CreateEmployeeRequest request = new CreateEmployeeRequest(
+        CreateEmployeeCommand request = new CreateEmployeeCommand(
                 "T-001", "X", "Y", null, null, null,
                 LocalDate.now(), 1L, 1L, type);
 
@@ -98,7 +98,7 @@ class EmployeeServiceCreateTest extends BaseEmployeeServiceTest {
         when(departmentLookup.findById(any())).thenReturn(Optional.of(departmentResult()));
         when(positionLookup.findById(any())).thenReturn(Optional.of(positionResult()));
 
-        CreateEmployeeRequest request = new CreateEmployeeRequest(
+        CreateEmployeeCommand request = new CreateEmployeeCommand(
                 "T-001", "X", "Y", null, null, null,
                 LocalDate.now(), 1L, 1L, type);
 

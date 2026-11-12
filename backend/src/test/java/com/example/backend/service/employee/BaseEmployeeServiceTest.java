@@ -2,14 +2,14 @@ package com.example.backend.service.employee;
 
 import com.example.backend.department.api.DepartmentLookup;
 import com.example.backend.department.api.dto.DepartmentResult;
+import com.example.backend.employee.api.dto.CreateEmployeeCommand;
 import com.example.backend.employee.api.dto.EmployeeResult;
+import com.example.backend.employee.api.dto.UpdateEmployeeCommand;
 import com.example.backend.employee.application.service.EmployeeService;
 import com.example.backend.employee.domain.model.Employee;
 import com.example.backend.employee.domain.model.EmploymentType;
 import com.example.backend.employee.domain.model.Gender;
 import com.example.backend.employee.domain.port.EmployeeRepository;
-import com.example.backend.employee.infrastructure.web.dto.CreateEmployeeRequest;
-import com.example.backend.employee.infrastructure.web.dto.UpdateEmployeeRequest;
 import com.example.backend.position.api.PositionLookup;
 import com.example.backend.position.api.dto.PositionResult;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -69,16 +69,16 @@ abstract class BaseEmployeeServiceTest {
         return new PositionResult(1L, "Developer", 10, java.math.BigDecimal.valueOf(2.48), "");
     }
 
-    protected CreateEmployeeRequest createRequest(String personnelNumber) {
-        return new CreateEmployeeRequest(
+    protected CreateEmployeeCommand createRequest(String personnelNumber) {
+        return new CreateEmployeeCommand(
                 personnelNumber, "Иванов", "Иван", "Иванович",
                 "ivan@gmail.com", "+375251231231",
                 LocalDate.of(2026, 1, 1),
                 1L, 1L, "FULL_TIME");
     }
 
-    protected UpdateEmployeeRequest updateRequest() {
-        return new UpdateEmployeeRequest(
+    protected UpdateEmployeeCommand updateRequest() {
+        return new UpdateEmployeeCommand(
                 "A",
                 "B",
                 "C",

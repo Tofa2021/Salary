@@ -1,11 +1,11 @@
 package com.example.backend.employee.application.facade;
 
 import com.example.backend.employee.api.EmployeeFacade;
+import com.example.backend.employee.api.dto.CreateEmployeeCommand;
+import com.example.backend.employee.api.dto.DismissCommand;
 import com.example.backend.employee.api.dto.EmployeeResult;
+import com.example.backend.employee.api.dto.UpdateEmployeeCommand;
 import com.example.backend.employee.application.service.EmployeeService;
-import com.example.backend.employee.infrastructure.web.dto.CreateEmployeeRequest;
-import com.example.backend.employee.infrastructure.web.dto.DismissRequest;
-import com.example.backend.employee.infrastructure.web.dto.UpdateEmployeeRequest;
 import com.example.backend.shared.pagination.PageRequest;
 import com.example.backend.shared.pagination.PageResult;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +21,7 @@ public class EmployeeFacadeImpl implements EmployeeFacade {
 
     @Override
     @Transactional
-    public EmployeeResult create(CreateEmployeeRequest request) {
+    public EmployeeResult create(CreateEmployeeCommand request) {
         return employeeService.create(request);
     }
 
@@ -51,13 +51,13 @@ public class EmployeeFacadeImpl implements EmployeeFacade {
 
     @Override
     @Transactional
-    public EmployeeResult update(Long id, UpdateEmployeeRequest request) {
+    public EmployeeResult update(Long id, UpdateEmployeeCommand request) {
         return employeeService.update(id, request);
     }
 
     @Override
     @Transactional
-    public EmployeeResult dismiss(Long id, DismissRequest request) {
+    public EmployeeResult dismiss(Long id, DismissCommand request) {
         return employeeService.dismiss(id, request);
     }
 

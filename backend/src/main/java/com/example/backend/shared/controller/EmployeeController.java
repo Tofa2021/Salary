@@ -1,10 +1,10 @@
 package com.example.backend.shared.controller;
 
+import com.example.backend.employee.api.dto.CreateEmployeeCommand;
+import com.example.backend.employee.api.dto.DismissCommand;
 import com.example.backend.employee.api.dto.EmployeeResult;
+import com.example.backend.employee.api.dto.UpdateEmployeeCommand;
 import com.example.backend.employee.application.service.EmployeeService;
-import com.example.backend.employee.infrastructure.web.dto.CreateEmployeeRequest;
-import com.example.backend.employee.infrastructure.web.dto.DismissRequest;
-import com.example.backend.employee.infrastructure.web.dto.UpdateEmployeeRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -20,7 +20,7 @@ public class EmployeeController {
 
     @PostMapping
     @PreAuthorize("hasAnyRole('ADMIN', 'HR')")
-    public ResponseEntity<EmployeeResult> create(@RequestBody CreateEmployeeRequest request) {
+    public ResponseEntity<EmployeeResult> create(@RequestBody CreateEmployeeCommand request) {
         return ResponseEntity.ok(employeeService.create(request));
     }
 
@@ -50,13 +50,13 @@ public class EmployeeController {
 
     @PutMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMIN', 'HR')")
-    public ResponseEntity<EmployeeResult> update(@PathVariable Long id, @RequestBody UpdateEmployeeRequest request) {
+    public ResponseEntity<EmployeeResult> update(@PathVariable Long id, @RequestBody UpdateEmployeeCommand request) {
         return ResponseEntity.ok(employeeService.update(id, request));
     }
 
     @PatchMapping("/{id}/dismiss")
     @PreAuthorize("hasAnyRole('ADMIN', 'HR')")
-    public ResponseEntity<EmployeeResult> dismiss(@PathVariable Long id, @RequestBody DismissRequest request) {
+    public ResponseEntity<EmployeeResult> dismiss(@PathVariable Long id, @RequestBody DismissCommand request) {
         return ResponseEntity.ok(employeeService.dismiss(id, request));
     }
 

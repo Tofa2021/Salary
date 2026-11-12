@@ -1,6 +1,8 @@
 package com.example.backend.employee.application.service;
 
+import com.example.backend.employee.api.dto.CreateEmploymentContractCommand;
 import com.example.backend.employee.api.dto.EmploymentContractResult;
+import com.example.backend.employee.api.dto.UpdateEmploymentContractCommand;
 import com.example.backend.employee.domain.exception.employee.EmployeeNotFoundException;
 import com.example.backend.employee.domain.exception.employmentcontract.EmploymentContractNotFoundException;
 import com.example.backend.employee.domain.exception.employmentcontract.EmploymentContractNumberAlreadyExistsException;
@@ -9,8 +11,6 @@ import com.example.backend.employee.domain.model.EmploymentContract;
 import com.example.backend.employee.domain.policy.MainJobPolicy;
 import com.example.backend.employee.domain.port.EmployeeRepository;
 import com.example.backend.employee.domain.port.EmploymentContractRepository;
-import com.example.backend.employee.infrastructure.web.dto.CreateEmploymentContractRequest;
-import com.example.backend.employee.infrastructure.web.dto.UpdateEmploymentContractRequest;
 import lombok.RequiredArgsConstructor;
 
 import java.time.Clock;
@@ -24,7 +24,7 @@ public class EmploymentContractService {
     private final MainJobPolicy mainJobPolicy;
     private final Clock clock;
 
-    public EmploymentContractResult create(Long employeeId, CreateEmploymentContractRequest request) {
+    public EmploymentContractResult create(Long employeeId, CreateEmploymentContractCommand request) {
         if (!employeeRepository.existsById(employeeId)) {
             throw new EmployeeNotFoundException(employeeId);
         }
@@ -75,7 +75,7 @@ public class EmploymentContractService {
         return toResult(contract, date);
     }
 
-    public EmploymentContractResult update(Long id, UpdateEmploymentContractRequest request) {
+    public EmploymentContractResult update(Long id, UpdateEmploymentContractCommand request) {
         EmploymentContract contract = findById(id);
         if (request.baseSalary() != null) {
             contract.setBaseSalary(request.baseSalary());
