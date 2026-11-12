@@ -55,6 +55,11 @@ public class JpaEmployeeRepository implements EmployeeRepository {
         return toDomain(saved);
     }
 
+    @Override
+    public boolean existsById(Long employeeId) {
+        return springDataEmployeeRepository.existsById(employeeId);
+    }
+
     private Pageable toPageable(PageRequest request) {
         return org.springframework.data.domain.PageRequest.of(request.page(), request.size());
     }

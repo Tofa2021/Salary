@@ -3,6 +3,7 @@ package com.example.backend.employee.infrastructure.config;
 import com.example.backend.department.api.DepartmentLookup;
 import com.example.backend.employee.application.service.EmployeeService;
 import com.example.backend.employee.application.service.EmploymentContractService;
+import com.example.backend.employee.domain.policy.MainJobPolicy;
 import com.example.backend.employee.domain.port.EmployeeRepository;
 import com.example.backend.employee.domain.port.EmploymentContractRepository;
 import com.example.backend.position.api.PositionLookup;
@@ -27,8 +28,9 @@ public class EmployeeServiceConfig {
     public EmploymentContractService employmentContractService(
             EmploymentContractRepository employmentContractRepository,
             EmployeeRepository employeeRepository,
+            MainJobPolicy mainJobPolicy,
             Clock clock
     ) {
-        return new EmploymentContractService(employmentContractRepository, employeeRepository, clock);
+        return new EmploymentContractService(employmentContractRepository, employeeRepository, mainJobPolicy, clock);
     }
 }

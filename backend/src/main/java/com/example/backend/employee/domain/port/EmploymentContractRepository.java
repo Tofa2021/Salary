@@ -21,4 +21,11 @@ public interface EmploymentContractRepository {
     List<EmploymentContract> findExpiring(ContractType contractType, LocalDate today, LocalDate to);
 
     Optional<EmploymentContract> findById(Long id);
+
+    Optional<EmploymentContract> findOverlappingMainJob(
+            Long employeeId,
+            Long excludeContractId,
+            LocalDate start,
+            LocalDate end
+    );
 }

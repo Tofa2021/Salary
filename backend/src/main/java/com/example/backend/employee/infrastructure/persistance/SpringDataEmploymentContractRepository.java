@@ -46,4 +46,19 @@ public interface SpringDataEmploymentContractRepository extends JpaRepository<Em
             @Param("from") LocalDate from,
             @Param("to") LocalDate to
     );
+
+    @Query("""
+            SELECT c FROM EmploymentContractJpaEntity c
+            WHERE c.employeeId = :employeeId
+              AND c.mainJob = true
+              AND (:excludeId IS NULL OR c.id <> :excludeId)
+              AND (c.endDate IS NULL OR c.endDate >= :start)
+              AND (:end IS NULL OR c.startDate <= :end)
+            """)
+    List<EmploymentContractJpaEntity> findOverlappingMainJobs(
+            @Param("employeeId") Long employeeId,
+            @Param("excludeId") Long excludeId,
+            @Param("start") LocalDate start,
+            @Param("end") LocalDate end
+    );
 }

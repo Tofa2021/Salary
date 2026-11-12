@@ -52,6 +52,12 @@ public class JpaEmployeeContractRepository implements EmploymentContractReposito
         return springDataRepository.findById(id).map(this::toDomain);
     }
 
+    @Override
+    public Optional<EmploymentContract> findOverlappingMainJob(Long employeeId, Long excludeContractId, LocalDate start, LocalDate end) {
+        return springDataRepository.findOverlappingMainJobs(employeeId, excludeContractId, start, end).stream()
+                .findFirst().map(this::toDomain);
+    }
+
     private EmploymentContract toDomain(EmploymentContractJpaEntity entity) {
         EmploymentContract contract = new EmploymentContract();
         contract.setId(entity.getId());

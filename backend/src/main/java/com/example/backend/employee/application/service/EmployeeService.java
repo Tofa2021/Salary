@@ -3,7 +3,10 @@ package com.example.backend.employee.application.service;
 import com.example.backend.department.api.DepartmentLookup;
 import com.example.backend.department.api.dto.DepartmentResult;
 import com.example.backend.employee.api.dto.EmployeeResult;
-import com.example.backend.employee.domain.exception.employee.*;
+import com.example.backend.employee.domain.exception.employee.EmployeeInvalidDepartmentException;
+import com.example.backend.employee.domain.exception.employee.EmployeeInvalidPositionException;
+import com.example.backend.employee.domain.exception.employee.EmployeeNotFoundException;
+import com.example.backend.employee.domain.exception.employee.EmployeePersonnelNumberAlreadyExistsException;
 import com.example.backend.employee.domain.model.Employee;
 import com.example.backend.employee.domain.model.EmploymentType;
 import com.example.backend.employee.domain.port.EmployeeRepository;
@@ -98,22 +101,22 @@ public class EmployeeService {
             employee.setEmploymentType(EmploymentType.from(request.employmentType()));
         }
 
+        employeeRepository.save(employee);
+
         return toResult(employee);
     }
 
     public EmployeeResult dismiss(Long id, DismissRequest request) {
         Employee employee = findEmployee(id);
-        if (request.dismissalDate().isBefore(employee.getHireDate())) {
-            throw new DismissalDateBeforeHireDateException(employee.getHireDate(), request.dismissalDate());
-        }
-        employee.setDismissalDate(request.dismissalDate());
+        employee.dismiss(request.dismissalDate());
+        employeeRepository.save(employee);
         return toResult(employee);
     }
 
     public EmployeeResult rehire(Long id, LocalDate newHireDate) {
         Employee employee = findEmployee(id);
-        employee.setHireDate(newHireDate);
-        employee.setDismissalDate(null);
+        employee.rehire(newHireDate);
+        employeeRepository.save(employee);
         return toResult(employee);
     }
 
@@ -134,42 +137,21 @@ public class EmployeeService {
 
     public void transfer(Long newDepartmentId, Long employeeId) {
         Employee employee = findEmployee(employeeId);
-        if (employee.getDismissalDate() != null) {
-            throw new EmployeeDismissedException(employeeId);
-        }
-
-        if (employee.getDepartmentId() == null) {
-            throw new EmployeeWithoutDepartmentException(employeeId);
-        }
-
-        DepartmentResult newDepartment = findDepartmentResult(newDepartmentId);
-        if (employee.getDepartmentId().equals(newDepartment.id())) {
-            throw new SameDepartmentException(employeeId, newDepartmentId);
-        }
-        employee.setDepartmentId(newDepartment.id());
+        employee.transferTo(newDepartmentId);
         employeeRepository.save(employee);
     }
 
     public void removeFromDepartment(Long employeeId) {
         Employee employee = findEmployee(employeeId);
-        if (employee.getDismissalDate() != null) {
-            throw new EmployeeDismissedException(employeeId);
-        }
-        if (employee.getDepartmentId() == null) {
-            throw new EmployeeWithoutDepartmentException(employeeId);
-        }
-        employee.setDepartmentId(null);
+        employee.removeFromDepartment();
         employeeRepository.save(employee);
     }
 
     public void addToDepartment(Long departmentId, Long employeeId) {
         Employee employee = findEmployee(employeeId);
-        if (employee.getDismissalDate() != null) throw new EmployeeDismissedException(employeeId);
-        if (employee.getDepartmentId() != null) {
-            throw new EmployeeAlreadyInDepartmentException(employeeId);
-        }
+        employee.ensureCanBeAddedToDepartment();
         DepartmentResult newDepartmentResult = findDepartmentResult(departmentId);
-        employee.setDepartmentId(newDepartmentResult.id());
+        employee.addToDepartment(newDepartmentResult.id());
         employeeRepository.save(employee);
     }
 
@@ -184,7 +166,7 @@ public class EmployeeService {
                 employee.getPhone(),
                 employee.getHireDate(),
                 employee.getDismissalDate(),
-                employee.getEmploymentType().name(),
+                employee.getEmploymentType() == null ? null : employee.getEmploymentType().name(),
                 employee.getDepartmentId(),
                 employee.getPositionId()
         );

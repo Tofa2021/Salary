@@ -1,5 +1,6 @@
 package com.example.backend.employee.domain.model;
 
+import com.example.backend.employee.domain.exception.employee.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -38,4 +39,53 @@ public class Employee {
 
     private int dependentChildrenCount;
     private boolean disabled;
+
+    public void dismiss(LocalDate date) {
+        if (date.isBefore(hireDate)) {
+            throw new DismissalDateBeforeHireDateException(hireDate, date);
+        }
+        this.dismissalDate = date;
+    }
+
+    public void ensureNotDismissed() {
+        if (dismissalDate != null) {
+            throw new EmployeeDismissedException(id);
+        }
+    }
+
+    public void transferTo(Long newDepartmentId) {
+        ensureNotDismissed();
+        if (departmentId == null) {
+            throw new EmployeeWithoutDepartmentException(id);
+        }
+        if (departmentId.equals(newDepartmentId)) {
+            throw new SameDepartmentException(id, newDepartmentId);
+        }
+        this.departmentId = newDepartmentId;
+    }
+
+    public void removeFromDepartment() {
+        ensureNotDismissed();
+        if (this.departmentId == null) {
+            throw new EmployeeWithoutDepartmentException(id);
+        }
+        this.departmentId = null;
+    }
+
+    public void addToDepartment(Long departmentId) {
+        ensureCanBeAddedToDepartment();
+        this.departmentId = departmentId;
+    }
+
+    public void rehire(LocalDate newHireDate) {
+        hireDate = newHireDate;
+        dismissalDate = null;
+    }
+
+    public void ensureCanBeAddedToDepartment() {
+        ensureNotDismissed();
+        if (this.departmentId != null) {
+            throw new EmployeeAlreadyInDepartmentException(id);
+        }
+    }
 }

@@ -20,4 +20,6 @@ public interface EmployeeRepository {
     Optional<Employee> findById(Long id);
 
     Employee save(Employee employee);
+
+    boolean existsById(Long employeeId);
 }
