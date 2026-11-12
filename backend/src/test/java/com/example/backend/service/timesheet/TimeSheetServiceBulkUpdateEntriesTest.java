@@ -1,12 +1,12 @@
 package com.example.backend.service.timesheet;
 
 import com.example.backend.employee.domain.model.Employee;
-import com.example.backend.shared.dto.timesheet.TimeSheetEntryResult;
-import com.example.backend.shared.dto.timesheet.TimeSheetEntryUpdateRequest;
-import com.example.backend.timesheet.exception.TimeSheetAlreadyApprovedException;
-import com.example.backend.timesheet.exception.TimeSheetNotFoundException;
-import com.example.backend.timesheet.model.TimeSheet;
-import com.example.backend.timesheet.model.TimeSheetEntry;
+import com.example.backend.timesheet.api.dto.TimeSheetEntryResult;
+import com.example.backend.timesheet.api.dto.TimeSheetEntryUpdateCommand;
+import com.example.backend.timesheet.domain.exception.TimeSheetAlreadyApprovedException;
+import com.example.backend.timesheet.domain.exception.TimeSheetNotFoundException;
+import com.example.backend.timesheet.domain.model.TimeSheet;
+import com.example.backend.timesheet.domain.model.TimeSheetEntry;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
@@ -32,8 +32,8 @@ class TimeSheetServiceBulkUpdateEntriesTest extends BaseTimeSheetServiceTest {
                 .thenReturn(List.of(entry1, entry2));
 
         List<TimeSheetEntryResult> result = timeSheetService.bulkUpdateEntries(1L, List.of(
-                new TimeSheetEntryUpdateRequest(10L, 21, 168, 0, 0, 0, 0, 0, 0),
-                new TimeSheetEntryUpdateRequest(11L, 20, 160, 0, 0, 0, 0, 0, 0)
+                new TimeSheetEntryUpdateCommand(10L, 21, 168, 0, 0, 0, 0, 0, 0),
+                new TimeSheetEntryUpdateCommand(11L, 20, 160, 0, 0, 0, 0, 0, 0)
         ));
 
         assertThat(result).hasSize(2);

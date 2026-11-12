@@ -6,4 +6,6 @@ import java.util.Optional;
 
 public interface EmployeeLookup {
     Optional<EmployeeResult> findById(Long id);
+
+    boolean existsByDepartmentId(Long departmentId);
 }

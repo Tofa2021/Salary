@@ -31,4 +31,6 @@ public interface SpringDataEmployeeRepository extends JpaRepository<EmployeeJpaE
               AND (e.dismissalDate IS NULL OR e.dismissalDate >= :date)
             """)
     List<EmployeeJpaEntity> findActiveByDepartmentOnDate(@Param("departmentId") Long departmentId, @Param("date") LocalDate date);
+
+    boolean existsByDepartmentId(Long departmentId);
 }

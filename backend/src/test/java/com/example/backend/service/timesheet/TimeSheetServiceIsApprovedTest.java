@@ -1,7 +1,7 @@
 package com.example.backend.service.timesheet;
 
-import com.example.backend.timesheet.exception.TimeSheetNotFoundException;
-import com.example.backend.timesheet.model.TimeSheet;
+import com.example.backend.timesheet.domain.exception.TimeSheetNotFoundException;
+import com.example.backend.timesheet.domain.model.TimeSheet;
 import org.junit.jupiter.api.Test;
 
 import java.util.Optional;

@@ -1,7 +1,11 @@
 package com.example.backend.service;
 
-import com.example.backend.department.*;
+import com.example.backend.department.Department;
+import com.example.backend.department.DepartmentService;
+import com.example.backend.department.SpringDataDepartmentRepository;
+import com.example.backend.department.api.dto.CreateDepartmentCommand;
 import com.example.backend.department.api.dto.DepartmentResult;
+import com.example.backend.department.api.dto.UpdateDepartmentCommand;
 import com.example.backend.department.exception.*;
 import com.example.backend.employee.domain.model.Employee;
 import com.example.backend.employee.infrastructure.persistance.SpringDataEmployeeRepository;
@@ -23,7 +27,7 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class DepartmentServiceTest {
     @Mock
-    private DepartmentRepository departmentRepository;
+    private SpringDataDepartmentRepository departmentRepository;
 
     @Mock
     private SpringDataEmployeeRepository employeeRepository;
@@ -33,7 +37,7 @@ class DepartmentServiceTest {
 
     @Test
     void create_WithoutParent_Success() {
-        CreateDepartmentRequest request = new CreateDepartmentRequest("Department", "D-001", null);
+        CreateDepartmentCommand request = new CreateDepartmentCommand("Department", "D-001", null);
         when(departmentRepository.save(any())).thenAnswer(inv -> {
             Department department = inv.getArgument(0);
             department.setId(1L);
@@ -52,7 +56,7 @@ class DepartmentServiceTest {
     @Test
     void create_WithParent_Success() {
         Department parent = new Department(1L, "Parent", "D-001", null, List.of());
-        CreateDepartmentRequest request = new CreateDepartmentRequest("Department", "D-002", parent.getId());
+        CreateDepartmentCommand request = new CreateDepartmentCommand("Department", "D-002", parent.getId());
         when(departmentRepository.findById(parent.getId())).thenReturn(Optional.of(parent));
         when(departmentRepository.save(any())).thenAnswer(inv -> {
             Department department = inv.getArgument(0);
@@ -71,7 +75,7 @@ class DepartmentServiceTest {
 
     @Test
     void create_ParentNotFound_Throws() {
-        CreateDepartmentRequest request = new CreateDepartmentRequest("Department", "D-002", 1L);
+        CreateDepartmentCommand request = new CreateDepartmentCommand("Department", "D-002", 1L);
         when(departmentRepository.findById(1L)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> departmentService.create(request))
@@ -83,7 +87,7 @@ class DepartmentServiceTest {
 
     @Test
     void create_NameAlreadyExists_Throws() {
-        CreateDepartmentRequest request = new CreateDepartmentRequest("Department", "D-001", null);
+        CreateDepartmentCommand request = new CreateDepartmentCommand("Department", "D-001", null);
         when(departmentRepository.existsByName(request.name())).thenReturn(true);
 
         assertThatThrownBy(() -> departmentService.create(request))
@@ -95,7 +99,7 @@ class DepartmentServiceTest {
 
     @Test
     void create_CodeAlreadyExists_Throws() {
-        CreateDepartmentRequest request = new CreateDepartmentRequest("Department", "D-001", null);
+        CreateDepartmentCommand request = new CreateDepartmentCommand("Department", "D-001", null);
         when(departmentRepository.existsByCode(request.code())).thenReturn(true);
 
         assertThatThrownBy(() -> departmentService.create(request))
@@ -179,7 +183,7 @@ class DepartmentServiceTest {
     void update_FullUpdate_Success() {
         Department parent = new Department(1L, "Parent", "D-003", null, List.of());
         Department department = new Department(2L, "A", "D-001", null, List.of());
-        UpdateDepartmentRequest request = new UpdateDepartmentRequest("B", "D-002", JsonNullable.of(1L));
+        UpdateDepartmentCommand request = new UpdateDepartmentCommand("B", "D-002", JsonNullable.of(1L));
         when(departmentRepository.findById(parent.getId())).thenReturn(Optional.of(parent));
         when(departmentRepository.findById(department.getId())).thenReturn(Optional.of(department));
         when(departmentRepository.save(department)).thenReturn(department);
@@ -199,7 +203,7 @@ class DepartmentServiceTest {
     void update_NullRequest_DoesNotUpdateAnything() {
         Department parent = new Department(2L, "Parent", "D-003", null, List.of());
         Department department = new Department(1L, "A", "D-001", parent, List.of());
-        UpdateDepartmentRequest request = new UpdateDepartmentRequest(null, null, JsonNullable.undefined());
+        UpdateDepartmentCommand request = new UpdateDepartmentCommand(null, null, JsonNullable.undefined());
         when(departmentRepository.findById(department.getId())).thenReturn(Optional.of(department));
         when(departmentRepository.save(department)).thenReturn(department);
 
@@ -216,7 +220,7 @@ class DepartmentServiceTest {
 
     @Test
     void update_DepartmentNotFound_Throws() {
-        UpdateDepartmentRequest request = new UpdateDepartmentRequest(null, null, JsonNullable.undefined());
+        UpdateDepartmentCommand request = new UpdateDepartmentCommand(null, null, JsonNullable.undefined());
         when(departmentRepository.findById(1L)).thenReturn(Optional.empty());
         assertThatThrownBy(() -> departmentService.update(1L, request))
                 .isInstanceOf(DepartmentNotFoundException.class);
@@ -227,7 +231,7 @@ class DepartmentServiceTest {
     @Test
     void update_ParentDepartmentNotFound_Throws() {
         Department department = new Department(1L, "A", "D-001", null, List.of());
-        UpdateDepartmentRequest request = new UpdateDepartmentRequest(null, null, JsonNullable.of(2L));
+        UpdateDepartmentCommand request = new UpdateDepartmentCommand(null, null, JsonNullable.of(2L));
         when(departmentRepository.findById(department.getId())).thenReturn(Optional.of(department));
         when(departmentRepository.findById(2L)).thenReturn(Optional.empty());
 
@@ -241,7 +245,7 @@ class DepartmentServiceTest {
     void update_SetParentFromNull_Success() {
         Department department = new Department(1L, "A", "D-001", null, List.of());
         Department newParent = new Department(2L, "Parent", "D-002", null, List.of());
-        UpdateDepartmentRequest request = new UpdateDepartmentRequest(
+        UpdateDepartmentCommand request = new UpdateDepartmentCommand(
                 null,
                 null,
                 JsonNullable.of(newParent.getId())
@@ -266,7 +270,7 @@ class DepartmentServiceTest {
         Department oldParent = new Department(3L, "OldParent", "D-003", null, List.of());
         Department department = new Department(1L, "A", "D-001", oldParent, List.of());
         Department newParent = new Department(2L, "NewParent", "D-002", null, List.of());
-        UpdateDepartmentRequest request = new UpdateDepartmentRequest(
+        UpdateDepartmentCommand request = new UpdateDepartmentCommand(
                 null,
                 null,
                 JsonNullable.of(newParent.getId())
@@ -290,7 +294,7 @@ class DepartmentServiceTest {
     void update_SetNullParent_Success() {
         Department parent = new Department(2L, "Parent", "D-002", null, List.of());
         Department department = new Department(1L, "A", "D-001", parent, List.of());
-        UpdateDepartmentRequest request = new UpdateDepartmentRequest(
+        UpdateDepartmentCommand request = new UpdateDepartmentCommand(
                 null,
                 null,
                 JsonNullable.ofNull()
@@ -312,7 +316,7 @@ class DepartmentServiceTest {
     @Test
     void update_OwnParent_Throws() {
         Department department = new Department(1L, "A", "D-001", null, List.of());
-        UpdateDepartmentRequest request = new UpdateDepartmentRequest(
+        UpdateDepartmentCommand request = new UpdateDepartmentCommand(
                 null,
                 null,
                 JsonNullable.of(department.getId())
@@ -329,7 +333,7 @@ class DepartmentServiceTest {
     void update_NewParentIsDescendant_Throws() {
         Department department = new Department(1L, "A", "D-001", null, List.of());
         Department descendant = new Department(2L, "B", "D-002", department, List.of());
-        UpdateDepartmentRequest request = new UpdateDepartmentRequest(
+        UpdateDepartmentCommand request = new UpdateDepartmentCommand(
                 null,
                 null,
                 JsonNullable.of(descendant.getId())
