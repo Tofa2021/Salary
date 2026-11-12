@@ -43,7 +43,7 @@ public class EmployeeService {
         employee.setHireDate(request.hireDate());
         employee.setDepartmentId(departmentResult.id());
         employee.setPositionId(positionResult.id());
-        employee.setEmploymentType(parseEmploymentType(request.employmentType()));
+        employee.setEmploymentType(EmploymentType.from(request.employmentType()));
 
         return toResult(employeeRepository.save(employee));
     }
@@ -95,7 +95,7 @@ public class EmployeeService {
             employee.setPositionId(positionResult.id());
         }
         if (request.employmentType() != null) {
-            employee.setEmploymentType(parseEmploymentType(request.employmentType()));
+            employee.setEmploymentType(EmploymentType.from(request.employmentType()));
         }
 
         return toResult(employee);
@@ -130,15 +130,6 @@ public class EmployeeService {
     private DepartmentResult findDepartmentResult(Long id) {
         return departmentLookup.findById(id)
                 .orElseThrow(() -> new EmployeeInvalidDepartmentException(id));
-    }
-
-    private EmploymentType parseEmploymentType(String value) {
-        if (value == null) throw new UnknownEmploymentTypeException(null);
-        try {
-            return EmploymentType.valueOf(value);
-        } catch (IllegalArgumentException ex) {
-            throw new UnknownEmploymentTypeException(value);
-        }
     }
 
     public void transfer(Long newDepartmentId, Long employeeId) {
@@ -179,6 +170,7 @@ public class EmployeeService {
         }
         DepartmentResult newDepartmentResult = findDepartmentResult(departmentId);
         employee.setDepartmentId(newDepartmentResult.id());
+        employeeRepository.save(employee);
     }
 
     private EmployeeResult toResult(Employee employee) {
@@ -192,9 +184,9 @@ public class EmployeeService {
                 employee.getPhone(),
                 employee.getHireDate(),
                 employee.getDismissalDate(),
-                employee.getEmploymentType() == null ? null : employee.getEmploymentType().name(),
-                employee.getDepartmentId() == null ? null : employee.getDepartmentId(),
-                employee.getPositionId() == null ? null : employee.getPositionId()
+                employee.getEmploymentType().name(),
+                employee.getDepartmentId(),
+                employee.getPositionId()
         );
     }
 }
