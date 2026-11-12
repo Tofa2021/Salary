@@ -22,4 +22,6 @@ public interface EmployeeRepository {
     Employee save(Employee employee);
 
     boolean existsById(Long employeeId);
+
+    boolean existsByDepartmentId(Long departmentId);
 }

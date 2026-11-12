@@ -17,6 +17,7 @@ import java.math.BigDecimal;
 import java.time.Clock;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 public class EmploymentContractService {
@@ -53,6 +54,10 @@ public class EmploymentContractService {
 
     public EmploymentContractResult getById(Long id) {
         return toResult(findById(id), today());
+    }
+
+    public Optional<EmploymentContractResult> findByIdOptional(Long id) {
+        return employmentContractRepository.findById(id).map(contract -> toResult(contract, today()));
     }
 
     public List<EmploymentContractResult> findByEmployee(Long employeeId) {

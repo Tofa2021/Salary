@@ -1,13 +1,13 @@
 package com.example.backend.service.timesheet;
 
 import com.example.backend.employee.domain.model.Employee;
-import com.example.backend.shared.dto.timesheet.TimeSheetEntryResult;
-import com.example.backend.shared.dto.timesheet.TimeSheetEntryUpdateRequest;
-import com.example.backend.timesheet.exception.InvalidTimeSheetEntryException;
-import com.example.backend.timesheet.exception.TimeSheetAlreadyApprovedException;
-import com.example.backend.timesheet.exception.TimeSheetEntryNotFoundException;
-import com.example.backend.timesheet.model.TimeSheet;
-import com.example.backend.timesheet.model.TimeSheetEntry;
+import com.example.backend.timesheet.api.dto.TimeSheetEntryResult;
+import com.example.backend.timesheet.api.dto.TimeSheetEntryUpdateCommand;
+import com.example.backend.timesheet.domain.exception.InvalidTimeSheetEntryException;
+import com.example.backend.timesheet.domain.exception.TimeSheetAlreadyApprovedException;
+import com.example.backend.timesheet.domain.exception.TimeSheetEntryNotFoundException;
+import com.example.backend.timesheet.domain.model.TimeSheet;
+import com.example.backend.timesheet.domain.model.TimeSheetEntry;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
@@ -74,7 +74,7 @@ class TimeSheetServiceUpdateEntryTest extends BaseTimeSheetServiceTest {
         prepare(false);
 
         assertThatThrownBy(() -> timeSheetService.updateEntry(10L,
-                new TimeSheetEntryUpdateRequest(21, 168, 0, 0, 0, 0, 200, 0)))
+                new TimeSheetEntryUpdateCommand(21, 168, 0, 0, 0, 0, 200, 0)))
                 .isInstanceOf(InvalidTimeSheetEntryException.class);
     }
 
@@ -83,7 +83,7 @@ class TimeSheetServiceUpdateEntryTest extends BaseTimeSheetServiceTest {
         prepare(false);
 
         assertThatThrownBy(() -> timeSheetService.updateEntry(10L,
-                new TimeSheetEntryUpdateRequest(21, 168, 0, 0, 0, 0, 0, 200)))
+                new TimeSheetEntryUpdateCommand(21, 168, 0, 0, 0, 0, 0, 200)))
                 .isInstanceOf(InvalidTimeSheetEntryException.class);
     }
 
@@ -92,7 +92,7 @@ class TimeSheetServiceUpdateEntryTest extends BaseTimeSheetServiceTest {
         prepare(false);
 
         assertThatThrownBy(() -> timeSheetService.updateEntry(10L,
-                new TimeSheetEntryUpdateRequest(-1, 0, 0, 0, 0, 0, 0, 0)))
+                new TimeSheetEntryUpdateCommand(-1, 0, 0, 0, 0, 0, 0, 0)))
                 .isInstanceOf(InvalidTimeSheetEntryException.class);
     }
 }

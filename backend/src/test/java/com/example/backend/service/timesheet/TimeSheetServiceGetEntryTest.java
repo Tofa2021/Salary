@@ -1,10 +1,10 @@
 package com.example.backend.service.timesheet;
 
 import com.example.backend.employee.domain.model.Employee;
-import com.example.backend.shared.dto.timesheet.TimeSheetEntryResult;
-import com.example.backend.timesheet.exception.TimeSheetEntryNotFoundException;
-import com.example.backend.timesheet.model.TimeSheet;
-import com.example.backend.timesheet.model.TimeSheetEntry;
+import com.example.backend.timesheet.api.dto.TimeSheetEntryResult;
+import com.example.backend.timesheet.domain.exception.TimeSheetEntryNotFoundException;
+import com.example.backend.timesheet.domain.model.TimeSheet;
+import com.example.backend.timesheet.domain.model.TimeSheetEntry;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;

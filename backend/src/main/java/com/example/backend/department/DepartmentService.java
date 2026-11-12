@@ -1,23 +1,26 @@
 package com.example.backend.department;
 
 
+import com.example.backend.department.api.dto.CreateDepartmentCommand;
 import com.example.backend.department.api.dto.DepartmentResult;
+import com.example.backend.department.api.dto.UpdateDepartmentCommand;
 import com.example.backend.department.exception.*;
-import com.example.backend.employee.infrastructure.persistance.SpringDataEmployeeRepository;
+import com.example.backend.employee.api.EmployeeLookup;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class DepartmentService {
-    private final DepartmentRepository departmentRepository;
-    private final SpringDataEmployeeRepository employeeRepository;
+    private final SpringDataDepartmentRepository departmentRepository;
+    private final EmployeeLookup employeeLookup;
 
     @Transactional
-    public DepartmentResult create(CreateDepartmentRequest request) {
+    public DepartmentResult create(CreateDepartmentCommand request) {
         if (departmentRepository.existsByName(request.name())) {
             throw new DepartmentNameAlreadyExistsException(request.name());
         }
@@ -31,7 +34,7 @@ public class DepartmentService {
             parentDepartment = findById(request.parentId());
         }
 
-        Department department = new Department(request.name(), request.code(), parentDepartment, List.of());
+        Department department = new Department(request.name(), request.code(), parentDepartment);
         return DepartmentResult.fromDepartment(departmentRepository.save(department));
     }
 
@@ -51,7 +54,7 @@ public class DepartmentService {
     }
 
     @Transactional
-    public DepartmentResult update(Long id, UpdateDepartmentRequest request) {
+    public DepartmentResult update(Long id, UpdateDepartmentCommand request) {
         Department department = findById(id);
 
         if (request.name() != null) {
@@ -86,9 +89,8 @@ public class DepartmentService {
     public void delete(Long id) {
         Department department = findById(id);
 
-        long employeeCount = employeeRepository.countByDepartmentId(id);
-        if (employeeCount > 0) {
-            throw new DepartmentHasEmployeesException(id, employeeCount);
+        if (employeeLookup.existsByDepartmentId(id)) {
+            throw new DepartmentHasEmployeesException(id);
         }
 
         long childrenCount = departmentRepository.countByParentId(id);
@@ -97,6 +99,11 @@ public class DepartmentService {
         }
 
         departmentRepository.delete(department);
+    }
+
+    @Transactional(readOnly = true)
+    public Optional<DepartmentResult> findByIdOptional(Long id) {
+        return departmentRepository.findById(id).map(DepartmentResult::fromDepartment);
     }
 
     private boolean isDescendant(Department candidate, Department root) {

@@ -3,17 +3,17 @@ package com.example.backend.service.timesheet;
 import com.example.backend.auth.model.User;
 import com.example.backend.auth.model.UserRole;
 import com.example.backend.department.Department;
-import com.example.backend.department.DepartmentRepository;
+import com.example.backend.department.SpringDataDepartmentRepository;
 import com.example.backend.employee.domain.model.Employee;
 import com.example.backend.employee.infrastructure.persistance.SpringDataEmployeeRepository;
-import com.example.backend.shared.dto.timesheet.CreateTimeSheetRequest;
-import com.example.backend.shared.dto.timesheet.TimeSheetEntryUpdateRequest;
-import com.example.backend.shared.dto.timesheet.TimeSheetResult;
-import com.example.backend.timesheet.model.TimeSheet;
-import com.example.backend.timesheet.model.TimeSheetEntry;
-import com.example.backend.timesheet.repository.TimeSheetEntryRepository;
-import com.example.backend.timesheet.repository.TimeSheetRepository;
-import com.example.backend.timesheet.service.TimeSheetService;
+import com.example.backend.timesheet.api.dto.CreateTimeSheetCommand;
+import com.example.backend.timesheet.api.dto.TimeSheetEntryUpdateCommand;
+import com.example.backend.timesheet.api.dto.TimeSheetResult;
+import com.example.backend.timesheet.application.service.TimeSheetService;
+import com.example.backend.timesheet.domain.model.TimeSheet;
+import com.example.backend.timesheet.domain.model.TimeSheetEntry;
+import com.example.backend.timesheet.infrastructure.persistance.repository.SpringDataTimeSheetEntryRepository;
+import com.example.backend.timesheet.infrastructure.persistance.repository.SpringDataTimeSheetRepository;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -27,16 +27,16 @@ import static org.assertj.core.api.Assertions.assertThat;
 @ExtendWith(MockitoExtension.class)
 abstract class BaseTimeSheetServiceTest {
     @Mock
-    protected TimeSheetRepository timeSheetRepository;
+    protected SpringDataTimeSheetRepository timeSheetRepository;
 
     @Mock
-    protected TimeSheetEntryRepository timeSheetEntryRepository;
+    protected SpringDataTimeSheetEntryRepository timeSheetEntryRepository;
 
     @Mock
     protected SpringDataEmployeeRepository employeeRepository;
 
     @Mock
-    protected DepartmentRepository departmentRepository;
+    protected SpringDataDepartmentRepository departmentRepository;
 
     @InjectMocks
     protected TimeSheetService timeSheetService;
@@ -108,12 +108,12 @@ abstract class BaseTimeSheetServiceTest {
         return user;
     }
 
-    protected CreateTimeSheetRequest createRequest(int year, int month, Long departmentId) {
-        return new CreateTimeSheetRequest(year, month, departmentId);
+    protected CreateTimeSheetCommand createRequest(int year, int month, Long departmentId) {
+        return new CreateTimeSheetCommand(year, month, departmentId);
     }
 
-    protected TimeSheetEntryUpdateRequest updateRequest(Long id, Integer workedDays, Integer workedHours) {
-        return new TimeSheetEntryUpdateRequest(
+    protected TimeSheetEntryUpdateCommand updateRequest(Long id, Integer workedDays, Integer workedHours) {
+        return new TimeSheetEntryUpdateCommand(
                 id,
                 workedDays,
                 workedHours,
@@ -126,8 +126,8 @@ abstract class BaseTimeSheetServiceTest {
         );
     }
 
-    protected TimeSheetEntryUpdateRequest updateRequestWithoutId(Integer workedDays, Integer workedHours) {
-        return new TimeSheetEntryUpdateRequest(
+    protected TimeSheetEntryUpdateCommand updateRequestWithoutId(Integer workedDays, Integer workedHours) {
+        return new TimeSheetEntryUpdateCommand(
                 null,
                 workedDays,
                 workedHours,

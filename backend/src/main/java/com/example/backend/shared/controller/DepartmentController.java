@@ -1,7 +1,7 @@
 package com.example.backend.shared.controller;
 
-import com.example.backend.department.CreateDepartmentRequest;
 import com.example.backend.department.DepartmentService;
+import com.example.backend.department.api.dto.CreateDepartmentCommand;
 import com.example.backend.department.api.dto.DepartmentResult;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -26,7 +26,7 @@ public class DepartmentController {
     }
 
     @PostMapping
-    private ResponseEntity<DepartmentResult> create(@RequestBody CreateDepartmentRequest request) {
+    private ResponseEntity<DepartmentResult> create(@RequestBody CreateDepartmentCommand request) {
         return ResponseEntity.ok(departmentService.create(request));
     }
 }
