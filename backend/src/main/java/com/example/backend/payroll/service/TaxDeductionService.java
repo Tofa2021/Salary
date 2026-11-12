@@ -1,16 +1,12 @@
 package com.example.backend.payroll.service;
 
-import com.example.backend.employee.domain.exception.employee.EmployeeNotFoundException;
-import com.example.backend.employee.domain.model.Employee;
 import com.example.backend.employee.infrastructure.persistance.SpringDataEmployeeRepository;
 import com.example.backend.payroll.exception.deduction.DeductionNotFoundException;
-import com.example.backend.payroll.exception.deduction.DuplicateChildDeductionException;
 import com.example.backend.payroll.exception.deduction.InvalidDeductionPeriodException;
 import com.example.backend.payroll.exception.deduction.UnknownDeductionTypeException;
 import com.example.backend.payroll.model.DeductionType;
 import com.example.backend.payroll.model.TaxDeduction;
 import com.example.backend.payroll.repository.TaxDeductionRepository;
-import com.example.backend.shared.dto.deduction.CreateDeductionRequest;
 import com.example.backend.shared.dto.deduction.DeductionResult;
 import com.example.backend.shared.dto.deduction.UpdateDeductionRequest;
 import lombok.RequiredArgsConstructor;
@@ -27,36 +23,36 @@ public class TaxDeductionService {
     private final TaxDeductionRepository deductionRepository;
     private final SpringDataEmployeeRepository employeeRepository;
 
-    @Transactional
-    public DeductionResult create(Long employeeId, CreateDeductionRequest request) {
-        Employee employee = employeeRepository.findById(employeeId)
-                .orElseThrow(() -> new EmployeeNotFoundException(employeeId));
-
-        DeductionType type = parseDeductionType(request.type());
-
-        if (request.validTo() != null && request.validTo().isBefore(request.validFrom())) {
-            throw new InvalidDeductionPeriodException(request.validFrom(), request.validTo());
-        }
-
-        if (type == DeductionType.CHILD && request.documentNumber() != null) {
-            boolean duplicate = deductionRepository.existsByEmployeeIdAndTypeAndDocumentNumber(
-                    employeeId, DeductionType.CHILD, request.documentNumber());
-            if (duplicate) {
-                throw new DuplicateChildDeductionException(employeeId, request.documentNumber());
-            }
-        }
-
-        TaxDeduction deduction = new TaxDeduction(
-                employee,
-                type,
-                request.amount(),
-                request.validFrom(),
-                request.validTo(),
-                request.documentNumber()
-        );
-
-        return DeductionResult.from(deductionRepository.save(deduction), LocalDate.now());
-    }
+//    @Transactional
+//    public DeductionResult create(Long employeeId, CreateDeductionRequest request) {
+//        Employee employee = employeeRepository.findById(employeeId)
+//                .orElseThrow(() -> new EmployeeNotFoundException(employeeId));
+//
+//        DeductionType type = parseDeductionType(request.type());
+//
+//        if (request.validTo() != null && request.validTo().isBefore(request.validFrom())) {
+//            throw new InvalidDeductionPeriodException(request.validFrom(), request.validTo());
+//        }
+//
+//        if (type == DeductionType.CHILD && request.documentNumber() != null) {
+//            boolean duplicate = deductionRepository.existsByEmployeeIdAndTypeAndDocumentNumber(
+//                    employeeId, DeductionType.CHILD, request.documentNumber());
+//            if (duplicate) {
+//                throw new DuplicateChildDeductionException(employeeId, request.documentNumber());
+//            }
+//        }
+//
+//        TaxDeduction deduction = new TaxDeduction(
+//                employee,
+//                type,
+//                request.amount(),
+//                request.validFrom(),
+//                request.validTo(),
+//                request.documentNumber()
+//        );
+//
+//        return DeductionResult.from(deductionRepository.save(deduction), LocalDate.now());
+//    }
 
     @Transactional(readOnly = true)
     public DeductionResult getById(Long id) {

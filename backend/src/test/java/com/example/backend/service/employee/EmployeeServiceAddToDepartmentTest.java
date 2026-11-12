@@ -1,9 +1,8 @@
 package com.example.backend.service.employee;
 
-import com.example.backend.department.Department;
-import com.example.backend.department.exception.DepartmentNotFoundException;
 import com.example.backend.employee.domain.exception.employee.EmployeeAlreadyInDepartmentException;
 import com.example.backend.employee.domain.exception.employee.EmployeeDismissedException;
+import com.example.backend.employee.domain.exception.employee.EmployeeInvalidDepartmentException;
 import com.example.backend.employee.domain.model.Employee;
 import org.junit.jupiter.api.Test;
 
@@ -19,20 +18,19 @@ class EmployeeServiceAddToDepartmentTest extends BaseEmployeeServiceTest {
     @Test
     void addToDepartment_Success() {
         Employee employee = employee(1L, "T-001");
-        employee.setDepartment(null);
-        Department newDepartment = department(2L, "HR");
+        employee.setDepartmentId(null);
         when(employeeRepository.findById(1L)).thenReturn(Optional.of(employee));
-        when(departmentRepository.findById(2L)).thenReturn(Optional.of(newDepartment));
+        when(departmentLookup.findById(2L)).thenReturn(Optional.of(departmentResult(2L, "HR")));
 
         employeeService.addToDepartment(2L, 1L);
 
-        assertThat(employee.getDepartment()).isSameAs(newDepartment);
+        assertThat(employee.getDepartmentId()).isEqualTo(2L);
     }
 
     @Test
     void addToDepartment_EmployeeDismissed_Throws() {
         Employee employee = employee(1L, "T-001");
-        employee.setDepartment(null);
+        employee.setDepartmentId(null);
         employee.setDismissalDate(LocalDate.of(2025, 6, 1));
         when(employeeRepository.findById(1L)).thenReturn(Optional.of(employee));
 
@@ -52,11 +50,11 @@ class EmployeeServiceAddToDepartmentTest extends BaseEmployeeServiceTest {
     @Test
     void addToDepartment_departmentNotFound_throws() {
         Employee employee = employee(1L, "T-001");
-        employee.setDepartment(null);
+        employee.setDepartmentId(null);
         when(employeeRepository.findById(1L)).thenReturn(Optional.of(employee));
-        when(departmentRepository.findById(99L)).thenReturn(Optional.empty());
+        when(departmentLookup.findById(99L)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> employeeService.addToDepartment(99L, 1L))
-                .isInstanceOf(DepartmentNotFoundException.class);
+                .isInstanceOf(EmployeeInvalidDepartmentException.class);
     }
 }

@@ -5,10 +5,12 @@ import com.example.backend.auth.repository.UserRepository;
 import com.example.backend.department.Department;
 import com.example.backend.department.DepartmentRepository;
 import com.example.backend.department.exception.DepartmentNotFoundException;
-import com.example.backend.employee.domain.exception.employee.EmployeeNotFoundException;
 import com.example.backend.employee.domain.model.Employee;
 import com.example.backend.employee.infrastructure.persistance.SpringDataEmployeeRepository;
-import com.example.backend.shared.dto.timesheet.*;
+import com.example.backend.shared.dto.timesheet.TimeSheetEntryResult;
+import com.example.backend.shared.dto.timesheet.TimeSheetEntryUpdateRequest;
+import com.example.backend.shared.dto.timesheet.TimeSheetResult;
+import com.example.backend.shared.dto.timesheet.TimeSheetSummaryResult;
 import com.example.backend.timesheet.exception.*;
 import com.example.backend.timesheet.model.TimeSheet;
 import com.example.backend.timesheet.model.TimeSheetEntry;
@@ -19,7 +21,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -35,28 +36,28 @@ public class TimeSheetService {
     private final DepartmentRepository departmentRepository;
     private final UserRepository userRepository;
 
-    @Transactional
-    public TimeSheetResult create(CreateTimeSheetRequest request) {
-        Department department = findDepartment(request.departmentId());
-
-        if (timeSheetRepository.findByDepartmentAndPeriod(request.departmentId(), request.year(), request.month()).isPresent()) {
-            throw new TimeSheetAlreadyExistsException(request.departmentId(), request.year(), request.month());
-        }
-
-        TimeSheet timeSheet = new TimeSheet(request.year(), request.month(), department);
-
-        LocalDate periodEnd = LocalDate.of(request.year(), request.month(), 1)
-                .withDayOfMonth(LocalDate.of(request.year(), request.month(), 1).lengthOfMonth());
-
-        List<Employee> employees = employeeRepository.findActiveByDepartmentOnDate(request.departmentId(), periodEnd);
-
-        for (Employee employee : employees) {
-            addEmployeeToTimeSheet(timeSheet, employee);
-        }
-
-        TimeSheet saved = timeSheetRepository.save(timeSheet);
-        return TimeSheetResult.from(saved, canEdit(saved), canApprove(saved), canReopen(saved));
-    }
+//    @Transactional
+//    public TimeSheetResult create(CreateTimeSheetRequest request) {
+//        Department department = findDepartment(request.departmentId());
+//
+//        if (timeSheetRepository.findByDepartmentAndPeriod(request.departmentId(), request.year(), request.month()).isPresent()) {
+//            throw new TimeSheetAlreadyExistsException(request.departmentId(), request.year(), request.month());
+//        }
+//
+//        TimeSheet timeSheet = new TimeSheet(request.year(), request.month(), department);
+//
+//        LocalDate periodEnd = LocalDate.of(request.year(), request.month(), 1)
+//                .withDayOfMonth(LocalDate.of(request.year(), request.month(), 1).lengthOfMonth());
+//
+//        List<Employee> employees = employeeRepository.findActiveByDepartmentOnDate(request.departmentId(), periodEnd);
+//
+//        for (Employee employee : employees) {
+//            addEmployeeToTimeSheet(timeSheet, employee);
+//        }
+//
+//        TimeSheet saved = timeSheetRepository.save(timeSheet);
+//        return TimeSheetResult.from(saved, canEdit(saved), canApprove(saved), canReopen(saved));
+//    }
 
     @Transactional(readOnly = true)
     public TimeSheetResult getById(Long id) {
@@ -180,35 +181,35 @@ public class TimeSheetService {
         return timeSheet.isApproved();
     }
 
-    @Transactional
-    public TimeSheetEntryResult addEmployeeToTimeSheet(Long timeSheetId, Long employeeId) {
-        TimeSheet timeSheet = findTimeSheet(timeSheetId);
-
-        if (timeSheet.isApproved()) {
-            throw new TimeSheetAlreadyApprovedException(timeSheetId);
-        }
-
-        Employee employee = employeeRepository.findById(employeeId)
-                .orElseThrow(() -> new EmployeeNotFoundException(employeeId));
-
-        if (timeSheetEntryRepository.existsByTimeSheetIdAndEmployeeId(timeSheetId, employeeId)) {
-            throw new DuplicateTimeSheetEntryException(timeSheetId, employeeId);
-        }
-
-        TimeSheetEntry entry = new TimeSheetEntry();
-        entry.setTimeSheet(timeSheet);
-        entry.setEmployee(employee);
-        entry.setWorkedDays(0);
-        entry.setWorkedHours(0);
-        entry.setVacationDays(0);
-        entry.setSickLeaveDays(0);
-        entry.setBusinessTripDays(0);
-        entry.setAbsentDays(0);
-        entry.setOvertimeHours(0);
-        entry.setNightHours(0);
-
-        return TimeSheetEntryResult.from(timeSheetEntryRepository.save(entry));
-    }
+//    @Transactional
+//    public TimeSheetEntryResult addEmployeeToTimeSheet(Long timeSheetId, Long employeeId) {
+//        TimeSheet timeSheet = findTimeSheet(timeSheetId);
+//
+//        if (timeSheet.isApproved()) {
+//            throw new TimeSheetAlreadyApprovedException(timeSheetId);
+//        }
+//
+//        Employee employee = employeeRepository.findById(employeeId)
+//                .orElseThrow(() -> new EmployeeNotFoundException(employeeId));
+//
+//        if (timeSheetEntryRepository.existsByTimeSheetIdAndEmployeeId(timeSheetId, employeeId)) {
+//            throw new DuplicateTimeSheetEntryException(timeSheetId, employeeId);
+//        }
+//
+//        TimeSheetEntry entry = new TimeSheetEntry();
+//        entry.setTimeSheet(timeSheet);
+//        entry.setEmployee(employee);
+//        entry.setWorkedDays(0);
+//        entry.setWorkedHours(0);
+//        entry.setVacationDays(0);
+//        entry.setSickLeaveDays(0);
+//        entry.setBusinessTripDays(0);
+//        entry.setAbsentDays(0);
+//        entry.setOvertimeHours(0);
+//        entry.setNightHours(0);
+//
+//        return TimeSheetEntryResult.from(timeSheetEntryRepository.save(entry));
+//    }
 
     public TimeSheetEntry addEmployeeToTimeSheet(TimeSheet timeSheet, Employee employee) {
         TimeSheetEntry entry = new TimeSheetEntry(

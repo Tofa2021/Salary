@@ -1,12 +1,12 @@
 package com.example.backend.service.employee;
 
-import com.example.backend.department.exception.DepartmentNotFoundException;
 import com.example.backend.employee.api.dto.EmployeeResult;
+import com.example.backend.employee.domain.exception.employee.EmployeeInvalidDepartmentException;
+import com.example.backend.employee.domain.exception.employee.EmployeeInvalidPositionException;
 import com.example.backend.employee.domain.exception.employee.EmployeeNotFoundException;
 import com.example.backend.employee.domain.exception.employee.UnknownEmploymentTypeException;
 import com.example.backend.employee.domain.model.Employee;
 import com.example.backend.employee.infrastructure.web.dto.UpdateEmployeeRequest;
-import com.example.backend.position.exception.PositionNotFoundException;
 import org.junit.jupiter.api.Test;
 
 import java.util.Optional;
@@ -21,8 +21,8 @@ class EmployeeServiceUpdateTest extends BaseEmployeeServiceTest {
     void update_AllFields_UpdatesEverything() {
         Employee employee = employee(1L, "T-001");
         when(employeeRepository.findById(1L)).thenReturn(Optional.of(employee));
-        when(departmentRepository.findById(1L)).thenReturn(Optional.of(department()));
-        when(positionRepository.findById(1L)).thenReturn(Optional.of(position()));
+        when(departmentLookup.findById(1L)).thenReturn(Optional.of(departmentResult()));
+        when(positionLookup.findById(1L)).thenReturn(Optional.of(positionResult()));
 
         EmployeeResult result = employeeService.update(1L, updateRequest());
 
@@ -38,7 +38,7 @@ class EmployeeServiceUpdateTest extends BaseEmployeeServiceTest {
         when(employeeRepository.findById(1L)).thenReturn(Optional.of(employee));
 
         UpdateEmployeeRequest request = new UpdateEmployeeRequest(
-                null, null, null, null, null, null, null, null, null, null);
+                null, null, null, null, null, null, null, null);
 
         EmployeeResult result = employeeService.update(1L, request);
 
@@ -52,7 +52,7 @@ class EmployeeServiceUpdateTest extends BaseEmployeeServiceTest {
         when(employeeRepository.findById(1L)).thenReturn(Optional.of(employee));
 
         UpdateEmployeeRequest request = new UpdateEmployeeRequest(
-                null, "НовоеИмя", null, null, null, null, null, null, null, null);
+                null, "НовоеИмя", null, null, null, null, null, null);
 
         EmployeeResult result = employeeService.update(1L, request);
 
@@ -64,26 +64,26 @@ class EmployeeServiceUpdateTest extends BaseEmployeeServiceTest {
     void update_DepartmentNotFound_Throws() {
         Employee employee = employee(1L, "T-001");
         when(employeeRepository.findById(1L)).thenReturn(Optional.of(employee));
-        when(departmentRepository.findById(99L)).thenReturn(Optional.empty());
+        when(departmentLookup.findById(99L)).thenReturn(Optional.empty());
 
         UpdateEmployeeRequest request = new UpdateEmployeeRequest(
-                null, null, null, null, null, null, null, 99L, null, null);
+                null, null, null, null, null, 99L, null, null);
 
         assertThatThrownBy(() -> employeeService.update(1L, request))
-                .isInstanceOf(DepartmentNotFoundException.class);
+                .isInstanceOf(EmployeeInvalidDepartmentException.class);
     }
 
     @Test
     void update_PositionNotFound_Throws() {
         Employee employee = employee(1L, "T-001");
         when(employeeRepository.findById(1L)).thenReturn(Optional.of(employee));
-        when(positionRepository.findById(99L)).thenReturn(Optional.empty());
+        when(positionLookup.findById(99L)).thenReturn(Optional.empty());
 
         UpdateEmployeeRequest request = new UpdateEmployeeRequest(
-                null, null, null, null, null, null, null, null, 99L, null);
+                null, null, null, null, null, null, 99L, null);
 
         assertThatThrownBy(() -> employeeService.update(1L, request))
-                .isInstanceOf(PositionNotFoundException.class);
+                .isInstanceOf(EmployeeInvalidPositionException.class);
     }
 
     @Test
@@ -92,7 +92,7 @@ class EmployeeServiceUpdateTest extends BaseEmployeeServiceTest {
         when(employeeRepository.findById(1L)).thenReturn(Optional.of(employee));
 
         UpdateEmployeeRequest request = new UpdateEmployeeRequest(
-                null, null, null, null, null, null, null, null, null, "INVALID");
+                null, null, null, null, null, null, null, "INVALID");
 
         assertThatThrownBy(() -> employeeService.update(1L, request))
                 .isInstanceOf(UnknownEmploymentTypeException.class);

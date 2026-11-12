@@ -1,10 +1,6 @@
 package com.example.backend.service.employee;
 
-import com.example.backend.department.Department;
-import com.example.backend.department.exception.DepartmentNotFoundException;
-import com.example.backend.employee.domain.exception.employee.EmployeeDismissedException;
-import com.example.backend.employee.domain.exception.employee.EmployeeNotFoundException;
-import com.example.backend.employee.domain.exception.employee.SameDepartmentException;
+import com.example.backend.employee.domain.exception.employee.*;
 import com.example.backend.employee.domain.model.Employee;
 import org.junit.jupiter.api.Test;
 
@@ -13,21 +9,20 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.Mockito.verifyNoInteractions;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 class EmployeeServiceTransferTest extends BaseEmployeeServiceTest {
 
     @Test
     void transfer_Success() {
         Employee employee = employee(1L, "T-001");
-        Department newDept = department(2L, "HR");
         when(employeeRepository.findById(1L)).thenReturn(Optional.of(employee));
-        when(departmentRepository.findById(2L)).thenReturn(Optional.of(newDept));
+        when(departmentLookup.findById(2L)).thenReturn(Optional.of(departmentResult(2L, "HR")));
 
         employeeService.transfer(2L, 1L);
 
-        assertThat(employee.getDepartment()).isSameAs(newDept);
+        assertThat(employee.getDepartmentId()).isEqualTo(2L);
+        verify(employeeRepository).save(employee);
     }
 
     @Test
@@ -39,24 +34,36 @@ class EmployeeServiceTransferTest extends BaseEmployeeServiceTest {
         assertThatThrownBy(() -> employeeService.transfer(2L, 1L))
                 .isInstanceOf(EmployeeDismissedException.class);
 
-        verifyNoInteractions(departmentRepository);
+        verifyNoInteractions(departmentLookup);
+    }
+
+    @Test
+    void transfer_EmployeeWithoutDepartment_Throws() {
+        Employee employee = employee(1L, "T-001");
+        employee.setDepartmentId(null);
+        when(employeeRepository.findById(1L)).thenReturn(Optional.of(employee));
+
+        assertThatThrownBy(() -> employeeService.transfer(2L, 1L))
+                .isInstanceOf(EmployeeWithoutDepartmentException.class);
+
+        verifyNoInteractions(departmentLookup);
     }
 
     @Test
     void transfer_DepartmentNotFound_Throws() {
         Employee employee = employee(1L, "T-001");
         when(employeeRepository.findById(1L)).thenReturn(Optional.of(employee));
-        when(departmentRepository.findById(99L)).thenReturn(Optional.empty());
+        when(departmentLookup.findById(99L)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> employeeService.transfer(99L, 1L))
-                .isInstanceOf(DepartmentNotFoundException.class);
+                .isInstanceOf(EmployeeInvalidDepartmentException.class);
     }
 
     @Test
     void transfer_SameDepartment_Throws() {
-        Employee employee = employee(1L, "T-001");   // department = 1L
+        Employee employee = employee(1L, "T-001");
         when(employeeRepository.findById(1L)).thenReturn(Optional.of(employee));
-        when(departmentRepository.findById(1L)).thenReturn(Optional.of(department()));
+        when(departmentLookup.findById(1L)).thenReturn(Optional.of(departmentResult(1L, "IT")));
 
         assertThatThrownBy(() -> employeeService.transfer(1L, 1L))
                 .isInstanceOf(SameDepartmentException.class);
