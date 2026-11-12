@@ -11,7 +11,7 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 class EmployeeServiceRemoveFromDepartmentTest extends BaseEmployeeServiceTest {
 
@@ -22,7 +22,8 @@ class EmployeeServiceRemoveFromDepartmentTest extends BaseEmployeeServiceTest {
 
         employeeService.removeFromDepartment(1L);
 
-        assertThat(employee.getDepartment()).isNull();
+        assertThat(employee.getDepartmentId()).isNull();
+        verify(employeeRepository).save(employee);
     }
 
     @Test
@@ -33,12 +34,14 @@ class EmployeeServiceRemoveFromDepartmentTest extends BaseEmployeeServiceTest {
 
         assertThatThrownBy(() -> employeeService.removeFromDepartment(1L))
                 .isInstanceOf(EmployeeDismissedException.class);
+
+        verifyNoInteractions(departmentLookup);
     }
 
     @Test
     void removeFromDepartment_WithoutDepartment_Throws() {
         Employee employee = employee(1L, "T-001");
-        employee.setDepartment(null);
+        employee.setDepartmentId(null);
         when(employeeRepository.findById(1L)).thenReturn(Optional.of(employee));
 
         assertThatThrownBy(() -> employeeService.removeFromDepartment(1L))

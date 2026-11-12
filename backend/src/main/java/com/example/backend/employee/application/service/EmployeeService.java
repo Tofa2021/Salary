@@ -168,6 +168,7 @@ public class EmployeeService {
             throw new EmployeeWithoutDepartmentException(employeeId);
         }
         employee.setDepartmentId(null);
+        employeeRepository.save(employee);
     }
 
     public void addToDepartment(Long departmentId, Long employeeId) {

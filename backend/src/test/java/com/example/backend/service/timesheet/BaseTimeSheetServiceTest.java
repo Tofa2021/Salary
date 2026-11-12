@@ -21,12 +21,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 abstract class BaseTimeSheetServiceTest {
@@ -131,18 +127,18 @@ abstract class BaseTimeSheetServiceTest {
         );
     }
 
-    protected void stubCreateSuccess(Department department, List<Employee> employees) {
-        when(departmentRepository.findById(department.getId())).thenReturn(Optional.of(department));
-        when(timeSheetRepository.findByDepartmentAndPeriod(department.getId(), 2026, 1)).thenReturn(Optional.empty());
-        when(employeeRepository.findActiveByDepartmentOnDate(any(), any())).thenReturn(employees);
-        when(timeSheetRepository.save(any(TimeSheet.class))).thenAnswer(inv -> {
-            TimeSheet timeSheet = inv.getArgument(0);
-            if (timeSheet.getId() == null) {
-                timeSheet.setId(1L);
-            }
-            return timeSheet;
-        });
-    }
+//    protected void stubCreateSuccess(Department department, List<Employee> employees) {
+//        when(departmentRepository.findById(department.getId())).thenReturn(Optional.of(department));
+//        when(timeSheetRepository.findByDepartmentAndPeriod(department.getId(), 2026, 1)).thenReturn(Optional.empty());
+//        when(employeeRepository.findActiveByDepartmentOnDate(any(), any())).thenReturn(employees);
+//        when(timeSheetRepository.save(any(TimeSheet.class))).thenAnswer(inv -> {
+//            TimeSheet timeSheet = inv.getArgument(0);
+//            if (timeSheet.getId() == null) {
+//                timeSheet.setId(1L);
+//            }
+//            return timeSheet;
+//        });
+//    }
 
     protected void assertTimeSheetResult(TimeSheetResult result, TimeSheet expected) {
         assertThat(result.id()).isEqualTo(expected.getId());

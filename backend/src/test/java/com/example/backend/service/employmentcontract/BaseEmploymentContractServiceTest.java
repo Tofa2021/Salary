@@ -2,7 +2,6 @@ package com.example.backend.service.employmentcontract;
 
 import com.example.backend.employee.api.dto.EmploymentContractResult;
 import com.example.backend.employee.application.service.EmploymentContractService;
-import com.example.backend.employee.domain.model.ContractType;
 import com.example.backend.employee.domain.model.Employee;
 import com.example.backend.employee.domain.model.EmploymentContract;
 import com.example.backend.employee.infrastructure.persistance.SpringDataEmployeeRepository;
@@ -40,28 +39,28 @@ abstract class BaseEmploymentContractServiceTest {
         e.setHireDate(LocalDate.of(2026, 1, 1));
         return e;
     }
+//
+//    protected EmploymentContract contract(Long id, Employee employee) {
+//        EmploymentContract c = new EmploymentContract();
+//        c.setId(id);
+//        c.setEmployee(employee);
+//        c.setContractNumber("C-" + id);
+//        c.setStartDate(LocalDate.of(2026, 1, 1));
+//        c.setEndDate(null);
+//        c.setContractType(ContractType.INDEFINITE);
+//        c.setBaseSalary(BigDecimal.valueOf(1000));
+//        c.setBonusPercent(BigDecimal.valueOf(10));
+//        c.setWorkHoursPerWeek(40);
+//        c.setMainJob(true);
+//        return c;
+//    }
 
-    protected EmploymentContract contract(Long id, Employee employee) {
-        EmploymentContract c = new EmploymentContract();
-        c.setId(id);
-        c.setEmployee(employee);
-        c.setContractNumber("C-" + id);
-        c.setStartDate(LocalDate.of(2026, 1, 1));
-        c.setEndDate(null);
-        c.setContractType(ContractType.INDEFINITE);
-        c.setBaseSalary(BigDecimal.valueOf(1000));
-        c.setBonusPercent(BigDecimal.valueOf(10));
-        c.setWorkHoursPerWeek(40);
-        c.setMainJob(true);
-        return c;
-    }
-
-    protected EmploymentContract fixedTermContract(Long id, Employee employee, LocalDate endDate) {
-        EmploymentContract c = contract(id, employee);
-        c.setContractType(ContractType.FIXED_TERM);
-        c.setEndDate(endDate);
-        return c;
-    }
+//    protected EmploymentContract fixedTermContract(Long id, Employee employee, LocalDate endDate) {
+//        EmploymentContract c = contract(id, employee);
+//        c.setContractType(ContractType.FIXED_TERM);
+//        c.setEndDate(endDate);
+//        return c;
+//    }
 
     protected CreateEmploymentContractRequest createRequest(String number, String type, boolean mainJob) {
         return new CreateEmploymentContractRequest(
@@ -87,24 +86,24 @@ abstract class BaseEmploymentContractServiceTest {
         );
     }
 
-    protected void stubCreateBase(Employee employee) {
-        when(employeeRepository.findById(employee.getId())).thenReturn(Optional.of(employee));
-        when(contractRepository.existsByContractNumber(any())).thenReturn(false);
-        when(contractRepository.save(any(EmploymentContract.class))).thenAnswer(inv -> {
-            EmploymentContract c = inv.getArgument(0);
-            if (c.getId() == null) c.setId(1L);
-            return c;
-        });
-    }
+//    protected void stubCreateBase(Employee employee) {
+//        when(employeeRepository.findById(employee.getId())).thenReturn(Optional.of(employee));
+//        when(contractRepository.existsByContractNumber(any())).thenReturn(false);
+//        when(contractRepository.save(any(EmploymentContract.class))).thenAnswer(inv -> {
+//            EmploymentContract c = inv.getArgument(0);
+//            if (c.getId() == null) c.setId(1L);
+//            return c;
+//        });
+//    }
 
     protected void stubMainJobCheck() {
         when(contractRepository.findActiveMainOnDate(any(), any())).thenReturn(Optional.empty());
     }
 
-    protected void stubCreateSuccess(Employee employee) {
-        stubCreateBase(employee);
-        stubMainJobCheck();
-    }
+//    protected void stubCreateSuccess(Employee employee) {
+//        stubCreateBase(employee);
+//        stubMainJobCheck();
+//    }
 
     protected void assertContractResult(EmploymentContractResult result, EmploymentContract expected) {
         assertThat(result.id()).isEqualTo(expected.getId());

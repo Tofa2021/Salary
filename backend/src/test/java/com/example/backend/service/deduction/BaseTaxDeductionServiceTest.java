@@ -17,8 +17,6 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 abstract class BaseTaxDeductionServiceTest {
@@ -103,18 +101,18 @@ abstract class BaseTaxDeductionServiceTest {
         );
     }
 
-    protected void stubCreateBase(Employee employee) {
-        when(employeeRepository.findById(employee.getId())).thenReturn(java.util.Optional.of(employee));
-        when(deductionRepository.save(any(TaxDeduction.class))).thenAnswer(inv -> {
-            TaxDeduction deduction = inv.getArgument(0);
-
-            if (deduction.getId() == null) {
-                deduction.setId(1L);
-            }
-
-            return deduction;
-        });
-    }
+//    protected void stubCreateBase(Employee employee) {
+//        when(employeeRepository.findById(employee.getId())).thenReturn(java.util.Optional.of(employee));
+//        when(deductionRepository.save(any(TaxDeduction.class))).thenAnswer(inv -> {
+//            TaxDeduction deduction = inv.getArgument(0);
+//
+//            if (deduction.getId() == null) {
+//                deduction.setId(1L);
+//            }
+//
+//            return deduction;
+//        });
+//    }
 
     protected void assertDeductionResult(DeductionResult result, TaxDeduction expected) {
         assertThat(result.id()).isEqualTo(expected.getId());

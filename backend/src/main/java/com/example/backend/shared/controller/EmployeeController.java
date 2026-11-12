@@ -6,8 +6,6 @@ import com.example.backend.employee.infrastructure.web.dto.CreateEmployeeRequest
 import com.example.backend.employee.infrastructure.web.dto.DismissRequest;
 import com.example.backend.employee.infrastructure.web.dto.UpdateEmployeeRequest;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -26,11 +24,11 @@ public class EmployeeController {
         return ResponseEntity.ok(employeeService.create(request));
     }
 
-    @GetMapping
-    @PreAuthorize("hasAnyRole('ADMIN', 'HR', 'ACCOUNTANT', 'ANALYST')")
-    public ResponseEntity<Page<EmployeeResult>> findAll(Pageable pageable) {
-        return ResponseEntity.ok(employeeService.getAll(pageable));
-    }
+//    @GetMapping
+//    @PreAuthorize("hasAnyRole('ADMIN', 'HR', 'ACCOUNTANT', 'ANALYST')")
+//    public ResponseEntity<Page<EmployeeResult>> findAll(Pageable pageable) {
+//        return ResponseEntity.ok(employeeService.getAll(pageable));
+//    }
 
     @GetMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMIN', 'HR', 'ACCOUNTANT', 'ANALYST')")
@@ -44,11 +42,11 @@ public class EmployeeController {
         return ResponseEntity.ok(employeeService.getByPersonnelNumber(pn));
     }
 
-    @GetMapping("/by-department/{departmentId}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'HR', 'ACCOUNTANT', 'ANALYST')")
-    public ResponseEntity<Page<EmployeeResult>> findByDepartment(@PathVariable Long departmentId, Pageable pageable) {
-        return ResponseEntity.ok(employeeService.getByDepartment(departmentId, pageable));
-    }
+//    @GetMapping("/by-department/{departmentId}")
+//    @PreAuthorize("hasAnyRole('ADMIN', 'HR', 'ACCOUNTANT', 'ANALYST')")
+//    public ResponseEntity<Page<EmployeeResult>> findByDepartment(@PathVariable Long departmentId, Pageable pageable) {
+//        return ResponseEntity.ok(employeeService.getByDepartment(departmentId, pageable));
+//    }
 
     @PutMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMIN', 'HR')")
