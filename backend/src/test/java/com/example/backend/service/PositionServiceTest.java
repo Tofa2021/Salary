@@ -1,12 +1,12 @@
 package com.example.backend.service;
 
-import com.example.backend.shared.dto.position.PositionRequest;
-import com.example.backend.shared.dto.position.PositionResult;
 import com.example.backend.payroll.exception.tariffrate.TariffRateNotFoundException;
 import com.example.backend.payroll.service.TariffRateService;
 import com.example.backend.position.Position;
 import com.example.backend.position.PositionRepository;
+import com.example.backend.position.PositionRequest;
 import com.example.backend.position.PositionService;
+import com.example.backend.position.api.dto.PositionResult;
 import com.example.backend.position.exception.InvalidPositionNameException;
 import com.example.backend.position.exception.InvalidTariffCategoryException;
 import com.example.backend.position.exception.InvalidTariffCoefficientException;

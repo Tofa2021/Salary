@@ -1,8 +1,8 @@
 package com.example.backend.shared.controller;
 
+import com.example.backend.department.CreateDepartmentRequest;
 import com.example.backend.department.DepartmentService;
-import com.example.backend.shared.dto.department.CreateDepartmentRequest;
-import com.example.backend.shared.dto.department.DepartmentResult;
+import com.example.backend.department.api.dto.DepartmentResult;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

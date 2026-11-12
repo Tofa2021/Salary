@@ -1,13 +1,13 @@
 package com.example.backend.service.employmentcontract;
 
+import com.example.backend.employee.api.dto.EmploymentContractResult;
 import com.example.backend.employee.application.service.EmploymentContractService;
 import com.example.backend.employee.domain.model.ContractType;
 import com.example.backend.employee.domain.model.Employee;
 import com.example.backend.employee.domain.model.EmploymentContract;
-import com.example.backend.employee.infrastructure.repository.EmployeeRepository;
-import com.example.backend.employee.infrastructure.repository.EmploymentContractRepository;
-import com.example.backend.shared.dto.employmentcontract.CreateEmploymentContractRequest;
-import com.example.backend.shared.dto.employmentcontract.EmploymentContractResult;
+import com.example.backend.employee.infrastructure.persistance.SpringDataEmployeeRepository;
+import com.example.backend.employee.infrastructure.persistance.SpringDataEmploymentContractRepository;
+import com.example.backend.employee.infrastructure.web.dto.CreateEmploymentContractRequest;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -25,9 +25,9 @@ import static org.mockito.Mockito.when;
 abstract class BaseEmploymentContractServiceTest {
 
     @Mock
-    protected EmploymentContractRepository contractRepository;
+    protected SpringDataEmploymentContractRepository contractRepository;
     @Mock
-    protected EmployeeRepository employeeRepository;
+    protected SpringDataEmployeeRepository employeeRepository;
     @InjectMocks
     protected EmploymentContractService contractService;
 

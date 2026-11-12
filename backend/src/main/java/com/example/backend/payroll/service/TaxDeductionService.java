@@ -2,7 +2,7 @@ package com.example.backend.payroll.service;
 
 import com.example.backend.employee.domain.exception.employee.EmployeeNotFoundException;
 import com.example.backend.employee.domain.model.Employee;
-import com.example.backend.employee.infrastructure.repository.EmployeeRepository;
+import com.example.backend.employee.infrastructure.persistance.SpringDataEmployeeRepository;
 import com.example.backend.payroll.exception.deduction.DeductionNotFoundException;
 import com.example.backend.payroll.exception.deduction.DuplicateChildDeductionException;
 import com.example.backend.payroll.exception.deduction.InvalidDeductionPeriodException;
@@ -25,7 +25,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class TaxDeductionService {
     private final TaxDeductionRepository deductionRepository;
-    private final EmployeeRepository employeeRepository;
+    private final SpringDataEmployeeRepository employeeRepository;
 
     @Transactional
     public DeductionResult create(Long employeeId, CreateDeductionRequest request) {

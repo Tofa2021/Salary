@@ -1,10 +1,10 @@
 package com.example.backend.service.employee;
 
+import com.example.backend.employee.api.dto.EmployeeResult;
 import com.example.backend.employee.domain.exception.employee.DismissalDateBeforeHireDateException;
 import com.example.backend.employee.domain.exception.employee.EmployeeNotFoundException;
 import com.example.backend.employee.domain.model.Employee;
-import com.example.backend.shared.dto.employee.DismissRequest;
-import com.example.backend.shared.dto.employee.EmployeeResult;
+import com.example.backend.employee.infrastructure.web.dto.DismissRequest;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;

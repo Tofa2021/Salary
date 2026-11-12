@@ -1,5 +1,6 @@
 package com.example.backend.service.employmentcontract;
 
+import com.example.backend.employee.api.dto.EmploymentContractResult;
 import com.example.backend.employee.domain.exception.employee.EmployeeNotFoundException;
 import com.example.backend.employee.domain.exception.employmentcontract.EmploymentContractNumberAlreadyExistsException;
 import com.example.backend.employee.domain.exception.employmentcontract.InvalidEmploymentContractPeriodException;
@@ -8,8 +9,7 @@ import com.example.backend.employee.domain.exception.employmentcontract.UnknownE
 import com.example.backend.employee.domain.model.ContractType;
 import com.example.backend.employee.domain.model.Employee;
 import com.example.backend.employee.domain.model.EmploymentContract;
-import com.example.backend.shared.dto.employmentcontract.CreateEmploymentContractRequest;
-import com.example.backend.shared.dto.employmentcontract.EmploymentContractResult;
+import com.example.backend.employee.infrastructure.web.dto.CreateEmploymentContractRequest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullSource;

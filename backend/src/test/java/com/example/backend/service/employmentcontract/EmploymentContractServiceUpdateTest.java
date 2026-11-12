@@ -1,11 +1,11 @@
 package com.example.backend.service.employmentcontract;
 
+import com.example.backend.employee.api.dto.EmploymentContractResult;
 import com.example.backend.employee.domain.exception.employmentcontract.EmploymentContractNotFoundException;
 import com.example.backend.employee.domain.exception.employmentcontract.InvalidEmploymentContractPeriodException;
 import com.example.backend.employee.domain.model.Employee;
 import com.example.backend.employee.domain.model.EmploymentContract;
-import com.example.backend.shared.dto.employmentcontract.EmploymentContractResult;
-import com.example.backend.shared.dto.employmentcontract.UpdateEmploymentContractRequest;
+import com.example.backend.employee.infrastructure.web.dto.UpdateEmploymentContractRequest;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;

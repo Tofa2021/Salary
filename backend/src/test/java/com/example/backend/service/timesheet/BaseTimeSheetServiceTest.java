@@ -5,7 +5,7 @@ import com.example.backend.auth.model.UserRole;
 import com.example.backend.department.Department;
 import com.example.backend.department.DepartmentRepository;
 import com.example.backend.employee.domain.model.Employee;
-import com.example.backend.employee.infrastructure.repository.EmployeeRepository;
+import com.example.backend.employee.infrastructure.persistance.SpringDataEmployeeRepository;
 import com.example.backend.shared.dto.timesheet.CreateTimeSheetRequest;
 import com.example.backend.shared.dto.timesheet.TimeSheetEntryUpdateRequest;
 import com.example.backend.shared.dto.timesheet.TimeSheetResult;
@@ -37,7 +37,7 @@ abstract class BaseTimeSheetServiceTest {
     protected TimeSheetEntryRepository timeSheetEntryRepository;
 
     @Mock
-    protected EmployeeRepository employeeRepository;
+    protected SpringDataEmployeeRepository employeeRepository;
 
     @Mock
     protected DepartmentRepository departmentRepository;

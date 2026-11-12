@@ -1,12 +1,12 @@
 package com.example.backend.service.employee;
 
 import com.example.backend.department.exception.DepartmentNotFoundException;
+import com.example.backend.employee.api.dto.EmployeeResult;
 import com.example.backend.employee.domain.exception.employee.EmployeeNotFoundException;
 import com.example.backend.employee.domain.exception.employee.UnknownEmploymentTypeException;
 import com.example.backend.employee.domain.model.Employee;
+import com.example.backend.employee.infrastructure.web.dto.UpdateEmployeeRequest;
 import com.example.backend.position.exception.PositionNotFoundException;
-import com.example.backend.shared.dto.employee.EmployeeResult;
-import com.example.backend.shared.dto.employee.UpdateEmployeeRequest;
 import org.junit.jupiter.api.Test;
 
 import java.util.Optional;

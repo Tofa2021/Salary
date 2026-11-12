@@ -7,7 +7,7 @@ import com.example.backend.department.DepartmentRepository;
 import com.example.backend.department.exception.DepartmentNotFoundException;
 import com.example.backend.employee.domain.exception.employee.EmployeeNotFoundException;
 import com.example.backend.employee.domain.model.Employee;
-import com.example.backend.employee.infrastructure.repository.EmployeeRepository;
+import com.example.backend.employee.infrastructure.persistance.SpringDataEmployeeRepository;
 import com.example.backend.shared.dto.timesheet.*;
 import com.example.backend.timesheet.exception.*;
 import com.example.backend.timesheet.model.TimeSheet;
@@ -31,7 +31,7 @@ import java.util.stream.Collectors;
 public class TimeSheetService {
     private final TimeSheetRepository timeSheetRepository;
     private final TimeSheetEntryRepository timeSheetEntryRepository;
-    private final EmployeeRepository employeeRepository;
+    private final SpringDataEmployeeRepository employeeRepository;
     private final DepartmentRepository departmentRepository;
     private final UserRepository userRepository;
 

@@ -1,27 +1,15 @@
 package com.example.backend.employee.domain.model;
 
-import com.example.backend.department.Department;
-import com.example.backend.payroll.model.PayrollRecord;
-import com.example.backend.position.Position;
-import com.example.backend.timesheet.model.TimeSheetEntry;
-import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
-import java.util.List;
 
-@Entity
 @Getter
 @Setter
-@AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "employees")
 public class Employee {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String personnelNumber;
@@ -40,27 +28,14 @@ public class Employee {
     private String email;
     private String phone;
 
-    @Enumerated(EnumType.STRING)
     private Gender gender;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    private Position position;
+    private Long positionId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    private Department department;
+    private Long departmentId;
 
-    @Enumerated(EnumType.STRING)
     private EmploymentType employmentType;
 
     private int dependentChildrenCount;
     private boolean disabled;
-
-    @OneToMany(mappedBy = "employee")
-    private List<EmploymentContract> contracts;
-
-    @OneToMany(mappedBy = "employee")
-    private List<PayrollRecord> payrollRecords;
-
-    @OneToMany(mappedBy = "employee")
-    private List<TimeSheetEntry> timeSheetEntries;
 }
