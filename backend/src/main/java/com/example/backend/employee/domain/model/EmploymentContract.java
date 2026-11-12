@@ -3,7 +3,6 @@ package com.example.backend.employee.domain.model;
 import com.example.backend.employee.domain.exception.employmentcontract.EmploymentContractAlreadyTerminatedException;
 import com.example.backend.employee.domain.exception.employmentcontract.ExtendEmploymentContractException;
 import com.example.backend.employee.domain.exception.employmentcontract.InvalidEmploymentContractPeriodException;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -12,7 +11,6 @@ import java.time.LocalDate;
 
 @Getter
 @NoArgsConstructor
-@AllArgsConstructor
 public class EmploymentContract {
     private Long id;
     private Long employeeId;
