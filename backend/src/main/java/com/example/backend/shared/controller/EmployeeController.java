@@ -1,10 +1,10 @@
 package com.example.backend.shared.controller;
 
+import com.example.backend.employee.api.dto.EmployeeResult;
 import com.example.backend.employee.application.service.EmployeeService;
-import com.example.backend.shared.dto.employee.CreateEmployeeRequest;
-import com.example.backend.shared.dto.employee.DismissRequest;
-import com.example.backend.shared.dto.employee.EmployeeResult;
-import com.example.backend.shared.dto.employee.UpdateEmployeeRequest;
+import com.example.backend.employee.infrastructure.web.dto.CreateEmployeeRequest;
+import com.example.backend.employee.infrastructure.web.dto.DismissRequest;
+import com.example.backend.employee.infrastructure.web.dto.UpdateEmployeeRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

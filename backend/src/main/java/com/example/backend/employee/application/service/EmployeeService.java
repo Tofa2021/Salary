@@ -1,43 +1,37 @@
 package com.example.backend.employee.application.service;
 
-import com.example.backend.department.Department;
-import com.example.backend.department.DepartmentRepository;
-import com.example.backend.department.exception.DepartmentNotFoundException;
+import com.example.backend.department.api.DepartmentLookup;
+import com.example.backend.department.api.dto.DepartmentResult;
+import com.example.backend.employee.api.dto.EmployeeResult;
 import com.example.backend.employee.domain.exception.employee.*;
 import com.example.backend.employee.domain.model.Employee;
 import com.example.backend.employee.domain.model.EmploymentType;
-import com.example.backend.employee.infrastructure.repository.EmployeeRepository;
-import com.example.backend.position.Position;
-import com.example.backend.position.PositionRepository;
-import com.example.backend.position.exception.PositionNotFoundException;
-import com.example.backend.shared.dto.employee.CreateEmployeeRequest;
-import com.example.backend.shared.dto.employee.DismissRequest;
-import com.example.backend.shared.dto.employee.EmployeeResult;
-import com.example.backend.shared.dto.employee.UpdateEmployeeRequest;
+import com.example.backend.employee.domain.port.EmployeeRepository;
+import com.example.backend.employee.infrastructure.web.dto.CreateEmployeeRequest;
+import com.example.backend.employee.infrastructure.web.dto.DismissRequest;
+import com.example.backend.employee.infrastructure.web.dto.UpdateEmployeeRequest;
+import com.example.backend.position.api.PositionLookup;
+import com.example.backend.position.api.dto.PositionResult;
+import com.example.backend.shared.pagination.PageRequest;
+import com.example.backend.shared.pagination.PageResult;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 
-@Service
 @RequiredArgsConstructor
 public class EmployeeService {
     private final EmployeeRepository employeeRepository;
-    private final DepartmentRepository departmentRepository;
-    private final PositionRepository positionRepository;
+    private final DepartmentLookup departmentLookup;
+    private final PositionLookup positionLookup;
 
-    @Transactional
     public EmployeeResult create(CreateEmployeeRequest request) {
         if (employeeRepository.existsByPersonnelNumber(request.personnelNumber())) {
             throw new EmployeePersonnelNumberAlreadyExistsException(request.personnelNumber());
         }
 
-        Department department = findDepartment(request.departmentId());
-        Position position = positionRepository.findById(request.positionId())
-                .orElseThrow(() -> new PositionNotFoundException(request.positionId()));
+        DepartmentResult departmentResult = findDepartmentResult(request.departmentId());
+        PositionResult positionResult = positionLookup.findById(request.positionId())
+                .orElseThrow(() -> new EmployeeInvalidPositionException(request.positionId()));
 
         Employee employee = new Employee();
         employee.setPersonnelNumber(request.personnelNumber());
@@ -47,37 +41,32 @@ public class EmployeeService {
         employee.setEmail(request.email());
         employee.setPhone(request.phone());
         employee.setHireDate(request.hireDate());
-        employee.setDepartment(department);
-        employee.setPosition(position);
+        employee.setDepartmentId(departmentResult.id());
+        employee.setPositionId(positionResult.id());
         employee.setEmploymentType(parseEmploymentType(request.employmentType()));
 
-        return EmployeeResult.fromEmployee(employeeRepository.save(employee));
+        return toResult(employeeRepository.save(employee));
     }
 
-    @Transactional(readOnly = true)
     public EmployeeResult getById(Long id) {
-        return EmployeeResult.fromEmployee(findEmployee(id));
+        return toResult(findEmployee(id));
     }
 
-    @Transactional(readOnly = true)
     public EmployeeResult getByPersonnelNumber(String personnelNumber) {
-        Employee e = employeeRepository.findByPersonnelNumber(personnelNumber)
+        Employee employee = employeeRepository.findByPersonnelNumber(personnelNumber)
                 .orElseThrow(() -> new EmployeeNotFoundException(personnelNumber));
-        return EmployeeResult.fromEmployee(e);
+        return toResult(employee);
     }
 
-    @Transactional(readOnly = true)
-    public Page<EmployeeResult> getAll(Pageable pageable) {
-        return employeeRepository.findAll(pageable).map(EmployeeResult::fromEmployee);
+    public PageResult<EmployeeResult> getAll(PageRequest pageRequest) {
+        return employeeRepository.findAll(pageRequest).map(this::toResult);
     }
 
-    @Transactional(readOnly = true)
-    public Page<EmployeeResult> getByDepartment(Long departmentId, Pageable pageable) {
-        return employeeRepository.findByDepartmentId(departmentId, pageable)
-                .map(EmployeeResult::fromEmployee);
+    public PageResult<EmployeeResult> getByDepartment(Long departmentId, PageRequest pageRequest) {
+        return employeeRepository.findByDepartmentId(departmentId, pageRequest)
+                .map(this::toResult);
     }
 
-    @Transactional
     public EmployeeResult update(Long id, UpdateEmployeeRequest request) {
         Employee employee = findEmployee(id);
 
@@ -96,47 +85,38 @@ public class EmployeeService {
         if (request.phone() != null) {
             employee.setPhone(request.phone());
         }
-        if (request.hireDate() != null) {
-            employee.setHireDate(request.hireDate());
-        }
-        if (request.dismissalDate() != null) {
-            employee.setDismissalDate(request.dismissalDate());
-        }
         if (request.departmentId() != null) {
-            Department department = findDepartment(request.departmentId());
-            employee.setDepartment(department);
+            DepartmentResult departmentResult = findDepartmentResult(request.departmentId());
+            employee.setDepartmentId(departmentResult.id());
         }
         if (request.positionId() != null) {
-            Position position = positionRepository.findById(request.positionId())
-                    .orElseThrow(() -> new PositionNotFoundException(request.positionId()));
-            employee.setPosition(position);
+            PositionResult positionResult = positionLookup.findById(request.positionId())
+                    .orElseThrow(() -> new EmployeeInvalidPositionException(request.positionId()));
+            employee.setPositionId(positionResult.id());
         }
         if (request.employmentType() != null) {
             employee.setEmploymentType(parseEmploymentType(request.employmentType()));
         }
 
-        return EmployeeResult.fromEmployee(employee);
+        return toResult(employee);
     }
 
-    @Transactional
     public EmployeeResult dismiss(Long id, DismissRequest request) {
         Employee employee = findEmployee(id);
         if (request.dismissalDate().isBefore(employee.getHireDate())) {
             throw new DismissalDateBeforeHireDateException(employee.getHireDate(), request.dismissalDate());
         }
         employee.setDismissalDate(request.dismissalDate());
-        return EmployeeResult.fromEmployee(employee);
+        return toResult(employee);
     }
 
-    @Transactional
     public EmployeeResult rehire(Long id, LocalDate newHireDate) {
         Employee employee = findEmployee(id);
         employee.setHireDate(newHireDate);
         employee.setDismissalDate(null);
-        return EmployeeResult.fromEmployee(employee);
+        return toResult(employee);
     }
 
-    @Transactional
     public void delete(Long id) {
         Employee employee = findEmployee(id);
         employeeRepository.delete(employee);
@@ -147,9 +127,9 @@ public class EmployeeService {
                 .orElseThrow(() -> new EmployeeNotFoundException(id));
     }
 
-    private Department findDepartment(Long id) {
-        return departmentRepository.findById(id)
-                .orElseThrow(() -> new DepartmentNotFoundException(id));
+    private DepartmentResult findDepartmentResult(Long id) {
+        return departmentLookup.findById(id)
+                .orElseThrow(() -> new EmployeeInvalidDepartmentException(id));
     }
 
     private EmploymentType parseEmploymentType(String value) {
@@ -161,40 +141,59 @@ public class EmployeeService {
         }
     }
 
-    @Transactional
     public void transfer(Long newDepartmentId, Long employeeId) {
         Employee employee = findEmployee(employeeId);
         if (employee.getDismissalDate() != null) {
             throw new EmployeeDismissedException(employeeId);
         }
-        Department newDepartment = findDepartment(newDepartmentId);
-        Department oldDepartment = employee.getDepartment();
-        if (oldDepartment != null && oldDepartment.getId().equals(newDepartmentId)) {
+
+        if (employee.getDepartmentId() == null) {
+            throw new EmployeeWithoutDepartmentException(employeeId);
+        }
+
+        DepartmentResult newDepartment = findDepartmentResult(newDepartmentId);
+        if (employee.getDepartmentId().equals(newDepartment.id())) {
             throw new SameDepartmentException(employeeId, newDepartmentId);
         }
-        employee.setDepartment(newDepartment);
+        employee.setDepartmentId(newDepartment.id());
+        employeeRepository.save(employee);
     }
 
-    @Transactional
     public void removeFromDepartment(Long employeeId) {
         Employee employee = findEmployee(employeeId);
         if (employee.getDismissalDate() != null) {
             throw new EmployeeDismissedException(employeeId);
         }
-        if (employee.getDepartment() == null) {
+        if (employee.getDepartmentId() == null) {
             throw new EmployeeWithoutDepartmentException(employeeId);
         }
-        employee.setDepartment(null);
+        employee.setDepartmentId(null);
     }
 
-    @Transactional
     public void addToDepartment(Long departmentId, Long employeeId) {
         Employee employee = findEmployee(employeeId);
         if (employee.getDismissalDate() != null) throw new EmployeeDismissedException(employeeId);
-        if (employee.getDepartment() != null) {
+        if (employee.getDepartmentId() != null) {
             throw new EmployeeAlreadyInDepartmentException(employeeId);
         }
-        Department newDepartment = findDepartment(departmentId);
-        employee.setDepartment(newDepartment);
+        DepartmentResult newDepartmentResult = findDepartmentResult(departmentId);
+        employee.setDepartmentId(newDepartmentResult.id());
+    }
+
+    private EmployeeResult toResult(Employee employee) {
+        return new EmployeeResult(
+                employee.getId(),
+                employee.getPersonnelNumber(),
+                employee.getSurname(),
+                employee.getName(),
+                employee.getMiddleName(),
+                employee.getEmail(),
+                employee.getPhone(),
+                employee.getHireDate(),
+                employee.getDismissalDate(),
+                employee.getEmploymentType() == null ? null : employee.getEmploymentType().name(),
+                employee.getDepartmentId() == null ? null : employee.getDepartmentId(),
+                employee.getPositionId() == null ? null : employee.getPositionId()
+        );
     }
 }

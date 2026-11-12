@@ -1,11 +1,9 @@
 package com.example.backend.department;
 
 
+import com.example.backend.department.api.dto.DepartmentResult;
 import com.example.backend.department.exception.*;
-import com.example.backend.employee.infrastructure.repository.EmployeeRepository;
-import com.example.backend.shared.dto.department.CreateDepartmentRequest;
-import com.example.backend.shared.dto.department.DepartmentResult;
-import com.example.backend.shared.dto.department.UpdateDepartmentRequest;
+import com.example.backend.employee.infrastructure.persistance.SpringDataEmployeeRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,7 +14,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class DepartmentService {
     private final DepartmentRepository departmentRepository;
-    private final EmployeeRepository employeeRepository;
+    private final SpringDataEmployeeRepository employeeRepository;
 
     @Transactional
     public DepartmentResult create(CreateDepartmentRequest request) {

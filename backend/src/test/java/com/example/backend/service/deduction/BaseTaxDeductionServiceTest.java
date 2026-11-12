@@ -1,7 +1,7 @@
 package com.example.backend.service.deduction;
 
 import com.example.backend.employee.domain.model.Employee;
-import com.example.backend.employee.infrastructure.repository.EmployeeRepository;
+import com.example.backend.employee.infrastructure.persistance.SpringDataEmployeeRepository;
 import com.example.backend.payroll.model.DeductionType;
 import com.example.backend.payroll.model.TaxDeduction;
 import com.example.backend.payroll.repository.TaxDeductionRepository;
@@ -27,7 +27,7 @@ abstract class BaseTaxDeductionServiceTest {
     protected TaxDeductionRepository deductionRepository;
 
     @Mock
-    protected EmployeeRepository employeeRepository;
+    protected SpringDataEmployeeRepository employeeRepository;
 
     @InjectMocks
     protected TaxDeductionService deductionService;
