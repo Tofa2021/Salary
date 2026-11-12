@@ -34,7 +34,7 @@ public class EmploymentContractService {
             throw new InvalidEmploymentContractPeriodException(request.startDate(), request.endDate());
         }
 
-        ContractType type = parseContractType(request.contractType());
+        ContractType type = ContractType.from(request.contractType());
 
         if (request.mainJob()) {
             employmentContractRepository.findActiveMainOnDate(employeeId, request.startDate())
@@ -122,6 +122,7 @@ public class EmploymentContractService {
             throw new InvalidEmploymentContractPeriodException(contract.getStartDate(), newEndDate);
         }
         contract.setEndDate(newEndDate);
+        employmentContractRepository.save(contract);
         return toResult(contract, today());
     }
 
@@ -135,18 +136,6 @@ public class EmploymentContractService {
         return employmentContractRepository.findExpiring(ContractType.FIXED_TERM, today, to).stream()
                 .map(c -> toResult(c, today))
                 .toList();
-    }
-
-    private ContractType parseContractType(String value) {
-        if (value == null) {
-            throw new UnknownEmploymentContractTypeException(null);
-        }
-
-        try {
-            return ContractType.valueOf(value);
-        } catch (IllegalArgumentException ex) {
-            throw new UnknownEmploymentContractTypeException(value);
-        }
     }
 
     private EmploymentContract findById(Long id) {
