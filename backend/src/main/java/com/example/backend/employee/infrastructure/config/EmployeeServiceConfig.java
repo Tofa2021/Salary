@@ -33,4 +33,9 @@ public class EmployeeServiceConfig {
     ) {
         return new EmploymentContractService(employmentContractRepository, employeeRepository, mainJobPolicy, clock);
     }
+
+    @Bean
+    public MainJobPolicy mainJobPolicy() {
+        return new MainJobPolicy();
+    }
 }

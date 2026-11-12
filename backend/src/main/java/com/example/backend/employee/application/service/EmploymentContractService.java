@@ -13,6 +13,7 @@ import com.example.backend.employee.domain.port.EmployeeRepository;
 import com.example.backend.employee.domain.port.EmploymentContractRepository;
 import lombok.RequiredArgsConstructor;
 
+import java.math.BigDecimal;
 import java.time.Clock;
 import java.time.LocalDate;
 import java.util.List;
@@ -69,9 +70,11 @@ public class EmploymentContractService {
 
     public EmploymentContractResult update(Long id, UpdateEmploymentContractCommand command) {
         EmploymentContract contract = findById(id);
-        if (command.baseSalary() != null || command.hourlyRate() != null || command.bonusPercent() != null) {
-            contract.changeSalary(command.baseSalary(), command.hourlyRate(), command.bonusPercent());
-        }
+        BigDecimal base = command.baseSalary() != null ? command.baseSalary() : contract.getBaseSalary();
+        BigDecimal hourly = command.hourlyRate() != null ? command.hourlyRate() : contract.getHourlyRate();
+        BigDecimal bonus = command.bonusPercent() != null ? command.bonusPercent() : contract.getBonusPercent();
+        contract.changeSalary(base, hourly, bonus);
+
         if (command.workHoursPerWeek() != null) {
             contract.changeWorkHours(command.workHoursPerWeek());
         }
