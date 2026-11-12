@@ -2,10 +2,11 @@ package com.example.backend.employee.application.service;
 
 import com.example.backend.employee.api.dto.EmploymentContractResult;
 import com.example.backend.employee.domain.exception.employee.EmployeeNotFoundException;
-import com.example.backend.employee.domain.exception.employmentcontract.*;
+import com.example.backend.employee.domain.exception.employmentcontract.EmploymentContractNotFoundException;
+import com.example.backend.employee.domain.exception.employmentcontract.EmploymentContractNumberAlreadyExistsException;
 import com.example.backend.employee.domain.model.ContractType;
-import com.example.backend.employee.domain.model.Employee;
 import com.example.backend.employee.domain.model.EmploymentContract;
+import com.example.backend.employee.domain.policy.MainJobPolicy;
 import com.example.backend.employee.domain.port.EmployeeRepository;
 import com.example.backend.employee.domain.port.EmploymentContractRepository;
 import com.example.backend.employee.infrastructure.web.dto.CreateEmploymentContractRequest;
@@ -20,39 +21,33 @@ import java.util.List;
 public class EmploymentContractService {
     private final EmploymentContractRepository employmentContractRepository;
     private final EmployeeRepository employeeRepository;
+    private final MainJobPolicy mainJobPolicy;
     private final Clock clock;
 
     public EmploymentContractResult create(Long employeeId, CreateEmploymentContractRequest request) {
-        Employee employee = employeeRepository.findById(employeeId)
-                .orElseThrow(() -> new EmployeeNotFoundException(employeeId));
+        if (!employeeRepository.existsById(employeeId)) {
+            throw new EmployeeNotFoundException(employeeId);
+        }
 
         if (employmentContractRepository.existsByContractNumber(request.contractNumber())) {
             throw new EmploymentContractNumberAlreadyExistsException(request.contractNumber());
         }
 
-        if (request.endDate() != null && request.endDate().isBefore(request.startDate())) {
-            throw new InvalidEmploymentContractPeriodException(request.startDate(), request.endDate());
-        }
-
         ContractType type = ContractType.from(request.contractType());
 
         if (request.mainJob()) {
-            employmentContractRepository.findActiveMainOnDate(employeeId, request.startDate())
-                    .ifPresent(existing -> {
-                        if (existing.getStartDate().isBefore(request.startDate())
-                                || existing.getEndDate() == null
-                                || existing.getEndDate().isAfter(request.startDate())
-                                || existing.getStartDate().equals(request.startDate())) {
-                            throw new MainJobAlreadyExistsException(employeeId, existing.getId());
-                        }
-                    });
+            mainJobPolicy.ensureNoOverlappingMainJob(
+                    true,
+                    employmentContractRepository.findOverlappingMainJob(
+                            employeeId, null, request.startDate(), request.endDate())
+            );
         }
 
         EmploymentContract contract = new EmploymentContract();
-        contract.setEmployeeId(employee.getId());
+        contract.setEmployeeId(employeeId);
         contract.setContractNumber(request.contractNumber());
         contract.setStartDate(request.startDate());
-        contract.setEndDate(request.endDate());
+        contract.changePeriod(request.endDate());
         contract.setContractType(type);
         contract.setBaseSalary(request.baseSalary());
         contract.setHourlyRate(request.hourlyRate());
@@ -102,26 +97,14 @@ public class EmploymentContractService {
 
     public EmploymentContractResult terminate(Long id, LocalDate terminationDate) {
         EmploymentContract contract = findById(id);
-        if (contract.getEndDate() != null && !contract.getEndDate().isAfter(today())) {
-            throw new EmploymentContractAlreadyTerminatedException(id);
-        }
-        if (terminationDate.isBefore(contract.getStartDate())) {
-            throw new InvalidEmploymentContractPeriodException(contract.getStartDate(), terminationDate);
-        }
-        contract.setEndDate(terminationDate);
+        contract.terminate(terminationDate);
         employmentContractRepository.save(contract);
         return toResult(contract, today());
     }
 
     public EmploymentContractResult extend(Long id, LocalDate newEndDate) {
         EmploymentContract contract = findById(id);
-        if (contract.getContractType() == ContractType.INDEFINITE) {
-            throw new ExtendEmploymentContractException("Cannot extend indefinite contract");
-        }
-        if (newEndDate.isBefore(contract.getStartDate())) {
-            throw new InvalidEmploymentContractPeriodException(contract.getStartDate(), newEndDate);
-        }
-        contract.setEndDate(newEndDate);
+        contract.extend(newEndDate);
         employmentContractRepository.save(contract);
         return toResult(contract, today());
     }
@@ -144,8 +127,6 @@ public class EmploymentContractService {
     }
 
     private EmploymentContractResult toResult(EmploymentContract contract, LocalDate today) {
-        boolean active = !contract.getStartDate().isAfter(today) &&
-                (contract.getEndDate() == null || !contract.getEndDate().isBefore(today));
         return new EmploymentContractResult(
                 contract.getId(),
                 contract.getEmployeeId(),
@@ -158,7 +139,7 @@ public class EmploymentContractService {
                 contract.getBonusPercent(),
                 contract.getWorkHoursPerWeek(),
                 contract.isMainJob(),
-                active
+                contract.isActiveOnDate(today)
         );
     }
 
