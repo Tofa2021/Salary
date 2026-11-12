@@ -1,8 +1,10 @@
 package com.example.backend.timesheet.api.dto;
 
+import java.time.LocalDate;
+
 public record CreateTimeSheetCommand(
-        int year,
-        int month,
-        Long departmentId
+        LocalDate periodStart,
+        LocalDate periodEnd,
+        Long employeeId
 ) {
 }

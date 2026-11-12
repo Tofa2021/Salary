@@ -1,14 +1,15 @@
 package com.example.backend.timesheet.infrastructure.persistance.entity;
 
-import com.example.backend.employee.domain.model.Employee;
+import com.example.backend.timesheet.domain.model.TimeSheetEntryType;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
+
 @Entity
-@AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
@@ -19,41 +20,16 @@ public class TimeSheetEntryJpaEntity {
     private Long id;
 
     @ManyToOne
+    @JoinColumn(name = "timesheet_id", nullable = false)
     private TimeSheetJpaEntity timeSheet;
 
-    @ManyToOne
-    private Employee employee;
+    @Column(nullable = false)
+    private LocalDate date;
 
-    private Integer workedDays;
-    private Integer workedHours;
-    private Integer vacationDays;
-    private Integer sickLeaveDays;
-    private Integer businessTripDays;
-    private Integer absentDays;
-    private Integer overtimeHours;
-    private Integer nightHours;
+    @Column(nullable = false, precision = 5, scale = 2)
+    private BigDecimal hours;
 
-    public TimeSheetEntryJpaEntity(
-            TimeSheetJpaEntity timeSheet,
-            Employee employee,
-            Integer workedDays,
-            Integer workedHours,
-            Integer vacationDays,
-            Integer sickLeaveDays,
-            Integer businessTripDays,
-            Integer absentDays,
-            Integer overtimeHours,
-            Integer nightHours
-    ) {
-        this.timeSheet = timeSheet;
-        this.employee = employee;
-        this.workedDays = workedDays;
-        this.workedHours = workedHours;
-        this.vacationDays = vacationDays;
-        this.sickLeaveDays = sickLeaveDays;
-        this.businessTripDays = businessTripDays;
-        this.absentDays = absentDays;
-        this.overtimeHours = overtimeHours;
-        this.nightHours = nightHours;
-    }
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private TimeSheetEntryType type;
 }

@@ -7,7 +7,6 @@ import com.example.backend.department.api.dto.CreateDepartmentCommand;
 import com.example.backend.department.api.dto.DepartmentResult;
 import com.example.backend.department.api.dto.UpdateDepartmentCommand;
 import com.example.backend.department.exception.*;
-import com.example.backend.employee.domain.model.Employee;
 import com.example.backend.employee.infrastructure.persistance.SpringDataEmployeeRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -55,7 +54,7 @@ class DepartmentServiceTest {
 
     @Test
     void create_WithParent_Success() {
-        Department parent = new Department(1L, "Parent", "D-001", null, List.of());
+        Department parent = new Department(1L, "Parent", "D-001", null);
         CreateDepartmentCommand request = new CreateDepartmentCommand("Department", "D-002", parent.getId());
         when(departmentRepository.findById(parent.getId())).thenReturn(Optional.of(parent));
         when(departmentRepository.save(any())).thenAnswer(inv -> {
@@ -111,7 +110,7 @@ class DepartmentServiceTest {
 
     @Test
     void getById_Success() {
-        Department department = new Department(1L, "Department", "D-001", null, List.of());
+        Department department = new Department(1L, "Department", "D-001", null);
         when(departmentRepository.findById(department.getId())).thenReturn(Optional.of(department));
 
         DepartmentResult result = departmentService.getById(department.getId());
@@ -120,7 +119,6 @@ class DepartmentServiceTest {
         assertThat(result.name()).isEqualTo(department.getName());
         assertThat(result.code()).isEqualTo(department.getCode());
         assertThat(result.parentId()).isNull();
-        assertThat(result.employeeIds()).isEqualTo(List.of());
     }
 
 //    @Test
@@ -150,8 +148,8 @@ class DepartmentServiceTest {
 
     @Test
     void getAll_Success() {
-        Department department1 = new Department(1L, "Department1", "D-001", null, List.of());
-        Department department2 = new Department(2L, "Department2", "D-002", null, List.of());
+        Department department1 = new Department(1L, "Department1", "D-001", null);
+        Department department2 = new Department(2L, "Department2", "D-002", null);
         List<Department> departments = List.of(department1, department2);
         when(departmentRepository.findAll()).thenReturn(departments);
 
@@ -163,13 +161,11 @@ class DepartmentServiceTest {
         assertThat(results.getFirst().name()).isEqualTo(department1.getName());
         assertThat(results.getFirst().code()).isEqualTo(department1.getCode());
         assertThat(results.getFirst().parentId()).isNull();
-        assertThat(results.getFirst().employeeIds()).isEqualTo(department1.getEmployees().stream().map(Employee::getId).toList());
 
         assertThat(results.get(1).id()).isEqualTo(department2.getId());
         assertThat(results.get(1).name()).isEqualTo(department2.getName());
         assertThat(results.get(1).code()).isEqualTo(department2.getCode());
         assertThat(results.get(1).parentId()).isNull();
-        assertThat(results.get(1).employeeIds()).isEqualTo(department2.getEmployees().stream().map(Employee::getId).toList());
     }
 
     @Test
@@ -181,8 +177,8 @@ class DepartmentServiceTest {
 
     @Test
     void update_FullUpdate_Success() {
-        Department parent = new Department(1L, "Parent", "D-003", null, List.of());
-        Department department = new Department(2L, "A", "D-001", null, List.of());
+        Department parent = new Department(1L, "Parent", "D-003", null);
+        Department department = new Department(2L, "A", "D-001", null);
         UpdateDepartmentCommand request = new UpdateDepartmentCommand("B", "D-002", JsonNullable.of(1L));
         when(departmentRepository.findById(parent.getId())).thenReturn(Optional.of(parent));
         when(departmentRepository.findById(department.getId())).thenReturn(Optional.of(department));
@@ -194,15 +190,14 @@ class DepartmentServiceTest {
         assertThat(result.name()).isEqualTo(request.name());
         assertThat(result.code()).isEqualTo(request.code());
         assertThat(result.parentId()).isEqualTo(request.parentId().get());
-        assertThat(result.employeeIds()).isEqualTo(department.getEmployees().stream().map(Employee::getId).toList());
 
         verify(departmentRepository).save(any());
     }
 
     @Test
     void update_NullRequest_DoesNotUpdateAnything() {
-        Department parent = new Department(2L, "Parent", "D-003", null, List.of());
-        Department department = new Department(1L, "A", "D-001", parent, List.of());
+        Department parent = new Department(2L, "Parent", "D-003", null);
+        Department department = new Department(1L, "A", "D-001", parent);
         UpdateDepartmentCommand request = new UpdateDepartmentCommand(null, null, JsonNullable.undefined());
         when(departmentRepository.findById(department.getId())).thenReturn(Optional.of(department));
         when(departmentRepository.save(department)).thenReturn(department);
@@ -213,7 +208,6 @@ class DepartmentServiceTest {
         assertThat(result.name()).isEqualTo(department.getName());
         assertThat(result.code()).isEqualTo(department.getCode());
         assertThat(result.parentId()).isEqualTo(department.getParent().getId());
-        assertThat(result.employeeIds()).isEqualTo(department.getEmployees().stream().map(Employee::getId).toList());
 
         verify(departmentRepository).save(any());
     }
@@ -230,7 +224,7 @@ class DepartmentServiceTest {
 
     @Test
     void update_ParentDepartmentNotFound_Throws() {
-        Department department = new Department(1L, "A", "D-001", null, List.of());
+        Department department = new Department(1L, "A", "D-001", null);
         UpdateDepartmentCommand request = new UpdateDepartmentCommand(null, null, JsonNullable.of(2L));
         when(departmentRepository.findById(department.getId())).thenReturn(Optional.of(department));
         when(departmentRepository.findById(2L)).thenReturn(Optional.empty());
@@ -243,8 +237,8 @@ class DepartmentServiceTest {
 
     @Test
     void update_SetParentFromNull_Success() {
-        Department department = new Department(1L, "A", "D-001", null, List.of());
-        Department newParent = new Department(2L, "Parent", "D-002", null, List.of());
+        Department department = new Department(1L, "A", "D-001", null);
+        Department newParent = new Department(2L, "Parent", "D-002", null);
         UpdateDepartmentCommand request = new UpdateDepartmentCommand(
                 null,
                 null,
@@ -260,16 +254,15 @@ class DepartmentServiceTest {
         assertThat(result.name()).isEqualTo(department.getName());
         assertThat(result.code()).isEqualTo(department.getCode());
         assertThat(result.parentId()).isEqualTo(newParent.getId());
-        assertThat(result.employeeIds()).isEqualTo(List.of());
 
         verify(departmentRepository).save(department);
     }
 
     @Test
     void update_SetParentFromAnotherDepartment_Success() {
-        Department oldParent = new Department(3L, "OldParent", "D-003", null, List.of());
-        Department department = new Department(1L, "A", "D-001", oldParent, List.of());
-        Department newParent = new Department(2L, "NewParent", "D-002", null, List.of());
+        Department oldParent = new Department(3L, "OldParent", "D-003", null);
+        Department department = new Department(1L, "A", "D-001", oldParent);
+        Department newParent = new Department(2L, "NewParent", "D-002", null);
         UpdateDepartmentCommand request = new UpdateDepartmentCommand(
                 null,
                 null,
@@ -285,15 +278,14 @@ class DepartmentServiceTest {
         assertThat(result.name()).isEqualTo(department.getName());
         assertThat(result.code()).isEqualTo(department.getCode());
         assertThat(result.parentId()).isEqualTo(newParent.getId());
-        assertThat(result.employeeIds()).isEqualTo(List.of());
 
         verify(departmentRepository).save(department);
     }
 
     @Test
     void update_SetNullParent_Success() {
-        Department parent = new Department(2L, "Parent", "D-002", null, List.of());
-        Department department = new Department(1L, "A", "D-001", parent, List.of());
+        Department parent = new Department(2L, "Parent", "D-002", null);
+        Department department = new Department(1L, "A", "D-001", parent);
         UpdateDepartmentCommand request = new UpdateDepartmentCommand(
                 null,
                 null,
@@ -308,14 +300,13 @@ class DepartmentServiceTest {
         assertThat(result.name()).isEqualTo(department.getName());
         assertThat(result.code()).isEqualTo(department.getCode());
         assertThat(result.parentId()).isNull();
-        assertThat(result.employeeIds()).isEqualTo(List.of());
 
         verify(departmentRepository).save(department);
     }
 
     @Test
     void update_OwnParent_Throws() {
-        Department department = new Department(1L, "A", "D-001", null, List.of());
+        Department department = new Department(1L, "A", "D-001", null);
         UpdateDepartmentCommand request = new UpdateDepartmentCommand(
                 null,
                 null,
@@ -331,8 +322,8 @@ class DepartmentServiceTest {
 
     @Test
     void update_NewParentIsDescendant_Throws() {
-        Department department = new Department(1L, "A", "D-001", null, List.of());
-        Department descendant = new Department(2L, "B", "D-002", department, List.of());
+        Department department = new Department(1L, "A", "D-001", null);
+        Department descendant = new Department(2L, "B", "D-002", department);
         UpdateDepartmentCommand request = new UpdateDepartmentCommand(
                 null,
                 null,
@@ -349,7 +340,7 @@ class DepartmentServiceTest {
 
     @Test
     void delete_Success() {
-        Department department = new Department(1L, "Department", "D-001", null, List.of());
+        Department department = new Department(1L, "Department", "D-001", null);
         when(departmentRepository.findById(department.getId())).thenReturn(Optional.of(department));
         when(departmentRepository.countByParentId(department.getId())).thenReturn(0L);
         when(employeeRepository.countByDepartmentId(department.getId())).thenReturn(0L);
@@ -371,7 +362,7 @@ class DepartmentServiceTest {
 
     @Test
     void delete_HasChildDepartments_Throws() {
-        Department department = new Department(1L, "Department", "D-001", null, List.of());
+        Department department = new Department(1L, "Department", "D-001", null);
         when(departmentRepository.findById(department.getId())).thenReturn(Optional.of(department));
         when(employeeRepository.countByDepartmentId(department.getId())).thenReturn(0L);
         when(departmentRepository.countByParentId(department.getId())).thenReturn(1L);
