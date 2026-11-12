@@ -11,27 +11,26 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 class EmployeeServiceAddToDepartmentTest extends BaseEmployeeServiceTest {
 
     @Test
     void addToDepartment_Success() {
-        Employee employee = employee(1L, "T-001");
-        employee.setDepartmentId(null);
+        Employee employee = employee(1L, "T-001", null, null);
         when(employeeRepository.findById(1L)).thenReturn(Optional.of(employee));
         when(departmentLookup.findById(2L)).thenReturn(Optional.of(departmentResult(2L, "HR")));
 
         employeeService.addToDepartment(2L, 1L);
 
         assertThat(employee.getDepartmentId()).isEqualTo(2L);
+        verify(employeeRepository).save(employee);
     }
 
     @Test
     void addToDepartment_EmployeeDismissed_Throws() {
-        Employee employee = employee(1L, "T-001");
-        employee.setDepartmentId(null);
-        employee.setDismissalDate(LocalDate.of(2025, 6, 1));
+        Employee employee = employee(1L, "T-001", LocalDate.of(2025, 6, 1), null);
         when(employeeRepository.findById(1L)).thenReturn(Optional.of(employee));
 
         assertThatThrownBy(() -> employeeService.addToDepartment(2L, 1L))
@@ -43,14 +42,13 @@ class EmployeeServiceAddToDepartmentTest extends BaseEmployeeServiceTest {
         Employee employee = employee(1L, "T-001");
         when(employeeRepository.findById(1L)).thenReturn(Optional.of(employee));
 
-        assertThatThrownBy(() -> employeeService.addToDepartment(2L, employee.getId()))
+        assertThatThrownBy(() -> employeeService.addToDepartment(2L, 1L))
                 .isInstanceOf(EmployeeAlreadyInDepartmentException.class);
     }
 
     @Test
     void addToDepartment_departmentNotFound_throws() {
-        Employee employee = employee(1L, "T-001");
-        employee.setDepartmentId(null);
+        Employee employee = employee(1L, "T-001", null, null);
         when(employeeRepository.findById(1L)).thenReturn(Optional.of(employee));
         when(departmentLookup.findById(99L)).thenReturn(Optional.empty());
 

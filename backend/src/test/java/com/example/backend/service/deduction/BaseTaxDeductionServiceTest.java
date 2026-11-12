@@ -31,12 +31,27 @@ abstract class BaseTaxDeductionServiceTest {
     protected TaxDeductionService deductionService;
 
     protected Employee employee(Long id) {
-        Employee employee = new Employee();
-        employee.setId(id);
-        employee.setPersonnelNumber("T-" + id);
-        employee.setSurname("Иванов");
-        employee.setName("Иван");
-        return employee;
+        return Employee.rehydrate(
+                id,
+                "T-" + id,
+                "Иванов",
+                "Иван",
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                0,
+                false
+        );
     }
 
     protected TaxDeduction deduction(

@@ -27,8 +27,7 @@ class EmployeeServiceTransferTest extends BaseEmployeeServiceTest {
 
     @Test
     void transfer_EmployeeDismissed_Throws() {
-        Employee employee = employee(1L, "T-001");
-        employee.setDismissalDate(LocalDate.of(2025, 6, 1));
+        Employee employee = employee(1L, "T-001", LocalDate.of(2025, 6, 1), 1L);
         when(employeeRepository.findById(1L)).thenReturn(Optional.of(employee));
 
         assertThatThrownBy(() -> employeeService.transfer(2L, 1L))
@@ -39,8 +38,7 @@ class EmployeeServiceTransferTest extends BaseEmployeeServiceTest {
 
     @Test
     void transfer_EmployeeWithoutDepartment_Throws() {
-        Employee employee = employee(1L, "T-001");
-        employee.setDepartmentId(null);
+        Employee employee = employee(1L, "T-001", null, null);
         when(employeeRepository.findById(1L)).thenReturn(Optional.of(employee));
 
         assertThatThrownBy(() -> employeeService.transfer(2L, 1L))
@@ -63,7 +61,6 @@ class EmployeeServiceTransferTest extends BaseEmployeeServiceTest {
     void transfer_SameDepartment_Throws() {
         Employee employee = employee(1L, "T-001");
         when(employeeRepository.findById(1L)).thenReturn(Optional.of(employee));
-        when(departmentLookup.findById(1L)).thenReturn(Optional.of(departmentResult(1L, "IT")));
 
         assertThatThrownBy(() -> employeeService.transfer(1L, 1L))
                 .isInstanceOf(SameDepartmentException.class);

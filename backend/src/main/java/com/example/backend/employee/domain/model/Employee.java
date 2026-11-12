@@ -43,12 +43,19 @@ public class Employee {
             String surname,
             String name,
             String middleName,
+            String passportSeries,
+            String passportNumber,
+            String identificationNumber,
             String email,
             String phone,
+            Gender gender,
+            LocalDate birthDate,
             LocalDate hireDate,
             Long departmentId,
             Long positionId,
-            EmploymentType employmentType
+            EmploymentType employmentType,
+            int dependentChildrenCount,
+            boolean disabled
     ) {
         if (personnelNumber == null || personnelNumber.isBlank()) {
             throw new IllegalArgumentException("personnelNumber is required");
@@ -62,18 +69,28 @@ public class Employee {
         if (employmentType == null) {
             throw new IllegalArgumentException("employmentType is required");
         }
+        if (dependentChildrenCount < 0) {
+            throw new IllegalArgumentException("childrenCount >= 0");
+        }
 
         Employee employee = new Employee();
         employee.personnelNumber = personnelNumber;
         employee.surname = surname;
         employee.name = name;
         employee.middleName = middleName;
+        employee.passportSeries = passportSeries;
+        employee.passportNumber = passportNumber;
+        employee.identificationNumber = identificationNumber;
         employee.email = email;
         employee.phone = phone;
+        employee.birthDate = birthDate;
+        employee.gender = gender;
         employee.hireDate = hireDate;
         employee.departmentId = departmentId;
         employee.positionId = positionId;
         employee.employmentType = employmentType;
+        employee.disabled = disabled;
+        employee.dependentChildrenCount = dependentChildrenCount;
         return employee;
     }
 
@@ -135,14 +152,18 @@ public class Employee {
         }
     }
 
-    public void transferTo(Long newDepartmentId) {
-        ensureNotDismissed();
+    public void ensureCanBeTransfer(Long newDepartmentId) {
         if (departmentId == null) {
             throw new EmployeeWithoutDepartmentException(id);
         }
         if (departmentId.equals(newDepartmentId)) {
             throw new SameDepartmentException(id, newDepartmentId);
         }
+    }
+
+    public void transferTo(Long newDepartmentId) {
+        ensureNotDismissed();
+        ensureCanBeTransfer(newDepartmentId);
         this.departmentId = newDepartmentId;
     }
 
@@ -192,6 +213,42 @@ public class Employee {
         }
         if (phone != null) {
             this.phone = phone;
+        }
+    }
+
+    public void updateDocuments(
+            String passportSeries,
+            String passportNumber,
+            String identificationNumber,
+            LocalDate birthDate,
+            Gender gender
+    ) {
+        if (passportSeries != null) {
+            this.passportSeries = passportSeries;
+        }
+        if (passportNumber != null) {
+            this.passportNumber = passportNumber;
+        }
+        if (identificationNumber != null) {
+            this.identificationNumber = identificationNumber;
+        }
+        if (birthDate != null) {
+            this.birthDate = birthDate;
+        }
+        if (gender != null) {
+            this.gender = gender;
+        }
+    }
+
+    public void updateBenefits(Boolean disabled, Integer dependentChildrenCount) {
+        if (disabled != null) {
+            this.disabled = disabled;
+        }
+        if (dependentChildrenCount != null) {
+            if (dependentChildrenCount < 0) {
+                throw new IllegalArgumentException("childrenCount >= 0");
+            }
+            this.dependentChildrenCount = dependentChildrenCount;
         }
     }
 
