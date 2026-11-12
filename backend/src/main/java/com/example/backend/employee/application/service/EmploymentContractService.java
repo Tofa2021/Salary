@@ -24,36 +24,28 @@ public class EmploymentContractService {
     private final MainJobPolicy mainJobPolicy;
     private final Clock clock;
 
-    public EmploymentContractResult create(Long employeeId, CreateEmploymentContractCommand request) {
+    public EmploymentContractResult create(Long employeeId, CreateEmploymentContractCommand command) {
         if (!employeeRepository.existsById(employeeId)) {
             throw new EmployeeNotFoundException(employeeId);
         }
 
-        if (employmentContractRepository.existsByContractNumber(request.contractNumber())) {
-            throw new EmploymentContractNumberAlreadyExistsException(request.contractNumber());
+        if (employmentContractRepository.existsByContractNumber(command.contractNumber())) {
+            throw new EmploymentContractNumberAlreadyExistsException(command.contractNumber());
         }
 
-        ContractType type = ContractType.from(request.contractType());
-
-        if (request.mainJob()) {
+        if (command.mainJob()) {
             mainJobPolicy.ensureNoOverlappingMainJob(
                     true,
                     employmentContractRepository.findOverlappingMainJob(
-                            employeeId, null, request.startDate(), request.endDate())
+                            employeeId, null, command.startDate(), command.endDate())
             );
         }
 
-        EmploymentContract contract = new EmploymentContract();
-        contract.setEmployeeId(employeeId);
-        contract.setContractNumber(request.contractNumber());
-        contract.setStartDate(request.startDate());
-        contract.changePeriod(request.endDate());
-        contract.setContractType(type);
-        contract.setBaseSalary(request.baseSalary());
-        contract.setHourlyRate(request.hourlyRate());
-        contract.setBonusPercent(request.bonusPercent());
-        contract.setWorkHoursPerWeek(request.workHoursPerWeek());
-        contract.setMainJob(request.mainJob());
+        EmploymentContract contract = EmploymentContract.create(
+                employeeId, command.contractNumber(), command.startDate(), command.endDate(),
+                ContractType.from(command.contractType()), command.baseSalary(),
+                command.hourlyRate(), command.bonusPercent(), command.workHoursPerWeek(), command.mainJob()
+        );
 
         return toResult(employmentContractRepository.save(contract), today());
     }
@@ -75,23 +67,16 @@ public class EmploymentContractService {
         return toResult(contract, date);
     }
 
-    public EmploymentContractResult update(Long id, UpdateEmploymentContractCommand request) {
+    public EmploymentContractResult update(Long id, UpdateEmploymentContractCommand command) {
         EmploymentContract contract = findById(id);
-        if (request.baseSalary() != null) {
-            contract.setBaseSalary(request.baseSalary());
+        if (command.baseSalary() != null || command.hourlyRate() != null || command.bonusPercent() != null) {
+            contract.changeSalary(command.baseSalary(), command.hourlyRate(), command.bonusPercent());
         }
-        if (request.hourlyRate() != null) {
-            contract.setHourlyRate(request.hourlyRate());
-        }
-        if (request.bonusPercent() != null) {
-            contract.setBonusPercent(request.bonusPercent());
-        }
-        if (request.workHoursPerWeek() != null) {
-            contract.setWorkHoursPerWeek(request.workHoursPerWeek());
+        if (command.workHoursPerWeek() != null) {
+            contract.changeWorkHours(command.workHoursPerWeek());
         }
 
         employmentContractRepository.save(contract);
-
         return toResult(contract, today());
     }
 

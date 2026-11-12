@@ -74,27 +74,27 @@ public class JpaEmployeeRepository implements EmployeeRepository {
     }
 
     private Employee toDomain(EmployeeJpaEntity jpaEntity) {
-        Employee employee = new Employee();
-        employee.setId(jpaEntity.getId());
-        employee.setPersonnelNumber(jpaEntity.getPersonnelNumber());
-        employee.setSurname(jpaEntity.getSurname());
-        employee.setName(jpaEntity.getName());
-        employee.setMiddleName(jpaEntity.getMiddleName());
-        employee.setPassportSeries(jpaEntity.getPassportSeries());
-        employee.setPassportNumber(jpaEntity.getPassportNumber());
-        employee.setIdentificationNumber(jpaEntity.getIdentificationNumber());
-        employee.setBirthDate(jpaEntity.getBirthDate());
-        employee.setHireDate(jpaEntity.getHireDate());
-        employee.setDismissalDate(jpaEntity.getDismissalDate());
-        employee.setEmail(jpaEntity.getEmail());
-        employee.setPhone(jpaEntity.getPhone());
-        employee.setGender(jpaEntity.getGender());
-        employee.setPositionId(jpaEntity.getPositionId());
-        employee.setDepartmentId(jpaEntity.getDepartmentId());
-        employee.setEmploymentType(jpaEntity.getEmploymentType());
-        employee.setDependentChildrenCount(jpaEntity.getDependentChildrenCount());
-        employee.setDisabled(jpaEntity.isDisabled());
-        return employee;
+        return Employee.rehydrate(
+                jpaEntity.getId(),
+                jpaEntity.getPersonnelNumber(),
+                jpaEntity.getSurname(),
+                jpaEntity.getName(),
+                jpaEntity.getMiddleName(),
+                jpaEntity.getPassportSeries(),
+                jpaEntity.getPassportNumber(),
+                jpaEntity.getIdentificationNumber(),
+                jpaEntity.getBirthDate(),
+                jpaEntity.getHireDate(),
+                jpaEntity.getDismissalDate(),
+                jpaEntity.getEmail(),
+                jpaEntity.getPhone(),
+                jpaEntity.getGender(),
+                jpaEntity.getPositionId(),
+                jpaEntity.getDepartmentId(),
+                jpaEntity.getEmploymentType(),
+                jpaEntity.getDependentChildrenCount(),
+                jpaEntity.isDisabled()
+        );
     }
 
     private EmployeeJpaEntity toEntity(Employee employee) {

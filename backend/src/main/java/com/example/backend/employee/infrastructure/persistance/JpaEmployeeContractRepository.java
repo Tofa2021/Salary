@@ -59,19 +59,12 @@ public class JpaEmployeeContractRepository implements EmploymentContractReposito
     }
 
     private EmploymentContract toDomain(EmploymentContractJpaEntity entity) {
-        EmploymentContract contract = new EmploymentContract();
-        contract.setId(entity.getId());
-        contract.setEmployeeId(entity.getEmployeeId());
-        contract.setContractNumber(entity.getContractNumber());
-        contract.setStartDate(entity.getStartDate());
-        contract.setEndDate(entity.getEndDate());
-        contract.setContractType(entity.getContractType());
-        contract.setBaseSalary(entity.getBaseSalary());
-        contract.setHourlyRate(entity.getHourlyRate());
-        contract.setBonusPercent(entity.getBonusPercent());
-        contract.setWorkHoursPerWeek(entity.getWorkHoursPerWeek());
-        contract.setMainJob(entity.isMainJob());
-        return contract;
+        return EmploymentContract.rehydrate(
+                entity.getId(), entity.getEmployeeId(), entity.getContractNumber(),
+                entity.getStartDate(), entity.getEndDate(), entity.getContractType(),
+                entity.getBaseSalary(), entity.getHourlyRate(), entity.getBonusPercent(),
+                entity.getWorkHoursPerWeek(), entity.isMainJob()
+        );
     }
 
     private EmploymentContractJpaEntity toEntity(EmploymentContract contract) {

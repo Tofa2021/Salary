@@ -27,26 +27,26 @@ public class EmployeeService {
     private final DepartmentLookup departmentLookup;
     private final PositionLookup positionLookup;
 
-    public EmployeeResult create(CreateEmployeeCommand request) {
-        if (employeeRepository.existsByPersonnelNumber(request.personnelNumber())) {
-            throw new EmployeePersonnelNumberAlreadyExistsException(request.personnelNumber());
+    public EmployeeResult create(CreateEmployeeCommand command) { // FIXME промотреть комманду передавать childrenCount disable и паспортные данные
+        if (employeeRepository.existsByPersonnelNumber(command.personnelNumber())) {
+            throw new EmployeePersonnelNumberAlreadyExistsException(command.personnelNumber());
         }
 
-        DepartmentResult departmentResult = findDepartmentResult(request.departmentId());
-        PositionResult positionResult = positionLookup.findById(request.positionId())
-                .orElseThrow(() -> new EmployeeInvalidPositionException(request.positionId()));
+        DepartmentResult departmentResult = findDepartmentResult(command.departmentId());
+        PositionResult positionResult = findPositionResult(command.positionId());
 
-        Employee employee = new Employee();
-        employee.setPersonnelNumber(request.personnelNumber());
-        employee.setSurname(request.surname());
-        employee.setName(request.name());
-        employee.setMiddleName(request.middleName());
-        employee.setEmail(request.email());
-        employee.setPhone(request.phone());
-        employee.setHireDate(request.hireDate());
-        employee.setDepartmentId(departmentResult.id());
-        employee.setPositionId(positionResult.id());
-        employee.setEmploymentType(EmploymentType.from(request.employmentType()));
+        Employee employee = Employee.hire(
+                command.personnelNumber(),
+                command.surname(),
+                command.name(),
+                command.middleName(),
+                command.email(),
+                command.phone(),
+                command.hireDate(),
+                departmentResult.id(),
+                positionResult.id(),
+                EmploymentType.from(command.employmentType())
+        );
 
         return toResult(employeeRepository.save(employee));
     }
@@ -70,35 +70,20 @@ public class EmployeeService {
                 .map(this::toResult);
     }
 
-    public EmployeeResult update(Long id, UpdateEmployeeCommand request) {
+    public EmployeeResult update(Long id, UpdateEmployeeCommand command) {
         Employee employee = findEmployee(id);
 
-        if (request.surname() != null) {
-            employee.setSurname(request.surname());
+        employee.updatePersonalData(command.surname(), command.name(), command.middleName());
+        employee.updateContacts(command.email(), command.phone());
+
+        if (command.departmentId() != null) {
+            employee.changeDepartment(findDepartmentResult(command.departmentId()).id());
         }
-        if (request.name() != null) {
-            employee.setName(request.name());
+        if (command.positionId() != null) {
+            employee.changePosition(findPositionResult(command.positionId()).id());
         }
-        if (request.middleName() != null) {
-            employee.setMiddleName(request.middleName());
-        }
-        if (request.email() != null) {
-            employee.setEmail(request.email());
-        }
-        if (request.phone() != null) {
-            employee.setPhone(request.phone());
-        }
-        if (request.departmentId() != null) {
-            DepartmentResult departmentResult = findDepartmentResult(request.departmentId());
-            employee.setDepartmentId(departmentResult.id());
-        }
-        if (request.positionId() != null) {
-            PositionResult positionResult = positionLookup.findById(request.positionId())
-                    .orElseThrow(() -> new EmployeeInvalidPositionException(request.positionId()));
-            employee.setPositionId(positionResult.id());
-        }
-        if (request.employmentType() != null) {
-            employee.setEmploymentType(EmploymentType.from(request.employmentType()));
+        if (command.employmentType() != null) {
+            employee.changeEmploymentType(EmploymentType.from(command.employmentType()));
         }
 
         employeeRepository.save(employee);
@@ -133,6 +118,11 @@ public class EmployeeService {
     private DepartmentResult findDepartmentResult(Long id) {
         return departmentLookup.findById(id)
                 .orElseThrow(() -> new EmployeeInvalidDepartmentException(id));
+    }
+
+    private PositionResult findPositionResult(Long id) {
+        return positionLookup.findById(id)
+                .orElseThrow(() -> new EmployeeInvalidPositionException(id));
     }
 
     public void transfer(Long newDepartmentId, Long employeeId) {
