@@ -73,8 +73,7 @@ class EmployeeServiceGetTest extends BaseEmployeeServiceTest {
     @Test
     void getAll_PageBeyondRange_ReturnsEmptyWithMetadata() {
         PageRequest request = PageRequest.of(100, 20);
-        when(employeeRepository.findAll(request))
-                .thenReturn(PageResult.empty(100, 20));
+        when(employeeRepository.findAll(request)).thenReturn(PageResult.empty(100, 20));
 
         PageResult<EmployeeResult> result = employeeService.getAll(request);
 

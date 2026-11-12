@@ -50,14 +50,27 @@ abstract class BaseTimeSheetServiceTest {
     }
 
     protected Employee employee(Long id, String pn, LocalDate hire, LocalDate dismissal) {
-        Employee employee = new Employee();
-        employee.setId(id);
-        employee.setPersonnelNumber(pn);
-        employee.setSurname("Иванов");
-        employee.setName("Иван");
-        employee.setHireDate(hire);
-        employee.setDismissalDate(dismissal);
-        return employee;
+        return Employee.rehydrate(
+                id,
+                pn,
+                "Иванов",
+                "Иван",
+                null,
+                null,
+                null,
+                null,
+                null,
+                hire,
+                dismissal,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                0,
+                false
+        );
     }
 
     protected TimeSheet timeSheet(Long id, int year, int month, boolean approved) {

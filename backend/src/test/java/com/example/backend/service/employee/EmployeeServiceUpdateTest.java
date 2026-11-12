@@ -38,7 +38,12 @@ class EmployeeServiceUpdateTest extends BaseEmployeeServiceTest {
         when(employeeRepository.findById(1L)).thenReturn(Optional.of(employee));
 
         UpdateEmployeeCommand request = new UpdateEmployeeCommand(
-                null, null, null, null, null, null, null, null);
+                null, null, null,
+                null, null, null,
+                null, null,
+                null, null,
+                null, null, null,
+                null, null);
 
         EmployeeResult result = employeeService.update(1L, request);
 
@@ -52,7 +57,12 @@ class EmployeeServiceUpdateTest extends BaseEmployeeServiceTest {
         when(employeeRepository.findById(1L)).thenReturn(Optional.of(employee));
 
         UpdateEmployeeCommand request = new UpdateEmployeeCommand(
-                null, "НовоеИмя", null, null, null, null, null, null);
+                null, "НовоеИмя", null,
+                null, null, null,
+                null, null,
+                null, null,
+                null, null, null,
+                null, null);
 
         EmployeeResult result = employeeService.update(1L, request);
 
@@ -67,7 +77,12 @@ class EmployeeServiceUpdateTest extends BaseEmployeeServiceTest {
         when(departmentLookup.findById(99L)).thenReturn(Optional.empty());
 
         UpdateEmployeeCommand request = new UpdateEmployeeCommand(
-                null, null, null, null, null, 99L, null, null);
+                null, null, null,
+                null, null, null,
+                null, null,
+                null, null,
+                99L, null, null,
+                null, null);
 
         assertThatThrownBy(() -> employeeService.update(1L, request))
                 .isInstanceOf(EmployeeInvalidDepartmentException.class);
@@ -80,7 +95,12 @@ class EmployeeServiceUpdateTest extends BaseEmployeeServiceTest {
         when(positionLookup.findById(99L)).thenReturn(Optional.empty());
 
         UpdateEmployeeCommand request = new UpdateEmployeeCommand(
-                null, null, null, null, null, null, 99L, null);
+                null, null, null,
+                null, null, null,
+                null, null,
+                null, null,
+                null, 99L, null,
+                null, null);
 
         assertThatThrownBy(() -> employeeService.update(1L, request))
                 .isInstanceOf(EmployeeInvalidPositionException.class);
@@ -92,7 +112,12 @@ class EmployeeServiceUpdateTest extends BaseEmployeeServiceTest {
         when(employeeRepository.findById(1L)).thenReturn(Optional.of(employee));
 
         UpdateEmployeeCommand request = new UpdateEmployeeCommand(
-                null, null, null, null, null, null, null, "INVALID");
+                null, null, null,
+                null, null, null,
+                null, null,
+                null, null,
+                null, null, "INVALID",
+                null, null);
 
         assertThatThrownBy(() -> employeeService.update(1L, request))
                 .isInstanceOf(UnknownEmploymentTypeException.class);

@@ -7,6 +7,7 @@ import com.example.backend.employee.domain.exception.employee.EmployeeInvalidPos
 import com.example.backend.employee.domain.exception.employee.EmployeePersonnelNumberAlreadyExistsException;
 import com.example.backend.employee.domain.exception.employee.UnknownEmploymentTypeException;
 import com.example.backend.employee.domain.model.Employee;
+import com.example.backend.employee.domain.model.Gender;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullSource;
@@ -82,8 +83,12 @@ class EmployeeServiceCreateTest extends BaseEmployeeServiceTest {
         when(positionLookup.findById(any())).thenReturn(Optional.of(positionResult()));
 
         CreateEmployeeCommand request = new CreateEmployeeCommand(
-                "T-001", "X", "Y", null, null, null,
-                LocalDate.now(), 1L, 1L, type);
+                "T-001", "X", "Y", null,
+                null, null, null,
+                null, null,
+                Gender.MALE, LocalDate.of(1990, 1, 1),
+                LocalDate.now(), 1L, 1L, type,
+                false, 0);
 
         assertThatThrownBy(() -> employeeService.create(request))
                 .isInstanceOf(UnknownEmploymentTypeException.class);
@@ -99,8 +104,12 @@ class EmployeeServiceCreateTest extends BaseEmployeeServiceTest {
         when(positionLookup.findById(any())).thenReturn(Optional.of(positionResult()));
 
         CreateEmployeeCommand request = new CreateEmployeeCommand(
-                "T-001", "X", "Y", null, null, null,
-                LocalDate.now(), 1L, 1L, type);
+                "T-001", "X", "Y", null,
+                null, null, null,
+                null, null,
+                Gender.MALE, LocalDate.of(1990, 1, 1),
+                LocalDate.now(), 1L, 1L, type,
+                false, 0);
 
         assertThatThrownBy(() -> employeeService.create(request))
                 .isInstanceOf(UnknownEmploymentTypeException.class);

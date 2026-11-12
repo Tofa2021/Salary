@@ -5,6 +5,8 @@ import com.example.backend.employee.api.dto.EmploymentContractResult;
 import com.example.backend.employee.application.service.EmploymentContractService;
 import com.example.backend.employee.domain.model.Employee;
 import com.example.backend.employee.domain.model.EmploymentContract;
+import com.example.backend.employee.domain.model.EmploymentType;
+import com.example.backend.employee.domain.model.Gender;
 import com.example.backend.employee.infrastructure.persistance.SpringDataEmployeeRepository;
 import com.example.backend.employee.infrastructure.persistance.SpringDataEmploymentContractRepository;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -31,13 +33,13 @@ abstract class BaseEmploymentContractServiceTest {
     protected EmploymentContractService contractService;
 
     protected Employee employee(Long id, String personnelNumber) {
-        Employee e = new Employee();
-        e.setId(id);
-        e.setPersonnelNumber(personnelNumber);
-        e.setSurname("Иванов");
-        e.setName("Иван");
-        e.setHireDate(LocalDate.of(2026, 1, 1));
-        return e;
+        return Employee.rehydrate(
+                1L, "T-001", "Иванов", "Иван", "Иванович",
+                null, null, null, null,
+                LocalDate.of(2026, 1, 1), null,
+                "ivan@gmail.com", "+375251231231", Gender.MALE,
+                1L, 1L, EmploymentType.FULL_TIME, 0, false
+        );
     }
 //
 //    protected EmploymentContract contract(Long id, Employee employee) {

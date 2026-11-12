@@ -28,8 +28,7 @@ class EmployeeServiceRemoveFromDepartmentTest extends BaseEmployeeServiceTest {
 
     @Test
     void removeFromDepartment_EmployeeDismissed_Throws() {
-        Employee employee = employee(1L, "T-001");
-        employee.setDismissalDate(LocalDate.of(2025, 6, 1));
+        Employee employee = employee(1L, "T-001", LocalDate.of(2025, 6, 1), 1L);
         when(employeeRepository.findById(1L)).thenReturn(Optional.of(employee));
 
         assertThatThrownBy(() -> employeeService.removeFromDepartment(1L))
@@ -40,8 +39,7 @@ class EmployeeServiceRemoveFromDepartmentTest extends BaseEmployeeServiceTest {
 
     @Test
     void removeFromDepartment_WithoutDepartment_Throws() {
-        Employee employee = employee(1L, "T-001");
-        employee.setDepartmentId(null);
+        Employee employee = employee(1L, "T-001", null, null);
         when(employeeRepository.findById(1L)).thenReturn(Optional.of(employee));
 
         assertThatThrownBy(() -> employeeService.removeFromDepartment(1L))

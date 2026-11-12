@@ -27,7 +27,7 @@ public class EmployeeService {
     private final DepartmentLookup departmentLookup;
     private final PositionLookup positionLookup;
 
-    public EmployeeResult create(CreateEmployeeCommand command) { // FIXME промотреть комманду передавать childrenCount disable и паспортные данные
+    public EmployeeResult create(CreateEmployeeCommand command) {
         if (employeeRepository.existsByPersonnelNumber(command.personnelNumber())) {
             throw new EmployeePersonnelNumberAlreadyExistsException(command.personnelNumber());
         }
@@ -40,12 +40,19 @@ public class EmployeeService {
                 command.surname(),
                 command.name(),
                 command.middleName(),
+                command.passportSeries(),
+                command.passportNumber(),
+                command.identificationNumber(),
                 command.email(),
                 command.phone(),
+                command.gender(),
+                command.birthDate(),
                 command.hireDate(),
                 departmentResult.id(),
                 positionResult.id(),
-                EmploymentType.from(command.employmentType())
+                EmploymentType.from(command.employmentType()),
+                command.childrenCount(),
+                command.disable()
         );
 
         return toResult(employeeRepository.save(employee));
@@ -74,7 +81,18 @@ public class EmployeeService {
         Employee employee = findEmployee(id);
 
         employee.updatePersonalData(command.surname(), command.name(), command.middleName());
+
         employee.updateContacts(command.email(), command.phone());
+
+        employee.updateDocuments(
+                command.passportSeries(),
+                command.passportNumber(),
+                command.identificationNumber(),
+                command.birthDate(),
+                command.gender()
+        );
+
+        employee.updateBenefits(command.disabled(), command.childrenCount());
 
         if (command.departmentId() != null) {
             employee.changeDepartment(findDepartmentResult(command.departmentId()).id());
@@ -87,7 +105,6 @@ public class EmployeeService {
         }
 
         employeeRepository.save(employee);
-
         return toResult(employee);
     }
 
@@ -127,6 +144,9 @@ public class EmployeeService {
 
     public void transfer(Long newDepartmentId, Long employeeId) {
         Employee employee = findEmployee(employeeId);
+        employee.ensureNotDismissed();
+        employee.ensureCanBeTransfer(newDepartmentId);
+        findDepartmentResult(newDepartmentId);
         employee.transferTo(newDepartmentId);
         employeeRepository.save(employee);
     }

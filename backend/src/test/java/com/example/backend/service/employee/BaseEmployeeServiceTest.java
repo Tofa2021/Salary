@@ -30,31 +30,35 @@ abstract class BaseEmployeeServiceTest {
 
     @Mock
     protected EmployeeRepository employeeRepository;
-
     @Mock
     protected DepartmentLookup departmentLookup;
-
     @Mock
     protected PositionLookup positionLookup;
-
     @InjectMocks
     protected EmployeeService employeeService;
 
     protected Employee employee(Long id, String personnelNumber) {
-        Employee employee = new Employee();
-        employee.setId(id);
-        employee.setPersonnelNumber(personnelNumber);
-        employee.setSurname("Иванов");
-        employee.setName("Иван");
-        employee.setMiddleName("Иванович");
-        employee.setEmail("ivan@gmail.com");
-        employee.setPhone("+375251231231");
-        employee.setHireDate(LocalDate.of(2026, 1, 1));
-        employee.setDepartmentId(1L);
-        employee.setPositionId(1L);
-        employee.setEmploymentType(EmploymentType.FULL_TIME);
-        employee.setGender(Gender.MALE);
-        return employee;
+        return employee(id, personnelNumber, null, 1L);
+    }
+
+
+    protected Employee employee(Long id, String personnelNumber,
+                                LocalDate dismissalDate, Long departmentId) {
+        return Employee.rehydrate(
+                id,
+                personnelNumber,
+                "Иванов", "Иван", "Иванович",
+                null, null, null,
+                null,
+                LocalDate.of(2026, 1, 1),
+                dismissalDate,
+                "ivan@gmail.com", "+375251231231",
+                Gender.MALE,
+                1L,
+                departmentId,
+                EmploymentType.FULL_TIME,
+                0, false
+        );
     }
 
     protected DepartmentResult departmentResult() {
@@ -72,21 +76,23 @@ abstract class BaseEmployeeServiceTest {
     protected CreateEmployeeCommand createRequest(String personnelNumber) {
         return new CreateEmployeeCommand(
                 personnelNumber, "Иванов", "Иван", "Иванович",
+                null, null, null,
                 "ivan@gmail.com", "+375251231231",
+                Gender.MALE, LocalDate.of(1990, 1, 1),
                 LocalDate.of(2026, 1, 1),
-                1L, 1L, "FULL_TIME");
+                1L, 1L, "FULL_TIME",
+                false, 0
+        );
     }
 
     protected UpdateEmployeeCommand updateRequest() {
         return new UpdateEmployeeCommand(
-                "A",
-                "B",
-                "C",
-                "asd@gmail.com",
-                "+3751231231",
-                1L,
-                1L,
-                "FULL_TIME"
+                "A", "B", "C",
+                null, null, null,
+                "asd@gmail.com", "+3751231231",
+                null, null,
+                1L, 1L, "FULL_TIME",
+                null, null
         );
     }
 
@@ -96,10 +102,27 @@ abstract class BaseEmployeeServiceTest {
         when(positionLookup.findById(1L)).thenReturn(Optional.of(positionResult()));
         when(employeeRepository.save(any(Employee.class))).thenAnswer(inv -> {
             Employee employee = inv.getArgument(0);
-            if (employee.getId() == null) {
-                employee.setId(1L);
-            }
-            return employee;
+            return Employee.rehydrate(
+                    1L,
+                    employee.getPersonnelNumber(),
+                    employee.getSurname(),
+                    employee.getName(),
+                    employee.getMiddleName(),
+                    employee.getPassportSeries(),
+                    employee.getPassportNumber(),
+                    employee.getIdentificationNumber(),
+                    employee.getBirthDate(),
+                    employee.getHireDate(),
+                    employee.getDismissalDate(),
+                    employee.getEmail(),
+                    employee.getPhone(),
+                    employee.getGender(),
+                    employee.getPositionId(),
+                    employee.getDepartmentId(),
+                    employee.getEmploymentType(),
+                    employee.getDependentChildrenCount(),
+                    employee.isDisabled()
+            );
         });
     }
 

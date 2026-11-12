@@ -26,6 +26,7 @@ class EmployeeServiceDismissTest extends BaseEmployeeServiceTest {
                 new DismissCommand(LocalDate.of(2026, 6, 1)));
 
         assertThat(result.dismissalDate()).isEqualTo(LocalDate.of(2026, 6, 1));
+        verify(employeeRepository).save(employee);
     }
 
     @Test
