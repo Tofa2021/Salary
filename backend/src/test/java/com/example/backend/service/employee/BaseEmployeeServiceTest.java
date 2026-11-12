@@ -18,7 +18,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -62,11 +61,11 @@ abstract class BaseEmployeeServiceTest {
     }
 
     protected DepartmentResult departmentResult() {
-        return new DepartmentResult(1L, "IT", "it-1", null, new ArrayList<>());
+        return new DepartmentResult(1L, "IT", "it-1", null);
     }
 
     protected DepartmentResult departmentResult(Long id, String name) {
-        return new DepartmentResult(id, name, name.toLowerCase() + "-" + id, null, new ArrayList<>());
+        return new DepartmentResult(id, name, name.toLowerCase() + "-" + id, null);
     }
 
     protected PositionResult positionResult() {

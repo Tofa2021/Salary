@@ -1,29 +1,16 @@
 package com.example.backend.timesheet.api.dto;
 
-import com.example.backend.timesheet.domain.model.TimeSheet;
+import com.example.backend.timesheet.domain.model.TimeSheetEntryType;
 
-import java.time.LocalDateTime;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.Map;
 
 public record TimeSheetSummaryResult(
-        Long id,
-        Integer year,
-        Integer month,
-        Long departmentId,
-        String departmentName,
-        boolean approved,
-        LocalDateTime approvedAt,
-        int entryCount
+        Long employeeId,
+        LocalDate periodStart,
+        LocalDate periodEnd,
+        BigDecimal totalHours,
+        Map<TimeSheetEntryType, BigDecimal> hoursByType
 ) {
-    public static TimeSheetSummaryResult from(TimeSheet timeSheet) {
-        return new TimeSheetSummaryResult(
-                timeSheet.getId(),
-                timeSheet.getYear(),
-                timeSheet.getMonth(),
-                timeSheet.getDepartment().getId(),
-                timeSheet.getDepartment().getName(),
-                timeSheet.isApproved(),
-                timeSheet.getApprovedAt(),
-                timeSheet.getEntries().size()
-        );
-    }
 }

@@ -1,51 +1,45 @@
 package com.example.backend.timesheet.infrastructure.persistance.entity;
 
-import com.example.backend.auth.model.User;
-import com.example.backend.department.Department;
+import com.example.backend.timesheet.domain.model.TimeSheetStatus;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@AllArgsConstructor
-@NoArgsConstructor
 @Getter
 @Setter
+@NoArgsConstructor
 @Table(name = "time_sheets")
 public class TimeSheetJpaEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private int year;
-    private int month;
+    @Column(name = "employee_id", nullable = false)
+    private Long employeeId;
 
-    @ManyToOne
-    private Department department;
+    @Column(name = "period_start", nullable = false)
+    private LocalDate periodStart;
 
-    @OneToMany(mappedBy = "timeSheet")
-    private List<TimeSheetEntryJpaEntity> entries;
+    @Column(name = "period_end", nullable = false)
+    private LocalDate periodEnd;
 
-    private boolean approved;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private TimeSheetStatus status;
+
+    @Column(name = "approved_at")
     private LocalDateTime approvedAt;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "approved_by_id")
-    private User approvedBy;
+    @Column(name = "approved_by")
+    private Long approvedBy;
 
-    public TimeSheetJpaEntity(int year, int month, Department department) {
-        this.year = year;
-        this.month = month;
-        this.department = department;
-        this.approved = false;
-        this.approvedAt = null;
-        this.entries = new ArrayList<>();
-        this.approvedBy = null;
-    }
+    @OneToMany(mappedBy = "timeSheet", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<TimeSheetEntryJpaEntity> entries = new ArrayList<>();
 }

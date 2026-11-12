@@ -1,316 +1,142 @@
 package com.example.backend.timesheet.application.service;
 
-import com.example.backend.auth.model.User;
-import com.example.backend.auth.repository.UserRepository;
-import com.example.backend.department.api.DepartmentLookup;
-import com.example.backend.department.api.dto.DepartmentResult;
-import com.example.backend.employee.api.EmployeeLookup;
-import com.example.backend.employee.domain.model.Employee;
+import com.example.backend.shared.pagination.PageRequest;
+import com.example.backend.shared.pagination.PageResult;
 import com.example.backend.timesheet.api.dto.*;
-import com.example.backend.timesheet.domain.exception.*;
+import com.example.backend.timesheet.domain.exception.TimeSheetNotFoundException;
 import com.example.backend.timesheet.domain.model.TimeSheet;
 import com.example.backend.timesheet.domain.model.TimeSheetEntry;
-import com.example.backend.timesheet.domain.port.TimeSheetEntryRepository;
+import com.example.backend.timesheet.domain.model.TimeSheetEntryType;
+import com.example.backend.timesheet.domain.model.WorkHours;
 import com.example.backend.timesheet.domain.port.TimeSheetRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.context.SecurityContextHolder;
 
+import java.math.BigDecimal;
+import java.time.Clock;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 public class TimeSheetService {
     private final TimeSheetRepository timeSheetRepository;
-    private final TimeSheetEntryRepository timeSheetEntryRepository;
-    private final EmployeeLookup employeeLookup;
-    private final DepartmentLookup departmentLookup;
-    private final UserRepository userRepository;
+    private final Clock clock;
 
-    public TimeSheetResult create(CreateTimeSheetCommand request) {
-        DepartmentResult departmentResult = findDepartment(request.departmentId());
+    public TimeSheetResult create(CreateTimeSheetCommand command) {
+        TimeSheet timeSheet = TimeSheet.create(command.employeeId(), command.periodStart(), command.periodEnd());
+        return toResult(timeSheetRepository.save(timeSheet));
+    }
 
-        if (timeSheetRepository.findByDepartmentAndPeriod(request.departmentId(), request.year(), request.month()).isPresent()) {
-            throw new TimeSheetAlreadyExistsException(request.departmentId(), request.year(), request.month());
-        }
+    public TimeSheetResult addEntry(Long timesheetId, TimeSheetEntryCommand command) {
+        TimeSheet timeSheet = findById(timesheetId);
+        timeSheet.addEntry(TimeSheetEntry.create(command.date(), WorkHours.of(command.hours()), command.type()));
+        return toResult(timeSheetRepository.save(timeSheet));
+    }
 
-        TimeSheet timeSheet = TimeSheet.create(request.year(), request.month(), departmentResult.id());
+    public TimeSheetResult removeEntry(Long timeSheetId, Long entryId) {
+        TimeSheet timeSheet = findById(timeSheetId);
+        timeSheet.removeEntry(entryId);
+        return toResult(timeSheetRepository.save(timeSheet));
+    }
 
-        List<Employee> employees = employeeRepository.findActiveByDepartmentOnDate(request.departmentId(), periodEnd);
+    public TimeSheetResult submit(Long timeSheetId) {
+        TimeSheet timeSheet = findById(timeSheetId);
+        timeSheet.submit();
+        return toResult(timeSheetRepository.save(timeSheet));
+    }
 
-        for (Employee employee : employees) {
-            addEmployeeToTimeSheet(timeSheet, employee);
-        }
+    public TimeSheetResult approve(Long timeSheetId, Long approvedBy) {
+        TimeSheet timeSheet = findById(timeSheetId);
+        timeSheet.approve(approvedBy, LocalDateTime.now(clock));
+        return toResult(timeSheetRepository.save(timeSheet));
+    }
 
-        TimeSheet saved = timeSheetRepository.save(timeSheet);
-        return TimeSheetResult.from(saved, canEdit(saved), canApprove(saved), canReopen(saved));
+    public TimeSheetResult reject(Long timeSheetId) {
+        TimeSheet timeSheet = findById(timeSheetId);
+        timeSheet.reject();
+        return toResult(timeSheetRepository.save(timeSheet));
+    }
+
+    public void delete(Long timeSheetId) {
+        TimeSheet timeSheet = findById(timeSheetId);
+        timeSheetRepository.delete(timeSheet);
     }
 
     public TimeSheetResult getById(Long id) {
-        TimeSheet timeSheet = findTimeSheet(id);
-        return TimeSheetResult.from(timeSheet, canEdit(timeSheet), canApprove(timeSheet), canReopen(timeSheet));
+        return toResult(findById(id));
     }
 
-    public TimeSheetResult getByPeriod(int year, int month, Long departmentId) {
-        TimeSheet timeSheet = timeSheetRepository.findByDepartmentAndPeriod(departmentId, year, month)
-                .orElseThrow(() -> new TimeSheetNotFoundException(departmentId, year, month));
-        return TimeSheetResult.from(timeSheet, canEdit(timeSheet), canApprove(timeSheet), canReopen(timeSheet));
+    public Optional<TimeSheetResult> findByIdOptional(Long id) {
+        return timeSheetRepository.findById(id).map(this::toResult);
     }
 
-    public List<TimeSheetSummaryResult> getAll(int year, int month) {
-        return timeSheetRepository.findAllByYearAndMonth(year, month).stream()
-                .map(TimeSheetSummaryResult::from)
+    public PageResult<TimeSheetResult> getByEmployee(Long employeeId, PageRequest pageRequest) {
+        return timeSheetRepository.findByEmployeeId(employeeId, pageRequest).map(this::toResult);
+    }
+
+    public PageResult<TimeSheetResult> getByPeriod(LocalDate start, LocalDate end, PageRequest pageRequest) {
+        return timeSheetRepository.findByPeriod(start, end, pageRequest).map(this::toResult);
+    }
+
+    public Optional<TimeSheetSummaryResult> findHoursSummaryOptional(Long employeeId, LocalDate start, LocalDate end) {
+        return timeSheetRepository.findByEmployeeIdAndPeriod(employeeId, start, end)
+                .map(this::toHoursSummary);
+    }
+
+    public List<TimeSheetSummaryResult> findHoursSummaries(LocalDate start, LocalDate end) {
+        return timeSheetRepository.findAllByPeriod(start, end).stream()
+                .map(this::toHoursSummary)
                 .toList();
     }
 
-    public TimeSheetEntryResult getEntry(Long timeSheetId, Long employeeId) {
-        TimeSheetEntry entry = timeSheetEntryRepository.findByTimeSheetIdAndEmployeeId(timeSheetId, employeeId)
-                .orElseThrow(() -> new TimeSheetEntryNotFoundException(timeSheetId, employeeId));
-        return TimeSheetEntryResult.from(entry);
+    private TimeSheet findById(Long id) {
+        return timeSheetRepository.findById(id).orElseThrow(() -> new TimeSheetNotFoundException(id));
     }
 
-    public TimeSheetEntryResult updateEntry(Long entryId, TimeSheetEntryUpdateCommand request) {
-        TimeSheetEntry entry = timeSheetEntryRepository.findById(entryId)
-                .orElseThrow(() -> new TimeSheetEntryNotFoundException(entryId));
-
-        if (entry.getTimeSheet().isApproved()) {
-            throw new TimeSheetAlreadyApprovedException(entry.getTimeSheet().getId());
-        }
-
-        applyUpdate(entry, request);
-        validateEntry(entry);
-
-        return TimeSheetEntryResult.from(timeSheetEntryRepository.save(entry));
-    }
-
-    public List<TimeSheetEntryResult> bulkUpdateEntries(Long timeSheetId, List<TimeSheetEntryUpdateCommand> requests) {
-        TimeSheet timeSheet = findTimeSheet(timeSheetId);
-
-        if (timeSheet.isApproved()) {
-            throw new TimeSheetAlreadyApprovedException(timeSheetId);
-        }
-        if (requests == null || requests.isEmpty()) {
-            return List.of();
-        }
-
-        List<Long> ids = requests.stream()
-                .map(TimeSheetEntryUpdateCommand::id)
-                .filter(java.util.Objects::nonNull)
-                .toList();
-        Map<Long, TimeSheetEntry> byId = timeSheetEntryRepository.findAllById(ids).stream()
-                .collect(Collectors.toMap(TimeSheetEntry::getId, Function.identity()));
-
-        List<TimeSheetEntryResult> result = new java.util.ArrayList<>();
-        for (TimeSheetEntryUpdateCommand request : requests) {
-            if (request.id() == null) {
-                throw new IllegalArgumentException("id is required for bulk update");
-            }
-            TimeSheetEntry entry = byId.get(request.id());
-            if (entry == null) {
-                throw new TimeSheetEntryNotFoundException(request.id());
-            }
-            applyUpdate(entry, request);
-            validateEntry(entry);
-            result.add(TimeSheetEntryResult.from(entry));
-        }
-        return result;
-    }
-
-    public TimeSheetResult approve(Long timeSheetId) {
-        TimeSheet timeSheet = findTimeSheet(timeSheetId);
-
-        if (timeSheet.isApproved()) {
-            throw new TimeSheetAlreadyApprovedException(timeSheetId);
-        }
-        if (timeSheet.getEntries() == null || timeSheet.getEntries().isEmpty()) {
-            throw new EmptyTimeSheetException(timeSheetId);
-        }
-
-        timeSheet.setApproved(true);
-        timeSheet.setApprovedAt(LocalDateTime.now());
-        timeSheet.setApprovedBy(currentUser());
-
-        return TimeSheetResult.from(timeSheetRepository.save(timeSheet), canEdit(timeSheet), canApprove(timeSheet), canReopen(timeSheet));
-    }
-
-    public TimeSheetResult reopen(Long timeSheetId) {
-        TimeSheet timeSheet = findTimeSheet(timeSheetId);
-
-        if (!timeSheet.isApproved()) {
-            throw new TimeSheetNotApprovedException(timeSheetId);
-        }
-//        TODO add later while payroll epic
-//        Long departmentId = timeSheet.getDepartment() != null ? timeSheet.getDepartment().getId() : null;
-//        if (departmentId != null && payrollRecordRepository
-//                .existsApprovedByPeriodAndDepartment(timeSheet.getYear(), timeSheet.getMonth(), departmentId)) {
-//            throw new PayrollAlreadyApprovedException(timeSheet.getYear(), timeSheet.getMonth(), departmentId);
-//        }
-
-        timeSheet.setApproved(false);
-        timeSheet.setApprovedAt(null);
-        timeSheet.setApprovedBy(null);
-
-        return TimeSheetResult.from(timeSheetRepository.save(timeSheet), canEdit(timeSheet), canApprove(timeSheet), canReopen(timeSheet));
-    }
-
-    public boolean isApproved(int year, int month, Long departmentId) {
-        TimeSheet timeSheet = timeSheetRepository.findByDepartmentAndPeriod(departmentId, year, month)
-                .orElseThrow(() -> new TimeSheetNotFoundException(departmentId, year, month));
-        return timeSheet.isApproved();
-    }
-
-    public TimeSheetEntryResult addEmployeeToTimeSheet(Long timeSheetId, Long employeeId) {
-        TimeSheet timeSheet = findTimeSheet(timeSheetId);
-
-        if (timeSheet.isApproved()) {
-            throw new TimeSheetAlreadyApprovedException(timeSheetId);
-        }
-
-        Employee employee = employeeRepository.findById(employeeId)
-                .orElseThrow(() -> new EmployeeNotFoundException(employeeId));
-
-        if (timeSheetEntryRepository.existsByTimeSheetIdAndEmployeeId(timeSheetId, employeeId)) {
-            throw new DuplicateTimeSheetEntryException(timeSheetId, employeeId);
-        }
-
-        TimeSheetEntry entry = new TimeSheetEntry();
-        entry.setTimeSheet(timeSheet);
-        entry.setEmployee(employee);
-        entry.setWorkedDays(0);
-        entry.setWorkedHours(0);
-        entry.setVacationDays(0);
-        entry.setSickLeaveDays(0);
-        entry.setBusinessTripDays(0);
-        entry.setAbsentDays(0);
-        entry.setOvertimeHours(0);
-        entry.setNightHours(0);
-
-        return TimeSheetEntryResult.from(timeSheetEntryRepository.save(entry));
-    }
-
-    public TimeSheetEntry addEmployeeToTimeSheet(TimeSheet timeSheet, Employee employee) {
-        TimeSheetEntry entry = new TimeSheetEntry(
-                timeSheet, employee,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0
+    private TimeSheetResult toResult(TimeSheet timeSheet) {
+        Map<TimeSheetEntryType, BigDecimal> byType = timeSheet.getEntries().stream()
+                .collect(Collectors.groupingBy(
+                        TimeSheetEntry::getType,
+                        Collectors.reducing(BigDecimal.ZERO, e -> e.getHours().value(), BigDecimal::add)
+                ));
+        return new TimeSheetResult(
+                timeSheet.getId(),
+                timeSheet.getEmployeeId(),
+                timeSheet.getPeriodStart(),
+                timeSheet.getPeriodEnd(),
+                timeSheet.getStatus(),
+                timeSheet.getEntries().stream().map(this::toResult).toList(),
+                timeSheet.totalHours().value(),
+                byType,
+                timeSheet.getApprovedAt(),
+                timeSheet.getApprovedBy()
         );
-        timeSheet.getEntries().add(entry);
-        return entry;
     }
 
-    public void removeEmployeeFromTimeSheet(Long timeSheetId, Long employeeId) {
-        TimeSheet timeSheet = findTimeSheet(timeSheetId);
-
-        if (timeSheet.isApproved()) {
-            throw new TimeSheetAlreadyApprovedException(timeSheetId);
-        }
-
-        TimeSheetEntry entry = timeSheetEntryRepository
-                .findByTimeSheetIdAndEmployeeId(timeSheetId, employeeId)
-                .orElseThrow(() -> new TimeSheetEntryNotFoundException(timeSheetId, employeeId));
-
-        timeSheetEntryRepository.delete(entry);
+    private TimeSheetEntryResult toResult(TimeSheetEntry entry) {
+        return new TimeSheetEntryResult(
+                entry.getId(),
+                entry.getDate(),
+                entry.getHours().value(),
+                entry.getType()
+        );
     }
 
-    private TimeSheet findTimeSheet(Long id) {
-        return timeSheetRepository.findById(id)
-                .orElseThrow(() -> new TimeSheetNotFoundException(id));
-    }
-
-    private DepartmentResult findDepartment(Long id) {
-        return departmentLookup.findById(id)
-                .orElseThrow(() -> new TimeSheetInvalidDepartmentException(id));
-    }
-
-    private void applyUpdate(TimeSheetEntry entry, TimeSheetEntryUpdateCommand request) {
-        if (request.workedDays() != null) {
-            entry.setWorkedDays(request.workedDays());
-        }
-        if (request.workedHours() != null) {
-            entry.setWorkedHours(request.workedHours());
-        }
-        if (request.vacationDays() != null) {
-            entry.setVacationDays(request.vacationDays());
-        }
-        if (request.sickLeaveDays() != null) {
-            entry.setSickLeaveDays(request.sickLeaveDays());
-        }
-        if (request.businessTripDays() != null) {
-            entry.setBusinessTripDays(request.businessTripDays());
-        }
-        if (request.absentDays() != null) {
-            entry.setAbsentDays(request.absentDays());
-        }
-        if (request.overtimeHours() != null) {
-            entry.setOvertimeHours(request.overtimeHours());
-        }
-        if (request.nightHours() != null) {
-            entry.setNightHours(request.nightHours());
-        }
-    }
-
-    private void validateEntry(TimeSheetEntry entry) {
-        if (entry.getWorkedDays() < 0 || entry.getWorkedHours() < 0
-                || entry.getVacationDays() < 0 || entry.getSickLeaveDays() < 0
-                || entry.getBusinessTripDays() < 0 || entry.getAbsentDays() < 0
-                || entry.getOvertimeHours() < 0 || entry.getNightHours() < 0) {
-            throw new InvalidTimeSheetEntryException("Negative values not allowed");
-        }
-
-//        TODO add later while add product calendar sheet
-//        TimeSheet ts = entry.getTimeSheet();
-//        int normDays = productionCalendarService.workingDaysInMonth(ts.getYear(), ts.getMonth());
-
-//        int totalDays = entry.getWorkedDays() + entry.getVacationDays()
-//                + entry.getSickLeaveDays() + entry.getBusinessTripDays() + entry.getAbsentDays();
-//        if (totalDays > normDays) {
-//            throw new InvalidTimeSheetEntryException(
-//                    "Total days " + totalDays + " exceed norm " + normDays);
-//        }
-        if (entry.getOvertimeHours() > entry.getWorkedHours()) {
-            throw new InvalidTimeSheetEntryException("Overtime hours " + entry.getOvertimeHours() +
-                    " exceed worked hours " + entry.getWorkedHours());
-        }
-        if (entry.getNightHours() > entry.getWorkedHours()) {
-            throw new InvalidTimeSheetEntryException("Night hours " + entry.getNightHours() +
-                    " exceed worked hours " + entry.getWorkedHours());
-        }
-    }
-
-    private User currentUser() {
-        var auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth == null || auth.getName() == null) {
-            return null;
-        }
-        return userRepository.findByUsername(auth.getName()).orElse(null);
-    }
-
-    private boolean canEdit(TimeSheet ts) {
-        return !ts.isApproved();
-    }
-
-    private boolean canApprove(TimeSheet ts) {
-        return !ts.isApproved() && ts.getEntries() != null && !ts.getEntries().isEmpty();
-    }
-
-    private boolean canReopen(TimeSheet timeSheet) {
-        if (!timeSheet.isApproved()) {
-            return false;
-        }
-        Long departmentId = timeSheet.getDepartment() != null ? timeSheet.getDepartment().getId() : null;
-        if (departmentId == null) {
-            return true;
-        }
-
-        return true;
-//        return !payrollRecordRepository.existsApprovedByPeriodAndDepartment(timeSheet.getYear(), timeSheet.getMonth(), departmentId);
+    private TimeSheetSummaryResult toHoursSummary(TimeSheet timeSheet) {
+        Map<TimeSheetEntryType, BigDecimal> byType = timeSheet.getEntries().stream()
+                .collect(Collectors.groupingBy(
+                        TimeSheetEntry::getType,
+                        Collectors.reducing(BigDecimal.ZERO, e -> e.getHours().value(), BigDecimal::add)
+                ));
+        return new TimeSheetSummaryResult(
+                timeSheet.getEmployeeId(),
+                timeSheet.getPeriodStart(),
+                timeSheet.getPeriodEnd(),
+                timeSheet.totalHours().value(),
+                byType
+        );
     }
 }

@@ -1,25 +1,61 @@
 package com.example.backend.timesheet.domain.model;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
-@AllArgsConstructor
-@NoArgsConstructor
+import java.math.BigDecimal;
+import java.time.LocalDate;
+
 @Getter
-@Setter
 public class TimeSheetEntry {
     private Long id;
-    private TimeSheet timeSheet;
-    private Long employeeId;
+    private LocalDate date;
+    private WorkHours hours;
+    private TimeSheetEntryType type;
 
-    private Integer workedDays;
-    private Integer workedHours;
-    private Integer vacationDays;
-    private Integer sickLeaveDays;
-    private Integer businessTripDays;
-    private Integer absentDays;
-    private Integer overtimeHours;
-    private Integer nightHours;
+    public static TimeSheetEntry create(LocalDate date, WorkHours hours, TimeSheetEntryType type) {
+        if (date == null) {
+            throw new IllegalArgumentException("date is required");
+        }
+
+        if (hours == null) {
+            throw new IllegalArgumentException("hours is required");
+        }
+
+        if (hours.value().compareTo(BigDecimal.ZERO) <= 0) {
+            throw new IllegalArgumentException("hours must be > 0");
+        }
+
+        if (type == null) {
+            throw new IllegalArgumentException("type is required");
+        }
+
+        TimeSheetEntry entry = new TimeSheetEntry();
+        entry.date = date;
+        entry.hours = hours;
+        entry.type = type;
+        return entry;
+    }
+
+    public static TimeSheetEntry rehydrate(Long id, LocalDate date, WorkHours hours, TimeSheetEntryType type) {
+        TimeSheetEntry entry = new TimeSheetEntry();
+        entry.id = id;
+        entry.date = date;
+        entry.hours = hours;
+        entry.type = type;
+        return entry;
+    }
+
+    public void changeHours(WorkHours newHours) {
+        if (newHours == null) {
+            throw new IllegalArgumentException("newHours is required");
+        }
+        this.hours = newHours;
+    }
+
+    public void changeType(TimeSheetEntryType newType) {
+        if (newType == null) {
+            throw new IllegalArgumentException("newType is required");
+        }
+        this.type = newType;
+    }
 }
