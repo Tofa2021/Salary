@@ -1,15 +1,11 @@
-package com.example.backend.employee.infrastructure.web.dto;
+package com.example.backend.employee.api.dto;
 
-import java.time.LocalDate;
-
-public record CreateEmployeeRequest(
-        String personnelNumber,
+public record UpdateEmployeeCommand(
         String surname,
         String name,
         String middleName,
         String email,
         String phone,
-        LocalDate hireDate,
         Long departmentId,
         Long positionId,
         String employmentType

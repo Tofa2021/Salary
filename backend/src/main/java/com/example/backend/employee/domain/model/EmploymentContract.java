@@ -61,6 +61,6 @@ public class EmploymentContract {
     }
 
     public boolean isActiveOnDate(LocalDate date) {
-        return !startDate.isAfter(date) && (endDate == null || endDate.isBefore(date));
+        return !startDate.isAfter(date) && (endDate == null || !endDate.isBefore(date));
     }
 }

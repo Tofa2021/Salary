@@ -1,9 +1,9 @@
-package com.example.backend.employee.infrastructure.web.dto;
+package com.example.backend.employee.api.dto;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-public record CreateEmploymentContractRequest(
+public record CreateEmploymentContractCommand(
         String contractNumber,
         LocalDate startDate,
         LocalDate endDate,

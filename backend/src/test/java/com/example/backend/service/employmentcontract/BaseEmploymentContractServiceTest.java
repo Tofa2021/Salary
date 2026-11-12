@@ -1,12 +1,12 @@
 package com.example.backend.service.employmentcontract;
 
+import com.example.backend.employee.api.dto.CreateEmploymentContractCommand;
 import com.example.backend.employee.api.dto.EmploymentContractResult;
 import com.example.backend.employee.application.service.EmploymentContractService;
 import com.example.backend.employee.domain.model.Employee;
 import com.example.backend.employee.domain.model.EmploymentContract;
 import com.example.backend.employee.infrastructure.persistance.SpringDataEmployeeRepository;
 import com.example.backend.employee.infrastructure.persistance.SpringDataEmploymentContractRepository;
-import com.example.backend.employee.infrastructure.web.dto.CreateEmploymentContractRequest;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -62,8 +62,8 @@ abstract class BaseEmploymentContractServiceTest {
 //        return c;
 //    }
 
-    protected CreateEmploymentContractRequest createRequest(String number, String type, boolean mainJob) {
-        return new CreateEmploymentContractRequest(
+    protected CreateEmploymentContractCommand createRequest(String number, String type, boolean mainJob) {
+        return new CreateEmploymentContractCommand(
                 number,
                 LocalDate.of(2026, 1, 1),
                 null,
@@ -76,10 +76,10 @@ abstract class BaseEmploymentContractServiceTest {
         );
     }
 
-    protected CreateEmploymentContractRequest createRequest(String number, String type,
+    protected CreateEmploymentContractCommand createRequest(String number, String type,
                                                             LocalDate start, LocalDate end,
                                                             boolean mainJob) {
-        return new CreateEmploymentContractRequest(
+        return new CreateEmploymentContractCommand(
                 number, start, end, type,
                 BigDecimal.valueOf(1000), null, BigDecimal.valueOf(10),
                 40, mainJob

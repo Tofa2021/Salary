@@ -1,12 +1,12 @@
 package com.example.backend.service.employee;
 
 import com.example.backend.employee.api.dto.EmployeeResult;
+import com.example.backend.employee.api.dto.UpdateEmployeeCommand;
 import com.example.backend.employee.domain.exception.employee.EmployeeInvalidDepartmentException;
 import com.example.backend.employee.domain.exception.employee.EmployeeInvalidPositionException;
 import com.example.backend.employee.domain.exception.employee.EmployeeNotFoundException;
 import com.example.backend.employee.domain.exception.employee.UnknownEmploymentTypeException;
 import com.example.backend.employee.domain.model.Employee;
-import com.example.backend.employee.infrastructure.web.dto.UpdateEmployeeRequest;
 import org.junit.jupiter.api.Test;
 
 import java.util.Optional;
@@ -37,7 +37,7 @@ class EmployeeServiceUpdateTest extends BaseEmployeeServiceTest {
         Employee employee = employee(1L, "T-001");
         when(employeeRepository.findById(1L)).thenReturn(Optional.of(employee));
 
-        UpdateEmployeeRequest request = new UpdateEmployeeRequest(
+        UpdateEmployeeCommand request = new UpdateEmployeeCommand(
                 null, null, null, null, null, null, null, null);
 
         EmployeeResult result = employeeService.update(1L, request);
@@ -51,7 +51,7 @@ class EmployeeServiceUpdateTest extends BaseEmployeeServiceTest {
         Employee employee = employee(1L, "T-001");
         when(employeeRepository.findById(1L)).thenReturn(Optional.of(employee));
 
-        UpdateEmployeeRequest request = new UpdateEmployeeRequest(
+        UpdateEmployeeCommand request = new UpdateEmployeeCommand(
                 null, "НовоеИмя", null, null, null, null, null, null);
 
         EmployeeResult result = employeeService.update(1L, request);
@@ -66,7 +66,7 @@ class EmployeeServiceUpdateTest extends BaseEmployeeServiceTest {
         when(employeeRepository.findById(1L)).thenReturn(Optional.of(employee));
         when(departmentLookup.findById(99L)).thenReturn(Optional.empty());
 
-        UpdateEmployeeRequest request = new UpdateEmployeeRequest(
+        UpdateEmployeeCommand request = new UpdateEmployeeCommand(
                 null, null, null, null, null, 99L, null, null);
 
         assertThatThrownBy(() -> employeeService.update(1L, request))
@@ -79,7 +79,7 @@ class EmployeeServiceUpdateTest extends BaseEmployeeServiceTest {
         when(employeeRepository.findById(1L)).thenReturn(Optional.of(employee));
         when(positionLookup.findById(99L)).thenReturn(Optional.empty());
 
-        UpdateEmployeeRequest request = new UpdateEmployeeRequest(
+        UpdateEmployeeCommand request = new UpdateEmployeeCommand(
                 null, null, null, null, null, null, 99L, null);
 
         assertThatThrownBy(() -> employeeService.update(1L, request))
@@ -91,7 +91,7 @@ class EmployeeServiceUpdateTest extends BaseEmployeeServiceTest {
         Employee employee = employee(1L, "T-001");
         when(employeeRepository.findById(1L)).thenReturn(Optional.of(employee));
 
-        UpdateEmployeeRequest request = new UpdateEmployeeRequest(
+        UpdateEmployeeCommand request = new UpdateEmployeeCommand(
                 null, null, null, null, null, null, null, "INVALID");
 
         assertThatThrownBy(() -> employeeService.update(1L, request))

@@ -2,7 +2,10 @@ package com.example.backend.employee.application.service;
 
 import com.example.backend.department.api.DepartmentLookup;
 import com.example.backend.department.api.dto.DepartmentResult;
+import com.example.backend.employee.api.dto.CreateEmployeeCommand;
+import com.example.backend.employee.api.dto.DismissCommand;
 import com.example.backend.employee.api.dto.EmployeeResult;
+import com.example.backend.employee.api.dto.UpdateEmployeeCommand;
 import com.example.backend.employee.domain.exception.employee.EmployeeInvalidDepartmentException;
 import com.example.backend.employee.domain.exception.employee.EmployeeInvalidPositionException;
 import com.example.backend.employee.domain.exception.employee.EmployeeNotFoundException;
@@ -10,9 +13,6 @@ import com.example.backend.employee.domain.exception.employee.EmployeePersonnelN
 import com.example.backend.employee.domain.model.Employee;
 import com.example.backend.employee.domain.model.EmploymentType;
 import com.example.backend.employee.domain.port.EmployeeRepository;
-import com.example.backend.employee.infrastructure.web.dto.CreateEmployeeRequest;
-import com.example.backend.employee.infrastructure.web.dto.DismissRequest;
-import com.example.backend.employee.infrastructure.web.dto.UpdateEmployeeRequest;
 import com.example.backend.position.api.PositionLookup;
 import com.example.backend.position.api.dto.PositionResult;
 import com.example.backend.shared.pagination.PageRequest;
@@ -27,7 +27,7 @@ public class EmployeeService {
     private final DepartmentLookup departmentLookup;
     private final PositionLookup positionLookup;
 
-    public EmployeeResult create(CreateEmployeeRequest request) {
+    public EmployeeResult create(CreateEmployeeCommand request) {
         if (employeeRepository.existsByPersonnelNumber(request.personnelNumber())) {
             throw new EmployeePersonnelNumberAlreadyExistsException(request.personnelNumber());
         }
@@ -70,7 +70,7 @@ public class EmployeeService {
                 .map(this::toResult);
     }
 
-    public EmployeeResult update(Long id, UpdateEmployeeRequest request) {
+    public EmployeeResult update(Long id, UpdateEmployeeCommand request) {
         Employee employee = findEmployee(id);
 
         if (request.surname() != null) {
@@ -106,7 +106,7 @@ public class EmployeeService {
         return toResult(employee);
     }
 
-    public EmployeeResult dismiss(Long id, DismissRequest request) {
+    public EmployeeResult dismiss(Long id, DismissCommand request) {
         Employee employee = findEmployee(id);
         employee.dismiss(request.dismissalDate());
         employeeRepository.save(employee);

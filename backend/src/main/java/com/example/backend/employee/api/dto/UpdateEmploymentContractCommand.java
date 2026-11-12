@@ -1,8 +1,8 @@
-package com.example.backend.employee.infrastructure.web.dto;
+package com.example.backend.employee.api.dto;
 
 import java.math.BigDecimal;
 
-public record UpdateEmploymentContractRequest(
+public record UpdateEmploymentContractCommand(
         BigDecimal baseSalary,
         BigDecimal hourlyRate,
         BigDecimal bonusPercent,
