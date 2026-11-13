@@ -20,7 +20,7 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class PositionService {
-    private final PositionRepository positionRepository;
+    private final SpringDataPositionRepository springDataPositionRepository;
     private final TariffRateLookup tariffRateLookup;
 
     @Transactional
@@ -35,12 +35,12 @@ public class PositionService {
                 request.qualificationRequirements()
         );
 
-        return toResult(positionRepository.save(position));
+        return toResult(springDataPositionRepository.save(position));
     }
 
     @Transactional(readOnly = true)
     public List<PositionResult> getAll() {
-        return positionRepository.findAll().stream().map(this::toResult).toList();
+        return springDataPositionRepository.findAll().stream().map(this::toResult).toList();
     }
 
     @Transactional(readOnly = true)
@@ -50,11 +50,11 @@ public class PositionService {
 
     @Transactional(readOnly = true)
     public Optional<PositionResult> findByIdOptional(Long id) {
-        return positionRepository.findById(id).map(this::toResult);
+        return springDataPositionRepository.findById(id).map(this::toResult);
     }
 
     private Position findById(Long id) {
-        return positionRepository.findById(id)
+        return springDataPositionRepository.findById(id)
                 .orElseThrow(() -> new PositionNotFoundException(id));
     }
 
@@ -83,7 +83,7 @@ public class PositionService {
             position.setQualificationRequirements(request.qualificationRequirements());
         }
 
-        return toResult(positionRepository.save(position));
+        return toResult(springDataPositionRepository.save(position));
     }
 
     @Transactional(readOnly = true)
@@ -108,7 +108,7 @@ public class PositionService {
     @Transactional
     public void delete(Long id) {
         Position position = findById(id);
-        positionRepository.delete(position);
+        springDataPositionRepository.delete(position);
     }
 
     private PositionResult toResult(Position position) {
