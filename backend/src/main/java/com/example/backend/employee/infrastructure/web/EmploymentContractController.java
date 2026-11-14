@@ -15,7 +15,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 @RestController
-@RequestMapping("/employee-contracts")
+@RequestMapping("/api/v1/employee-contracts")
 @RequiredArgsConstructor
 public class EmploymentContractController {
     private final EmploymentContractFacade employmentContractFacade;

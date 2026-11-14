@@ -16,6 +16,9 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -142,30 +145,30 @@ class PositionServiceTest {
         Position position1 = new Position(1L, "A", 2, new BigDecimal("1.23"), "");
         Position position2 = new Position(2L, "B", 3, new BigDecimal("1.32"), "");
         List<Position> positions = List.of(position1, position2);
-        when(springDataPositionRepository.findAll()).thenReturn(positions);
+        when(springDataPositionRepository.findAll(any(PageRequest.class))).thenReturn(new PageImpl<>(positions));
 
-        List<PositionResult> result = positionService.getAll();
+        Page<PositionResult> result = positionService.getAll(0, 2);
 
-        assertThat(result.size()).isEqualTo(positions.size());
+        assertThat(result.getSize()).isEqualTo(positions.size());
 
-        assertThat(result.getFirst().id()).isEqualTo(position1.getId());
-        assertThat(result.getFirst().name()).isEqualTo(position1.getName());
-        assertThat(result.getFirst().tariffCategory()).isEqualTo(position1.getTariffCategory());
-        assertThat(result.getFirst().tariffCoefficient()).isEqualTo(position1.getTariffCoefficient());
-        assertThat(result.getFirst().qualificationRequirements()).isEqualTo(position1.getQualificationRequirements());
+        assertThat(result.getContent().getFirst().id()).isEqualTo(position1.getId());
+        assertThat(result.getContent().getFirst().name()).isEqualTo(position1.getName());
+        assertThat(result.getContent().getFirst().tariffCategory()).isEqualTo(position1.getTariffCategory());
+        assertThat(result.getContent().getFirst().tariffCoefficient()).isEqualTo(position1.getTariffCoefficient());
+        assertThat(result.getContent().getFirst().qualificationRequirements()).isEqualTo(position1.getQualificationRequirements());
 
-        assertThat(result.get(1).id()).isEqualTo(position2.getId());
-        assertThat(result.get(1).name()).isEqualTo(position2.getName());
-        assertThat(result.get(1).tariffCategory()).isEqualTo(position2.getTariffCategory());
-        assertThat(result.get(1).tariffCoefficient()).isEqualTo(position2.getTariffCoefficient());
-        assertThat(result.get(1).qualificationRequirements()).isEqualTo(position2.getQualificationRequirements());
+        assertThat(result.getContent().get(1).id()).isEqualTo(position2.getId());
+        assertThat(result.getContent().get(1).name()).isEqualTo(position2.getName());
+        assertThat(result.getContent().get(1).tariffCategory()).isEqualTo(position2.getTariffCategory());
+        assertThat(result.getContent().get(1).tariffCoefficient()).isEqualTo(position2.getTariffCoefficient());
+        assertThat(result.getContent().get(1).qualificationRequirements()).isEqualTo(position2.getQualificationRequirements());
     }
 
     @Test
     void getAll_Empty() {
-        when(springDataPositionRepository.findAll()).thenReturn(List.of());
+        when(springDataPositionRepository.findAll(any(PageRequest.class))).thenReturn(new PageImpl<>(List.of()));
 
-        List<PositionResult> result = positionService.getAll();
+        Page<PositionResult> result = positionService.getAll(0, 2);
 
         assertTrue(result.isEmpty());
     }
