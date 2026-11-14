@@ -90,6 +90,7 @@ abstract class BaseEmploymentContractServiceTest {
 
     protected CreateEmploymentContractCommand createCommand(String number, String type, boolean mainJob) {
         return new CreateEmploymentContractCommand(
+                1L,
                 number,
                 LocalDate.of(2026, 1, 1),
                 null,
@@ -110,7 +111,7 @@ abstract class BaseEmploymentContractServiceTest {
             boolean mainJob
     ) {
         return new CreateEmploymentContractCommand(
-                number, start, end, type,
+                1L, number, start, end, type,
                 BigDecimal.valueOf(1000), null, BigDecimal.valueOf(10),
                 40, mainJob
         );

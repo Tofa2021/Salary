@@ -30,8 +30,7 @@ public class EmploymentContractServiceCreateTest extends BaseEmploymentContractS
         Employee employee = employee(1L, "T-001");
         stubCreateSuccess(employee);
 
-        EmploymentContractResult result = contractService.create(
-                1L, createCommand("C-001", "INDEFINITE", true));
+        EmploymentContractResult result = contractService.create(createCommand("C-001", "INDEFINITE", true));
 
         assertThat(result.id()).isEqualTo(1L);
         assertThat(result.contractNumber()).isEqualTo("C-001");
@@ -45,12 +44,11 @@ public class EmploymentContractServiceCreateTest extends BaseEmploymentContractS
 
     @Test
     void create_EmployeeNotFound_Throws() {
-        when(employeeRepository.existsById(99L)).thenReturn(false);
+        when(employeeRepository.existsById(1L)).thenReturn(false);
 
-        assertThatThrownBy(() -> contractService.create(99L,
-                createCommand("C-001", "INDEFINITE", true)))
+        assertThatThrownBy(() -> contractService.create(createCommand("C-001", "INDEFINITE", true)))
                 .isInstanceOf(EmployeeNotFoundException.class)
-                .hasMessageContaining("99");
+                .hasMessageContaining("1");
 
         verify(contractRepository, never()).save(any());
     }
@@ -61,8 +59,7 @@ public class EmploymentContractServiceCreateTest extends BaseEmploymentContractS
         when(employeeRepository.existsById(1L)).thenReturn(true);
         when(contractRepository.existsByContractNumber("C-001")).thenReturn(true);
 
-        assertThatThrownBy(() -> contractService.create(1L,
-                createCommand("C-001", "INDEFINITE", true)))
+        assertThatThrownBy(() -> contractService.create(createCommand("C-001", "INDEFINITE", true)))
                 .isInstanceOf(EmploymentContractNumberAlreadyExistsException.class);
 
         verify(contractRepository, never()).save(any());
@@ -80,7 +77,7 @@ public class EmploymentContractServiceCreateTest extends BaseEmploymentContractS
                 LocalDate.of(2026, 1, 1),
                 true);
 
-        assertThatThrownBy(() -> contractService.create(1L, request))
+        assertThatThrownBy(() -> contractService.create(request))
                 .isInstanceOf(InvalidEmploymentContractPeriodException.class);
 
         verify(contractRepository, never()).save(any());
@@ -95,8 +92,7 @@ public class EmploymentContractServiceCreateTest extends BaseEmploymentContractS
         when(contractRepository.findOverlappingMainJob(eq(1L), any(), any(), any()))
                 .thenReturn(Optional.of(existing));
 
-        assertThatThrownBy(() -> contractService.create(1L,
-                createCommand("C-001", "INDEFINITE", true)))
+        assertThatThrownBy(() -> contractService.create(createCommand("C-001", "INDEFINITE", true)))
                 .isInstanceOf(MainJobAlreadyExistsException.class);
 
         verify(contractRepository, never()).save(any());
@@ -107,7 +103,7 @@ public class EmploymentContractServiceCreateTest extends BaseEmploymentContractS
         Employee employee = employee(1L, "T-001");
         stubCreateBase(employee);
 
-        contractService.create(1L, createCommand("C-001", "CONTRACT", false));
+        contractService.create(createCommand("C-001", "CONTRACT", false));
 
         verify(contractRepository, never())
                 .findOverlappingMainJob(any(), any(), any(), any());
@@ -120,8 +116,7 @@ public class EmploymentContractServiceCreateTest extends BaseEmploymentContractS
         when(employeeRepository.existsById(1L)).thenReturn(true);
         when(contractRepository.existsByContractNumber(any())).thenReturn(false);
 
-        assertThatThrownBy(() -> contractService.create(1L,
-                createCommand("C-001", type, true)))
+        assertThatThrownBy(() -> contractService.create(createCommand("C-001", type, true)))
                 .isInstanceOf(UnknownEmploymentContractTypeException.class);
 
         verify(contractRepository, never()).save(any());
@@ -134,8 +129,7 @@ public class EmploymentContractServiceCreateTest extends BaseEmploymentContractS
         when(employeeRepository.existsById(1L)).thenReturn(true);
         when(contractRepository.existsByContractNumber(any())).thenReturn(false);
 
-        assertThatThrownBy(() -> contractService.create(1L,
-                createCommand("C-001", type, true)))
+        assertThatThrownBy(() -> contractService.create(createCommand("C-001", type, true)))
                 .isInstanceOf(UnknownEmploymentContractTypeException.class);
     }
 }

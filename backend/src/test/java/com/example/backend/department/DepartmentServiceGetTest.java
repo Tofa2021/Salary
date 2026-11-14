@@ -2,13 +2,18 @@ package com.example.backend.department;
 
 import com.example.backend.department.api.dto.DepartmentResult;
 import com.example.backend.department.exception.DepartmentNotFoundException;
+import com.example.backend.shared.pagination.PageRequest;
+import com.example.backend.shared.pagination.PageResult;
 import org.junit.jupiter.api.Test;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 
 import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 class DepartmentServiceGetTest extends BaseDepartmentServiceTest {
@@ -39,22 +44,22 @@ class DepartmentServiceGetTest extends BaseDepartmentServiceTest {
     void getAll_Success() {
         Department d1 = department(1L, "Department1", "D-001", null);
         Department d2 = department(2L, "Department2", "D-002", d1);
-        when(departmentRepository.findAll()).thenReturn(List.of(d1, d2));
+        when(departmentRepository.findAll(any(org.springframework.data.domain.PageRequest.class))).thenReturn(new PageImpl<>(List.of(d1, d2)));
 
-        List<DepartmentResult> results = departmentService.getAll();
+        PageResult<DepartmentResult> pageResult = departmentService.getAll(PageRequest.of(0, 2));
 
-        assertThat(results).hasSize(2);
-        assertThat(results.get(0).id()).isEqualTo(1L);
-        assertThat(results.get(0).parentId()).isNull();
-        assertThat(results.get(1).id()).isEqualTo(2L);
-        assertThat(results.get(1).parentId()).isEqualTo(1L);
+        assertThat(pageResult.items()).hasSize(2);
+        assertThat(pageResult.items().getFirst().id()).isEqualTo(1L);
+        assertThat(pageResult.items().get(0).parentId()).isNull();
+        assertThat(pageResult.items().get(1).id()).isEqualTo(2L);
+        assertThat(pageResult.items().get(1).parentId()).isEqualTo(1L);
     }
 
     @Test
     void getAll_Empty_Success() {
-        when(departmentRepository.findAll()).thenReturn(List.of());
+        when(departmentRepository.findAll(any(org.springframework.data.domain.PageRequest.class))).thenReturn(Page.empty());
 
-        assertThat(departmentService.getAll()).isEmpty();
+        assertThat(departmentService.getAll(PageRequest.of(0, 20)).items()).isEmpty();
     }
 
     @Test
