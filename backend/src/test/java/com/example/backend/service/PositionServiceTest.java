@@ -1,14 +1,14 @@
 package com.example.backend.service;
 
-import com.example.backend.dto.position.PositionRequest;
-import com.example.backend.dto.position.PositionResult;
-import com.example.backend.exception.position.InvalidPositionNameException;
-import com.example.backend.exception.position.InvalidTariffCategoryException;
-import com.example.backend.exception.position.InvalidTariffCoefficientException;
-import com.example.backend.exception.position.PositionNotFoundException;
-import com.example.backend.exception.tariffrate.TariffRateNotFoundException;
-import com.example.backend.model.employee.Position;
-import com.example.backend.repository.PositionRepository;
+import com.example.backend.position.Position;
+import com.example.backend.position.PositionService;
+import com.example.backend.position.SpringDataPositionRepository;
+import com.example.backend.position.api.dto.PositionCommand;
+import com.example.backend.position.api.dto.PositionResult;
+import com.example.backend.position.exception.InvalidPositionNameException;
+import com.example.backend.position.exception.InvalidTariffCategoryException;
+import com.example.backend.position.exception.InvalidTariffCoefficientException;
+import com.example.backend.position.exception.PositionNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -18,7 +18,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -31,23 +30,20 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class PositionServiceTest {
     @Mock
-    private PositionRepository positionRepository;
-
-    @Mock
-    private TariffRateService tariffRateService;
+    private SpringDataPositionRepository springDataPositionRepository;
 
     @InjectMocks
     private PositionService positionService;
 
     @Test
     void create_Success() {
-        PositionRequest request = new PositionRequest(
+        PositionCommand request = new PositionCommand(
                 "Инженер",
                 2,
                 new BigDecimal("1.23"),
                 ""
         );
-        when(positionRepository.save(any())).thenAnswer(inv -> {
+        when(springDataPositionRepository.save(any())).thenAnswer(inv -> {
             Position position = inv.getArgument(0);
             position.setId(1L);
             return position;
@@ -60,18 +56,18 @@ class PositionServiceTest {
         assertThat(result.tariffCoefficient()).isEqualTo(request.tariffCoefficient());
         assertThat(result.qualificationRequirements()).isEqualTo(request.qualificationRequirements());
 
-        verify(positionRepository).save(any());
+        verify(springDataPositionRepository).save(any());
     }
 
     @Test
     void create_Category1_Success() {
-        PositionRequest request = new PositionRequest(
+        PositionCommand request = new PositionCommand(
                 "Инженер",
                 1,
                 new BigDecimal("1.23"),
                 ""
         );
-        when(positionRepository.save(any())).thenAnswer(inv -> {
+        when(springDataPositionRepository.save(any())).thenAnswer(inv -> {
             Position position = inv.getArgument(0);
             position.setId(1L);
             return position;
@@ -84,18 +80,18 @@ class PositionServiceTest {
         assertThat(result.tariffCoefficient()).isEqualTo(request.tariffCoefficient());
         assertThat(result.qualificationRequirements()).isEqualTo(request.qualificationRequirements());
 
-        verify(positionRepository).save(any());
+        verify(springDataPositionRepository).save(any());
     }
 
     @Test
     void create_Category27_Success() {
-        PositionRequest request = new PositionRequest(
+        PositionCommand request = new PositionCommand(
                 "Инженер",
                 27,
                 new BigDecimal("1.23"),
                 ""
         );
-        when(positionRepository.save(any())).thenAnswer(inv -> {
+        when(springDataPositionRepository.save(any())).thenAnswer(inv -> {
             Position position = inv.getArgument(0);
             position.setId(1L);
             return position;
@@ -108,13 +104,13 @@ class PositionServiceTest {
         assertThat(result.tariffCoefficient()).isEqualTo(request.tariffCoefficient());
         assertThat(result.qualificationRequirements()).isEqualTo(request.qualificationRequirements());
 
-        verify(positionRepository).save(any());
+        verify(springDataPositionRepository).save(any());
     }
 
     @ParameterizedTest
     @ValueSource(ints = {-20, -5, -1, 0, 28, 30, 50})
     void create_InvalidTariffCategory_Throws(int tariffCategory) {
-        PositionRequest request = new PositionRequest(
+        PositionCommand request = new PositionCommand(
                 "Инженер",
                 tariffCategory,
                 new BigDecimal("1.23"),
@@ -123,13 +119,13 @@ class PositionServiceTest {
 
         assertThatThrownBy(() -> positionService.create(request)).isInstanceOf(InvalidTariffCategoryException.class);
 
-        verify(positionRepository, never()).save(any());
+        verify(springDataPositionRepository, never()).save(any());
     }
 
     @ParameterizedTest
     @ValueSource(strings = {"-1.00", "0.00", "0.4", "0.99"})
     void create_InvalidTariffCoefficient_Throws(String coefficient) {
-        PositionRequest request = new PositionRequest(
+        PositionCommand request = new PositionCommand(
                 "Инженер",
                 3,
                 new BigDecimal(coefficient),
@@ -138,7 +134,7 @@ class PositionServiceTest {
 
         assertThatThrownBy(() -> positionService.create(request)).isInstanceOf(InvalidTariffCoefficientException.class);
 
-        verify(positionRepository, never()).save(any());
+        verify(springDataPositionRepository, never()).save(any());
     }
 
     @Test
@@ -146,7 +142,7 @@ class PositionServiceTest {
         Position position1 = new Position(1L, "A", 2, new BigDecimal("1.23"), "");
         Position position2 = new Position(2L, "B", 3, new BigDecimal("1.32"), "");
         List<Position> positions = List.of(position1, position2);
-        when(positionRepository.findAll()).thenReturn(positions);
+        when(springDataPositionRepository.findAll()).thenReturn(positions);
 
         List<PositionResult> result = positionService.getAll();
 
@@ -167,7 +163,7 @@ class PositionServiceTest {
 
     @Test
     void getAll_Empty() {
-        when(positionRepository.findAll()).thenReturn(List.of());
+        when(springDataPositionRepository.findAll()).thenReturn(List.of());
 
         List<PositionResult> result = positionService.getAll();
 
@@ -178,7 +174,7 @@ class PositionServiceTest {
     void getById_Success() {
         Position position = new Position(1L, "A", 2, new BigDecimal("1.23"), "");
 
-        when(positionRepository.findById(1L)).thenReturn(Optional.of(position));
+        when(springDataPositionRepository.findById(1L)).thenReturn(Optional.of(position));
 
         PositionResult result = positionService.getById(1L);
 
@@ -191,7 +187,7 @@ class PositionServiceTest {
 
     @Test
     void getById_NotFound_Throws() {
-        when(positionRepository.findById(1L)).thenReturn(Optional.empty());
+        when(springDataPositionRepository.findById(1L)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> positionService.getById(1L))
                 .isInstanceOf(PositionNotFoundException.class)
@@ -201,9 +197,9 @@ class PositionServiceTest {
     @Test
     void update_Success() {
         Position position = new Position(1L, "A", 2, new BigDecimal("1.23"), "");
-        PositionRequest positionRequest = new PositionRequest("B", 3, new BigDecimal("1.3"), "new requirements");
-        when(positionRepository.findById(1L)).thenReturn(Optional.of(position));
-        when(positionRepository.save(position)).thenReturn(position);
+        PositionCommand positionRequest = new PositionCommand("B", 3, new BigDecimal("1.3"), "new requirements");
+        when(springDataPositionRepository.findById(1L)).thenReturn(Optional.of(position));
+        when(springDataPositionRepository.save(position)).thenReturn(position);
 
         PositionResult result = positionService.update(1L, positionRequest);
 
@@ -212,15 +208,15 @@ class PositionServiceTest {
         assertThat(result.tariffCoefficient()).isEqualTo(positionRequest.tariffCoefficient());
         assertThat(result.tariffCategory()).isEqualTo(positionRequest.tariffCategory());
         assertThat(result.qualificationRequirements()).isEqualTo(positionRequest.qualificationRequirements());
-        verify(positionRepository).save(any());
+        verify(springDataPositionRepository).save(any());
     }
 
     @Test
     void update_NullRequestName_DoesNotUpdateFiled() {
         Position position = new Position(1L, "A", 2, new BigDecimal("1.23"), "");
-        PositionRequest positionRequest = new PositionRequest(null, 3, new BigDecimal("1.3"), "new requirements");
-        when(positionRepository.findById(1L)).thenReturn(Optional.of(position));
-        when(positionRepository.save(position)).thenReturn(position);
+        PositionCommand positionRequest = new PositionCommand(null, 3, new BigDecimal("1.3"), "new requirements");
+        when(springDataPositionRepository.findById(1L)).thenReturn(Optional.of(position));
+        when(springDataPositionRepository.save(position)).thenReturn(position);
 
         PositionResult result = positionService.update(1L, positionRequest);
 
@@ -229,15 +225,15 @@ class PositionServiceTest {
         assertThat(result.tariffCoefficient()).isEqualTo(positionRequest.tariffCoefficient());
         assertThat(result.tariffCategory()).isEqualTo(positionRequest.tariffCategory());
         assertThat(result.qualificationRequirements()).isEqualTo(positionRequest.qualificationRequirements());
-        verify(positionRepository).save(any());
+        verify(springDataPositionRepository).save(any());
     }
 
     @Test
     void update_NullRequestTariffCoefficient_DoesNotUpdateFiled() {
         Position position = new Position(1L, "A", 2, new BigDecimal("1.23"), "");
-        PositionRequest positionRequest = new PositionRequest("B", 3, null, "new requirements");
-        when(positionRepository.findById(1L)).thenReturn(Optional.of(position));
-        when(positionRepository.save(position)).thenReturn(position);
+        PositionCommand positionRequest = new PositionCommand("B", 3, null, "new requirements");
+        when(springDataPositionRepository.findById(1L)).thenReturn(Optional.of(position));
+        when(springDataPositionRepository.save(position)).thenReturn(position);
 
         PositionResult result = positionService.update(1L, positionRequest);
 
@@ -246,15 +242,15 @@ class PositionServiceTest {
         assertThat(result.tariffCoefficient()).isEqualTo(position.getTariffCoefficient());
         assertThat(result.tariffCategory()).isEqualTo(positionRequest.tariffCategory());
         assertThat(result.qualificationRequirements()).isEqualTo(positionRequest.qualificationRequirements());
-        verify(positionRepository).save(any());
+        verify(springDataPositionRepository).save(any());
     }
 
     @Test
     void update_NullRequestTariffCategory_DoesNotUpdateFiled() {
         Position position = new Position(1L, "A", 2, new BigDecimal("1.23"), "");
-        PositionRequest positionRequest = new PositionRequest("B", null, new BigDecimal("1.32"), "new requirements");
-        when(positionRepository.findById(1L)).thenReturn(Optional.of(position));
-        when(positionRepository.save(position)).thenReturn(position);
+        PositionCommand positionRequest = new PositionCommand("B", null, new BigDecimal("1.32"), "new requirements");
+        when(springDataPositionRepository.findById(1L)).thenReturn(Optional.of(position));
+        when(springDataPositionRepository.save(position)).thenReturn(position);
 
         PositionResult result = positionService.update(1L, positionRequest);
 
@@ -263,15 +259,15 @@ class PositionServiceTest {
         assertThat(result.tariffCoefficient()).isEqualTo(positionRequest.tariffCoefficient());
         assertThat(result.tariffCategory()).isEqualTo(position.getTariffCategory());
         assertThat(result.qualificationRequirements()).isEqualTo(positionRequest.qualificationRequirements());
-        verify(positionRepository).save(any());
+        verify(springDataPositionRepository).save(any());
     }
 
     @Test
     void update_NullRequestQualificationRequirements_DoesNotUpdateFiled() {
         Position position = new Position(1L, "A", 2, new BigDecimal("1.23"), "");
-        PositionRequest positionRequest = new PositionRequest("B", 3, new BigDecimal("1.32"), null);
-        when(positionRepository.findById(1L)).thenReturn(Optional.of(position));
-        when(positionRepository.save(position)).thenReturn(position);
+        PositionCommand positionRequest = new PositionCommand("B", 3, new BigDecimal("1.32"), null);
+        when(springDataPositionRepository.findById(1L)).thenReturn(Optional.of(position));
+        when(springDataPositionRepository.save(position)).thenReturn(position);
 
         PositionResult result = positionService.update(1L, positionRequest);
 
@@ -280,15 +276,15 @@ class PositionServiceTest {
         assertThat(result.tariffCoefficient()).isEqualTo(positionRequest.tariffCoefficient());
         assertThat(result.tariffCategory()).isEqualTo(positionRequest.tariffCategory());
         assertThat(result.qualificationRequirements()).isEqualTo(position.getQualificationRequirements());
-        verify(positionRepository).save(any());
+        verify(springDataPositionRepository).save(any());
     }
 
     @Test
     void update_BlankQualificationRequirements_UpdatesFiled() {
         Position position = new Position(1L, "A", 2, new BigDecimal("1.23"), "Old requirements");
-        PositionRequest positionRequest = new PositionRequest(null, null, null, "");
-        when(positionRepository.findById(1L)).thenReturn(Optional.of(position));
-        when(positionRepository.save(position)).thenReturn(position);
+        PositionCommand positionRequest = new PositionCommand(null, null, null, "");
+        when(springDataPositionRepository.findById(1L)).thenReturn(Optional.of(position));
+        when(springDataPositionRepository.save(position)).thenReturn(position);
 
         PositionResult result = positionService.update(1L, positionRequest);
 
@@ -297,15 +293,15 @@ class PositionServiceTest {
         assertThat(result.tariffCoefficient()).isEqualTo(position.getTariffCoefficient());
         assertThat(result.tariffCategory()).isEqualTo(position.getTariffCategory());
         assertThat(result.qualificationRequirements()).isEqualTo(positionRequest.qualificationRequirements());
-        verify(positionRepository).save(any());
+        verify(springDataPositionRepository).save(any());
     }
 
     @Test
     void update_NullRequest_DoesNotChangeAnything() {
         Position position = new Position(1L, "A", 2, new BigDecimal("1.23"), "Old requirements");
-        PositionRequest positionRequest = new PositionRequest(null, null, null, null);
-        when(positionRepository.findById(1L)).thenReturn(Optional.of(position));
-        when(positionRepository.save(position)).thenReturn(position);
+        PositionCommand positionRequest = new PositionCommand(null, null, null, null);
+        when(springDataPositionRepository.findById(1L)).thenReturn(Optional.of(position));
+        when(springDataPositionRepository.save(position)).thenReturn(position);
 
         PositionResult result = positionService.update(1L, positionRequest);
 
@@ -314,153 +310,103 @@ class PositionServiceTest {
         assertThat(result.tariffCoefficient()).isEqualTo(position.getTariffCoefficient());
         assertThat(result.tariffCategory()).isEqualTo(position.getTariffCategory());
         assertThat(result.qualificationRequirements()).isEqualTo(position.getQualificationRequirements());
-        verify(positionRepository).save(any());
+        verify(springDataPositionRepository).save(any());
     }
 
     @ParameterizedTest
     @ValueSource(ints = {-50, -10, -1, 0, 28, 30, 50})
     void update_InvalidTariffCategory_Throws(int tariffCategory) {
         Position position = new Position(1L, "A", 2, new BigDecimal("1.23"), "Old requirements");
-        PositionRequest positionRequest = new PositionRequest(null, tariffCategory, null, null);
-        when(positionRepository.findById(1L)).thenReturn(Optional.of(position));
+        PositionCommand positionRequest = new PositionCommand(null, tariffCategory, null, null);
+        when(springDataPositionRepository.findById(1L)).thenReturn(Optional.of(position));
 
         assertThatThrownBy(() -> positionService.update(1L, positionRequest))
                 .isInstanceOf(InvalidTariffCategoryException.class);
 
-        verify(positionRepository, never()).save(any());
+        verify(springDataPositionRepository, never()).save(any());
     }
 
     @ParameterizedTest
     @ValueSource(strings = {"-1.00", "0.00", "0.63"})
     void update_InvalidTariffCoefficient_Throws(String tariffCoefficient) {
         Position position = new Position(1L, "A", 2, new BigDecimal("1.23"), "Old requirements");
-        PositionRequest positionRequest = new PositionRequest(null, null, new BigDecimal(tariffCoefficient), null);
-        when(positionRepository.findById(1L)).thenReturn(Optional.of(position));
+        PositionCommand positionRequest = new PositionCommand(null, null, new BigDecimal(tariffCoefficient), null);
+        when(springDataPositionRepository.findById(1L)).thenReturn(Optional.of(position));
 
         assertThatThrownBy(() -> positionService.update(1L, positionRequest))
                 .isInstanceOf(InvalidTariffCoefficientException.class);
 
-        verify(positionRepository, never()).save(any());
+        verify(springDataPositionRepository, never()).save(any());
     }
 
     @ParameterizedTest
     @ValueSource(strings = {"", " ", "     ", "\n", "\t", "\t\n", " \n", " \n "})
     void update_InvalidNewName_Throws(String name) {
         Position position = new Position(1L, "A", 2, new BigDecimal("1.23"), "Old requirements");
-        PositionRequest positionRequest = new PositionRequest(name, null, null, null);
-        when(positionRepository.findById(1L)).thenReturn(Optional.of(position));
+        PositionCommand positionRequest = new PositionCommand(name, null, null, null);
+        when(springDataPositionRepository.findById(1L)).thenReturn(Optional.of(position));
 
         assertThatThrownBy(() -> positionService.update(1L, positionRequest))
                 .isInstanceOf(InvalidPositionNameException.class);
 
-        verify(positionRepository, never()).save(any());
+        verify(springDataPositionRepository, never()).save(any());
     }
 
     @Test
     void update_PositionNotFound_Throws() {
-        PositionRequest positionRequest = new PositionRequest("B", null, null, null);
-        when(positionRepository.findById(1L)).thenReturn(Optional.empty());
+        PositionCommand positionRequest = new PositionCommand("B", null, null, null);
+        when(springDataPositionRepository.findById(1L)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> positionService.update(1L, positionRequest))
                 .isInstanceOf(PositionNotFoundException.class)
                 .hasMessageContaining("1");
 
-        verify(positionRepository, never()).save(any());
-    }
-
-    @Test
-    void calculateBaseSalary_Success() {
-        Position position = new Position(1L, "A", 2, new BigDecimal("2.48"), "Old requirements");
-        LocalDate date = LocalDate.of(2025, 3, 15);
-        when(positionRepository.findById(1L)).thenReturn(Optional.of(position));
-        when(tariffRateService.getBaseRateOn(date)).thenReturn(new BigDecimal("250.00"));
-
-        BigDecimal result = positionService.calculateBaseSalary(1L, date);
-
-        assertThat(result).isEqualByComparingTo("620.00");
-    }
-
-    @Test
-    void calculateBaseSalary_CoefficientOne_Success() {
-        Position position = new Position(1L, "A", 2, BigDecimal.ONE, "Old requirements");
-        LocalDate date = LocalDate.of(2025, 3, 15);
-        when(positionRepository.findById(1L)).thenReturn(Optional.of(position));
-        when(tariffRateService.getBaseRateOn(date)).thenReturn(new BigDecimal("250.00"));
-
-        BigDecimal result = positionService.calculateBaseSalary(1L, date);
-
-        assertThat(result).isEqualByComparingTo("250.00");
-    }
-
-    @Test
-    void calculateBaseSalary_RoundsToTwoDecimals() {
-        Position position = new Position(1L, "A", 2, new BigDecimal("2.333"), "Old requirements");
-        LocalDate date = LocalDate.of(2025, 3, 15);
-        when(positionRepository.findById(1L)).thenReturn(Optional.of(position));
-        when(tariffRateService.getBaseRateOn(date)).thenReturn(new BigDecimal("250.00"));
-
-        BigDecimal result = positionService.calculateBaseSalary(1L, date);
-
-        assertThat(result).isEqualByComparingTo("583.25");
-        assertThat(result.scale()).isEqualTo(2);
-    }
-
-    @Test
-    void calculateBaseSalary_DifferentDates_DifferentBaseRates() {
-        Position position = new Position(1L, "A", 2, new BigDecimal("2.48"), "Old requirements");
-        LocalDate jan = LocalDate.of(2025, 1, 15);
-        LocalDate may = LocalDate.of(2025, 5, 15);
-        when(positionRepository.findById(1L)).thenReturn(Optional.of(position));
-        when(tariffRateService.getBaseRateOn(jan)).thenReturn(new BigDecimal("250.00"));
-        when(tariffRateService.getBaseRateOn(may)).thenReturn(new BigDecimal("270.00"));
-
-        BigDecimal janSalary = positionService.calculateBaseSalary(1L, jan);
-        BigDecimal maySalary = positionService.calculateBaseSalary(1L, may);
-
-        assertThat(janSalary).isEqualByComparingTo("620.00");
-        assertThat(maySalary).isEqualByComparingTo("669.60");
+        verify(springDataPositionRepository, never()).save(any());
     }
 
     @Test
     void delete_Success() {
         Position position = new Position(1L, "A", 2, new BigDecimal("1.23"), "Requirements");
-        when(positionRepository.findById(1L)).thenReturn(Optional.of(position));
+        when(springDataPositionRepository.findById(1L)).thenReturn(Optional.of(position));
 
         positionService.delete(1L);
 
-        verify(positionRepository).delete(position);
-    }
-
-    @Test
-    void calculateBaseSalary_PositionNotFound_Throws() {
-        LocalDate date = LocalDate.now();
-        when(positionRepository.findById(1L)).thenReturn(Optional.empty());
-
-        assertThatThrownBy(() -> positionService.calculateBaseSalary(1L, date))
-                .isInstanceOf(PositionNotFoundException.class);
-
-        verify(tariffRateService, never()).getBaseRateOn(date);
-    }
-
-    @Test
-    void calculateBaseSalary_noTariffRate_throws() {
-        Position position = new Position(1L, "A", 2, new BigDecimal("1.23"), "Requirements");
-        LocalDate date = LocalDate.of(2020, 1, 1);
-        when(positionRepository.findById(1L)).thenReturn(Optional.of(position));
-        when(tariffRateService.getBaseRateOn(date)).thenThrow(new TariffRateNotFoundException("No tariff rate effective date " + date));
-
-        assertThatThrownBy(() -> positionService.calculateBaseSalary(1L, date))
-                .isInstanceOf(TariffRateNotFoundException.class);
+        verify(springDataPositionRepository).delete(position);
     }
 
     @Test
     void delete_NotFound_Throws() {
-        when(positionRepository.findById(1L)).thenReturn(Optional.empty());
+        when(springDataPositionRepository.findById(1L)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> positionService.delete(1L))
                 .isInstanceOf(PositionNotFoundException.class)
                 .hasMessageContaining("1");
 
-        verify(positionRepository, never()).delete(any());
+        verify(springDataPositionRepository, never()).delete(any());
+    }
+
+    @Test
+    void findByIdOptional_Success() {
+        Position position = new Position(1L, "A", 2, new BigDecimal("1.23"), "Requirements");
+        when(springDataPositionRepository.findById(1L)).thenReturn(Optional.of(position));
+
+        Optional<PositionResult> resultOptional = positionService.findByIdOptional(1L);
+
+        assertThat(resultOptional).isNotEmpty();
+        PositionResult result = resultOptional.get();
+        assertThat(result.id()).isEqualTo(position.getId());
+        assertThat(result.name()).isEqualTo(position.getName());
+        assertThat(result.tariffCategory()).isEqualTo(position.getTariffCategory());
+        assertThat(result.tariffCoefficient()).isEqualTo(position.getTariffCoefficient());
+        assertThat(result.qualificationRequirements()).isEqualTo(position.getQualificationRequirements());
+    }
+
+    @Test
+    void findByIdOptional_Empty_Success() {
+        when(springDataPositionRepository.findById(99L)).thenReturn(Optional.empty());
+
+        Optional<PositionResult> resultOptional = positionService.findByIdOptional(99L);
+
+        assertThat(resultOptional).isEmpty();
     }
 }

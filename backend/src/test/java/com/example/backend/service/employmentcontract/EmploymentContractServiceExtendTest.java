@@ -1,10 +1,11 @@
 package com.example.backend.service.employmentcontract;
 
-import com.example.backend.dto.employmentcontract.EmploymentContractResult;
-import com.example.backend.exception.employmentcontract.EmploymentContractNotFoundException;
-import com.example.backend.exception.employmentcontract.InvalidEmploymentContractPeriodException;
-import com.example.backend.model.employee.Employee;
-import com.example.backend.model.employee.EmploymentContract;
+import com.example.backend.employee.api.dto.EmploymentContractResult;
+import com.example.backend.employee.domain.exception.employmentcontract.EmploymentContractNotFoundException;
+import com.example.backend.employee.domain.exception.employmentcontract.ExtendEmploymentContractException;
+import com.example.backend.employee.domain.exception.employmentcontract.InvalidEmploymentContractPeriodException;
+import com.example.backend.employee.domain.model.Employee;
+import com.example.backend.employee.domain.model.EmploymentContract;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
@@ -35,7 +36,7 @@ class EmploymentContractServiceExtendTest extends BaseEmploymentContractServiceT
         when(contractRepository.findById(10L)).thenReturn(Optional.of(contract));
 
         assertThatThrownBy(() -> contractService.extend(10L, LocalDate.of(2026, 12, 31)))
-                .isInstanceOf(RuntimeException.class);
+                .isInstanceOf(ExtendEmploymentContractException.class);
     }
 
     @Test

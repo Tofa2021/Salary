@@ -1,20 +1,25 @@
 package com.example.backend.service.employee;
 
-import com.example.backend.dto.employee.CreateEmployeeRequest;
-import com.example.backend.dto.employee.EmployeeResult;
-import com.example.backend.dto.employee.UpdateEmployeeRequest;
-import com.example.backend.model.employee.*;
-import com.example.backend.repository.DepartmentRepository;
-import com.example.backend.repository.EmployeeRepository;
-import com.example.backend.repository.PositionRepository;
-import com.example.backend.service.EmployeeService;
+import com.example.backend.department.api.DepartmentLookup;
+import com.example.backend.department.api.dto.DepartmentResult;
+import com.example.backend.employee.api.dto.CreateEmployeeCommand;
+import com.example.backend.employee.api.dto.EmployeeResult;
+import com.example.backend.employee.api.dto.UpdateEmployeeCommand;
+import com.example.backend.employee.application.service.EmployeeQueryService;
+import com.example.backend.employee.application.service.EmployeeService;
+import com.example.backend.employee.domain.model.Employee;
+import com.example.backend.employee.domain.model.EmploymentType;
+import com.example.backend.employee.domain.model.Gender;
+import com.example.backend.employee.domain.port.EmployeeRepository;
+import com.example.backend.position.api.PositionLookup;
+import com.example.backend.position.api.dto.PositionResult;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -26,77 +31,100 @@ abstract class BaseEmployeeServiceTest {
     @Mock
     protected EmployeeRepository employeeRepository;
     @Mock
-    protected DepartmentRepository departmentRepository;
+    protected DepartmentLookup departmentLookup;
     @Mock
-    protected PositionRepository positionRepository;
+    protected PositionLookup positionLookup;
     @InjectMocks
     protected EmployeeService employeeService;
+    @InjectMocks
+    protected EmployeeQueryService employeeQueryService;
 
     protected Employee employee(Long id, String personnelNumber) {
-        Employee employee = new Employee();
-        employee.setId(id);
-        employee.setPersonnelNumber(personnelNumber);
-        employee.setSurname("Иванов");
-        employee.setName("Иван");
-        employee.setMiddleName("Иванович");
-        employee.setEmail("ivan@gmail.com");
-        employee.setPhone("+375251231231");
-        employee.setHireDate(LocalDate.of(2026, 1, 1));
-        employee.setDepartment(department());
-        employee.setPosition(position());
-        employee.setEmploymentType(EmploymentType.FULL_TIME);
-        employee.setGender(Gender.MALE);
-        return employee;
+        return employee(id, personnelNumber, null, 1L);
     }
 
-    protected Department department() {
-        Department department = new Department();
-        department.setId(1L);
-        department.setName("IT");
-        department.setCode("it-1");
-        return department;
-    }
 
-    protected Department department(Long id, String name) {
-        Department department = new Department();
-        department.setId(id);
-        department.setName(name);
-        department.setCode(name.toLowerCase() + "-" + id);
-        return department;
-    }
-
-    protected Position position() {
-        Position position = new Position();
-        position.setId(1L);
-        position.setName("Developer");
-        position.setTariffCategory(10);
-        position.setTariffCoefficient(BigDecimal.valueOf(2.48));
-        return position;
-    }
-
-    protected CreateEmployeeRequest createRequest(String personnelNumber) {
-        return new CreateEmployeeRequest(
-                personnelNumber, "Иванов", "Иван", "Иванович",
-                "ivan@gmail.com", "+375251231231",
+    protected Employee employee(Long id, String personnelNumber,
+                                LocalDate dismissalDate, Long departmentId) {
+        return Employee.rehydrate(
+                id,
+                personnelNumber,
+                "Иванов", "Иван", "Иванович",
+                null, null, null,
+                null,
                 LocalDate.of(2026, 1, 1),
-                1L, 1L, "FULL_TIME");
+                dismissalDate,
+                "ivan@gmail.com", "+375251231231",
+                Gender.MALE,
+                1L,
+                departmentId,
+                EmploymentType.FULL_TIME,
+                0, false
+        );
     }
 
-    protected UpdateEmployeeRequest updateRequest() {
-        return new UpdateEmployeeRequest(
-                "A", "B", "C", "asd@gmail.com", "+3751231231",
-                LocalDate.of(2026, 10, 1), null,
-                1L, 1L, "FULL_TIME");
+    protected DepartmentResult departmentResult() {
+        return new DepartmentResult(1L, "IT", "it-1", null);
+    }
+
+    protected DepartmentResult departmentResult(Long id, String name) {
+        return new DepartmentResult(id, name, name.toLowerCase() + "-" + id, null);
+    }
+
+    protected PositionResult positionResult() {
+        return new PositionResult(1L, "Developer", 10, java.math.BigDecimal.valueOf(2.48), "");
+    }
+
+    protected CreateEmployeeCommand createRequest(String personnelNumber) {
+        return new CreateEmployeeCommand(
+                personnelNumber, "Иванов", "Иван", "Иванович",
+                null, null, null,
+                "ivan@gmail.com", "+375251231231",
+                Gender.MALE, LocalDate.of(1990, 1, 1),
+                LocalDate.of(2026, 1, 1),
+                1L, 1L, "FULL_TIME",
+                false, 0
+        );
+    }
+
+    protected UpdateEmployeeCommand updateRequest() {
+        return new UpdateEmployeeCommand(
+                "A", "B", "C",
+                null, null, null,
+                "asd@gmail.com", "+3751231231",
+                null, null,
+                1L, 1L, "FULL_TIME",
+                null, null
+        );
     }
 
     protected void stubSuccessCreate(String personnelNumber) {
         when(employeeRepository.existsByPersonnelNumber(personnelNumber)).thenReturn(false);
-        when(departmentRepository.findById(1L)).thenReturn(java.util.Optional.of(department()));
-        when(positionRepository.findById(1L)).thenReturn(java.util.Optional.of(position()));
+        when(departmentLookup.findById(1L)).thenReturn(Optional.of(departmentResult()));
+        when(positionLookup.findById(1L)).thenReturn(Optional.of(positionResult()));
         when(employeeRepository.save(any(Employee.class))).thenAnswer(inv -> {
             Employee employee = inv.getArgument(0);
-            if (employee.getId() == null) employee.setId(1L);
-            return employee;
+            return Employee.rehydrate(
+                    1L,
+                    employee.getPersonnelNumber(),
+                    employee.getSurname(),
+                    employee.getName(),
+                    employee.getMiddleName(),
+                    employee.getPassportSeries(),
+                    employee.getPassportNumber(),
+                    employee.getIdentificationNumber(),
+                    employee.getBirthDate(),
+                    employee.getHireDate(),
+                    employee.getDismissalDate(),
+                    employee.getEmail(),
+                    employee.getPhone(),
+                    employee.getGender(),
+                    employee.getPositionId(),
+                    employee.getDepartmentId(),
+                    employee.getEmploymentType(),
+                    employee.getDependentChildrenCount(),
+                    employee.isDisabled()
+            );
         });
     }
 

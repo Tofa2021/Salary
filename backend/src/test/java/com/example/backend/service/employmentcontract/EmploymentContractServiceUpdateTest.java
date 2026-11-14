@@ -1,15 +1,13 @@
 package com.example.backend.service.employmentcontract;
 
-import com.example.backend.dto.employmentcontract.EmploymentContractResult;
-import com.example.backend.dto.employmentcontract.UpdateEmploymentContractRequest;
-import com.example.backend.exception.employmentcontract.EmploymentContractNotFoundException;
-import com.example.backend.exception.employmentcontract.InvalidEmploymentContractPeriodException;
-import com.example.backend.model.employee.Employee;
-import com.example.backend.model.employee.EmploymentContract;
+import com.example.backend.employee.api.dto.EmploymentContractResult;
+import com.example.backend.employee.api.dto.UpdateEmploymentContractCommand;
+import com.example.backend.employee.domain.exception.employmentcontract.EmploymentContractNotFoundException;
+import com.example.backend.employee.domain.model.Employee;
+import com.example.backend.employee.domain.model.EmploymentContract;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -21,13 +19,13 @@ class EmploymentContractServiceUpdateTest extends BaseEmploymentContractServiceT
     @Test
     void update_allFields_updatesEverything() {
         Employee employee = employee(1L, "T-001");
-        EmploymentContract contract = contract(10L, employee);   // baseSalary = 1000
+        EmploymentContract contract = contract(10L, employee);
         when(contractRepository.findById(10L)).thenReturn(Optional.of(contract));
 
-        UpdateEmploymentContractRequest request = new UpdateEmploymentContractRequest(
-                BigDecimal.valueOf(2000), null, BigDecimal.valueOf(25), 20, null);
+        var command = new UpdateEmploymentContractCommand(
+                BigDecimal.valueOf(2000), null, BigDecimal.valueOf(25), 20);
 
-        EmploymentContractResult result = contractService.update(10L, request);
+        EmploymentContractResult result = contractService.update(10L, command);
 
         assertThat(result.baseSalary()).isEqualByComparingTo("2000");
         assertThat(result.bonusPercent()).isEqualByComparingTo("25");
@@ -40,10 +38,9 @@ class EmploymentContractServiceUpdateTest extends BaseEmploymentContractServiceT
         EmploymentContract contract = contract(10L, employee);
         when(contractRepository.findById(10L)).thenReturn(Optional.of(contract));
 
-        UpdateEmploymentContractRequest request = new UpdateEmploymentContractRequest(
-                null, null, null, null, null);
+        var command = new UpdateEmploymentContractCommand(null, null, null, null);
 
-        EmploymentContractResult result = contractService.update(10L, request);
+        EmploymentContractResult result = contractService.update(10L, command);
 
         assertThat(result.baseSalary()).isEqualByComparingTo("1000");
         assertThat(result.workHoursPerWeek()).isEqualTo(40);
@@ -55,26 +52,13 @@ class EmploymentContractServiceUpdateTest extends BaseEmploymentContractServiceT
         EmploymentContract contract = contract(10L, employee);
         when(contractRepository.findById(10L)).thenReturn(Optional.of(contract));
 
-        UpdateEmploymentContractRequest request = new UpdateEmploymentContractRequest(
-                BigDecimal.valueOf(2500), null, null, null, null);
+        var command = new UpdateEmploymentContractCommand(
+                BigDecimal.valueOf(2500), null, null, null);
 
-        EmploymentContractResult result = contractService.update(10L, request);
+        EmploymentContractResult result = contractService.update(10L, command);
 
         assertThat(result.baseSalary()).isEqualByComparingTo("2500");
         assertThat(result.workHoursPerWeek()).isEqualTo(40);
-    }
-
-    @Test
-    void update_invalidEndDate_throws() {
-        Employee employee = employee(1L, "T-001");
-        EmploymentContract contract = contract(10L, employee);   // startDate = 2026-01-01
-        when(contractRepository.findById(10L)).thenReturn(Optional.of(contract));
-
-        UpdateEmploymentContractRequest request = new UpdateEmploymentContractRequest(
-                null, null, null, null, LocalDate.of(2025, 12, 31));
-
-        assertThatThrownBy(() -> contractService.update(10L, request))
-                .isInstanceOf(InvalidEmploymentContractPeriodException.class);
     }
 
     @Test
@@ -82,7 +66,7 @@ class EmploymentContractServiceUpdateTest extends BaseEmploymentContractServiceT
         when(contractRepository.findById(99L)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> contractService.update(99L,
-                new UpdateEmploymentContractRequest(null, null, null, null, null)))
+                new UpdateEmploymentContractCommand(null, null, null, null)))
                 .isInstanceOf(EmploymentContractNotFoundException.class);
     }
 }

@@ -1,12 +1,13 @@
 package com.example.backend.service.employee;
 
-import com.example.backend.dto.employee.CreateEmployeeRequest;
-import com.example.backend.dto.employee.EmployeeResult;
-import com.example.backend.exception.department.DepartmentNotFoundException;
-import com.example.backend.exception.employee.EmployeePersonnelNumberAlreadyExistsException;
-import com.example.backend.exception.employee.UnknownEmploymentTypeException;
-import com.example.backend.exception.position.PositionNotFoundException;
-import com.example.backend.model.employee.Employee;
+import com.example.backend.employee.api.dto.CreateEmployeeCommand;
+import com.example.backend.employee.api.dto.EmployeeResult;
+import com.example.backend.employee.domain.exception.employee.EmployeeInvalidDepartmentException;
+import com.example.backend.employee.domain.exception.employee.EmployeeInvalidPositionException;
+import com.example.backend.employee.domain.exception.employee.EmployeePersonnelNumberAlreadyExistsException;
+import com.example.backend.employee.domain.exception.employee.UnknownEmploymentTypeException;
+import com.example.backend.employee.domain.model.Employee;
+import com.example.backend.employee.domain.model.Gender;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullSource;
@@ -47,29 +48,29 @@ class EmployeeServiceCreateTest extends BaseEmployeeServiceTest {
                 .hasMessageContaining("T-001");
 
         verify(employeeRepository, never()).save(any());
-        verifyNoInteractions(departmentRepository, positionRepository);
+        verifyNoInteractions(departmentLookup, positionLookup);
     }
 
     @Test
     void create_DepartmentNotFound_ThrowsAndDoesNotSave() {
         when(employeeRepository.existsByPersonnelNumber(any())).thenReturn(false);
-        when(departmentRepository.findById(1L)).thenReturn(Optional.empty());
+        when(departmentLookup.findById(1L)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> employeeService.create(createRequest("T-001")))
-                .isInstanceOf(DepartmentNotFoundException.class);
+                .isInstanceOf(EmployeeInvalidDepartmentException.class);
 
         verify(employeeRepository, never()).save(any());
-        verifyNoInteractions(positionRepository);
+        verifyNoInteractions(positionLookup);
     }
 
     @Test
     void create_PositionNotFound_ThrowsAndDoesNotSave() {
         when(employeeRepository.existsByPersonnelNumber(any())).thenReturn(false);
-        when(departmentRepository.findById(1L)).thenReturn(Optional.of(department()));
-        when(positionRepository.findById(1L)).thenReturn(Optional.empty());
+        when(departmentLookup.findById(1L)).thenReturn(Optional.of(departmentResult()));
+        when(positionLookup.findById(1L)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> employeeService.create(createRequest("T-001")))
-                .isInstanceOf(PositionNotFoundException.class);
+                .isInstanceOf(EmployeeInvalidPositionException.class);
 
         verify(employeeRepository, never()).save(any());
     }
@@ -78,12 +79,16 @@ class EmployeeServiceCreateTest extends BaseEmployeeServiceTest {
     @ValueSource(strings = {"INVALID", "", "  "})
     void create_InvalidEmploymentType_Throws(String type) {
         when(employeeRepository.existsByPersonnelNumber(any())).thenReturn(false);
-        when(departmentRepository.findById(any())).thenReturn(Optional.of(department()));
-        when(positionRepository.findById(any())).thenReturn(Optional.of(position()));
+        when(departmentLookup.findById(any())).thenReturn(Optional.of(departmentResult()));
+        when(positionLookup.findById(any())).thenReturn(Optional.of(positionResult()));
 
-        CreateEmployeeRequest request = new CreateEmployeeRequest(
-                "T-001", "X", "Y", null, null, null,
-                LocalDate.now(), 1L, 1L, type);
+        CreateEmployeeCommand request = new CreateEmployeeCommand(
+                "T-001", "X", "Y", null,
+                null, null, null,
+                null, null,
+                Gender.MALE, LocalDate.of(1990, 1, 1),
+                LocalDate.now(), 1L, 1L, type,
+                false, 0);
 
         assertThatThrownBy(() -> employeeService.create(request))
                 .isInstanceOf(UnknownEmploymentTypeException.class);
@@ -95,12 +100,16 @@ class EmployeeServiceCreateTest extends BaseEmployeeServiceTest {
     @NullSource
     void create_NullEmploymentType_Throws(String type) {
         when(employeeRepository.existsByPersonnelNumber(any())).thenReturn(false);
-        when(departmentRepository.findById(any())).thenReturn(Optional.of(department()));
-        when(positionRepository.findById(any())).thenReturn(Optional.of(position()));
+        when(departmentLookup.findById(any())).thenReturn(Optional.of(departmentResult()));
+        when(positionLookup.findById(any())).thenReturn(Optional.of(positionResult()));
 
-        CreateEmployeeRequest request = new CreateEmployeeRequest(
-                "T-001", "X", "Y", null, null, null,
-                LocalDate.now(), 1L, 1L, type);
+        CreateEmployeeCommand request = new CreateEmployeeCommand(
+                "T-001", "X", "Y", null,
+                null, null, null,
+                null, null,
+                Gender.MALE, LocalDate.of(1990, 1, 1),
+                LocalDate.now(), 1L, 1L, type,
+                false, 0);
 
         assertThatThrownBy(() -> employeeService.create(request))
                 .isInstanceOf(UnknownEmploymentTypeException.class);

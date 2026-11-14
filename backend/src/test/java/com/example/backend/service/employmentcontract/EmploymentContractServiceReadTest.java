@@ -1,9 +1,10 @@
 package com.example.backend.service.employmentcontract;
 
-import com.example.backend.dto.employmentcontract.EmploymentContractResult;
-import com.example.backend.exception.employmentcontract.EmploymentContractNotFoundException;
-import com.example.backend.model.employee.Employee;
-import com.example.backend.model.employee.EmploymentContract;
+import com.example.backend.employee.api.dto.EmploymentContractResult;
+import com.example.backend.employee.domain.exception.employmentcontract.EmploymentContractNotFoundException;
+import com.example.backend.employee.domain.model.ContractType;
+import com.example.backend.employee.domain.model.Employee;
+import com.example.backend.employee.domain.model.EmploymentContract;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
@@ -84,12 +85,12 @@ class EmploymentContractServiceReadTest extends BaseEmploymentContractServiceTes
     void findExpiring_ReturnsFixedTermContracts() {
         Employee employee = employee(1L, "T-001");
         List<EmploymentContract> contracts = List.of(
-                fixedTermContract(10L, employee, LocalDate.now().plusDays(15))
+                fixedTermContract(10L, employee, TODAY.plusDays(15))
         );
         when(contractRepository.findExpiring(
-                com.example.backend.model.employee.ContractType.FIXED_TERM,
-                LocalDate.now(),
-                LocalDate.now().plusDays(30))).thenReturn(contracts);
+                ContractType.FIXED_TERM,
+                TODAY,
+                TODAY.plusDays(30))).thenReturn(contracts);
 
         List<EmploymentContractResult> result = contractService.findExpiring(30);
 

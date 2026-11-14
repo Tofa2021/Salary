@@ -1,11 +1,11 @@
 package com.example.backend.service.employmentcontract;
 
-import com.example.backend.dto.employmentcontract.EmploymentContractResult;
-import com.example.backend.exception.employmentcontract.EmploymentContractAlreadyTerminatedException;
-import com.example.backend.exception.employmentcontract.EmploymentContractNotFoundException;
-import com.example.backend.exception.employmentcontract.InvalidEmploymentContractPeriodException;
-import com.example.backend.model.employee.Employee;
-import com.example.backend.model.employee.EmploymentContract;
+import com.example.backend.employee.api.dto.EmploymentContractResult;
+import com.example.backend.employee.domain.exception.employmentcontract.EmploymentContractAlreadyTerminatedException;
+import com.example.backend.employee.domain.exception.employmentcontract.EmploymentContractNotFoundException;
+import com.example.backend.employee.domain.exception.employmentcontract.InvalidEmploymentContractPeriodException;
+import com.example.backend.employee.domain.model.Employee;
+import com.example.backend.employee.domain.model.EmploymentContract;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
@@ -32,18 +32,17 @@ class EmploymentContractServiceTerminateTest extends BaseEmploymentContractServi
     @Test
     void terminate_alreadyTerminated_throws() {
         Employee employee = employee(1L, "T-001");
-        EmploymentContract contract = contract(10L, employee);
-        contract.setEndDate(LocalDate.now().minusDays(1));   // уже истёк
+        EmploymentContract contract = fixedTermContract(10L, employee, LocalDate.of(2026, 1, 1));
         when(contractRepository.findById(10L)).thenReturn(Optional.of(contract));
 
-        assertThatThrownBy(() -> contractService.terminate(10L, LocalDate.now()))
+        assertThatThrownBy(() -> contractService.terminate(10L, LocalDate.of(2026, 6, 1)))
                 .isInstanceOf(EmploymentContractAlreadyTerminatedException.class);
     }
 
     @Test
     void terminate_beforeStartDate_throws() {
         Employee employee = employee(1L, "T-001");
-        EmploymentContract contract = contract(10L, employee);   // startDate = 2026-01-01
+        EmploymentContract contract = contract(10L, employee);
         when(contractRepository.findById(10L)).thenReturn(Optional.of(contract));
 
         assertThatThrownBy(() -> contractService.terminate(10L, LocalDate.of(2025, 12, 31)))

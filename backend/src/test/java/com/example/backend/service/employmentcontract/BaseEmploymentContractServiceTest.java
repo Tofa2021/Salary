@@ -1,70 +1,95 @@
 package com.example.backend.service.employmentcontract;
 
-import com.example.backend.dto.employmentcontract.CreateEmploymentContractRequest;
-import com.example.backend.dto.employmentcontract.EmploymentContractResult;
-import com.example.backend.model.employee.ContractType;
-import com.example.backend.model.employee.Employee;
-import com.example.backend.model.employee.EmploymentContract;
-import com.example.backend.repository.EmployeeRepository;
-import com.example.backend.repository.EmploymentContractRepository;
-import com.example.backend.service.EmploymentContractService;
+import com.example.backend.employee.api.dto.CreateEmploymentContractCommand;
+import com.example.backend.employee.api.dto.EmploymentContractResult;
+import com.example.backend.employee.application.service.EmploymentContractService;
+import com.example.backend.employee.domain.model.*;
+import com.example.backend.employee.domain.policy.MainJobPolicy;
+import com.example.backend.employee.domain.port.EmployeeRepository;
+import com.example.backend.employee.domain.port.EmploymentContractRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
+import java.time.Clock;
+import java.time.Instant;
 import java.time.LocalDate;
-import java.util.Optional;
+import java.time.ZoneOffset;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.lenient;
 
 @ExtendWith(MockitoExtension.class)
 abstract class BaseEmploymentContractServiceTest {
+    protected static final LocalDate TODAY = LocalDate.of(2026, 6, 1);
 
     @Mock
     protected EmploymentContractRepository contractRepository;
+
     @Mock
     protected EmployeeRepository employeeRepository;
-    @InjectMocks
+
+    protected MainJobPolicy mainJobPolicy;
+    protected Clock clock;
     protected EmploymentContractService contractService;
 
+    @BeforeEach
+    void setUpService() {
+        mainJobPolicy = new MainJobPolicy();
+        clock = Clock.fixed(Instant.parse("2026-06-01T00:00:00Z"), ZoneOffset.UTC);
+        contractService = new EmploymentContractService(
+                contractRepository, employeeRepository, mainJobPolicy, clock);
+    }
+
     protected Employee employee(Long id, String personnelNumber) {
-        Employee e = new Employee();
-        e.setId(id);
-        e.setPersonnelNumber(personnelNumber);
-        e.setSurname("Иванов");
-        e.setName("Иван");
-        e.setHireDate(LocalDate.of(2026, 1, 1));
-        return e;
+        return Employee.rehydrate(
+                id, personnelNumber, "Иванов", "Иван", "Иванович",
+                null, null, null, null,
+                LocalDate.of(2026, 1, 1), null,
+                "ivan@gmail.com", "+375251231231", Gender.MALE,
+                1L, 1L, EmploymentType.FULL_TIME, 0, false
+        );
     }
 
     protected EmploymentContract contract(Long id, Employee employee) {
-        EmploymentContract c = new EmploymentContract();
-        c.setId(id);
-        c.setEmployee(employee);
-        c.setContractNumber("C-" + id);
-        c.setStartDate(LocalDate.of(2026, 1, 1));
-        c.setEndDate(null);
-        c.setContractType(ContractType.INDEFINITE);
-        c.setBaseSalary(BigDecimal.valueOf(1000));
-        c.setBonusPercent(BigDecimal.valueOf(10));
-        c.setWorkHoursPerWeek(40);
-        c.setMainJob(true);
-        return c;
+        EmploymentContract contract = EmploymentContract.create(
+                employee.getId(), "C-" + id,
+                LocalDate.of(2026, 1, 1), null,
+                ContractType.INDEFINITE,
+                BigDecimal.valueOf(1000), null, BigDecimal.valueOf(10),
+                40, true
+        );
+
+
+        return EmploymentContract.rehydrate(
+                id, contract.getEmployeeId(), contract.getContractNumber(),
+                contract.getStartDate(), contract.getEndDate(), contract.getContractType(),
+                contract.getBaseSalary(), contract.getHourlyRate(), contract.getBonusPercent(),
+                contract.getWorkHoursPerWeek(), contract.isMainJob()
+        );
     }
 
     protected EmploymentContract fixedTermContract(Long id, Employee employee, LocalDate endDate) {
-        EmploymentContract c = contract(id, employee);
-        c.setContractType(ContractType.FIXED_TERM);
-        c.setEndDate(endDate);
-        return c;
+        EmploymentContract contract = EmploymentContract.create(
+                employee.getId(), "C-" + id,
+                LocalDate.of(2026, 1, 1), endDate,
+                ContractType.FIXED_TERM,
+                BigDecimal.valueOf(1000), null, BigDecimal.valueOf(10),
+                40, true
+        );
+        return EmploymentContract.rehydrate(
+                id, contract.getEmployeeId(), contract.getContractNumber(),
+                contract.getStartDate(), contract.getEndDate(), contract.getContractType(),
+                contract.getBaseSalary(), contract.getHourlyRate(), contract.getBonusPercent(),
+                contract.getWorkHoursPerWeek(), contract.isMainJob()
+        );
     }
 
-    protected CreateEmploymentContractRequest createRequest(String number, String type, boolean mainJob) {
-        return new CreateEmploymentContractRequest(
+    protected CreateEmploymentContractCommand createCommand(String number, String type, boolean mainJob) {
+        return new CreateEmploymentContractCommand(
                 number,
                 LocalDate.of(2026, 1, 1),
                 null,
@@ -77,10 +102,14 @@ abstract class BaseEmploymentContractServiceTest {
         );
     }
 
-    protected CreateEmploymentContractRequest createRequest(String number, String type,
-                                                            LocalDate start, LocalDate end,
-                                                            boolean mainJob) {
-        return new CreateEmploymentContractRequest(
+    protected CreateEmploymentContractCommand createCommand(
+            String number,
+            String type,
+            LocalDate start,
+            LocalDate end,
+            boolean mainJob
+    ) {
+        return new CreateEmploymentContractCommand(
                 number, start, end, type,
                 BigDecimal.valueOf(1000), null, BigDecimal.valueOf(10),
                 40, mainJob
@@ -88,17 +117,26 @@ abstract class BaseEmploymentContractServiceTest {
     }
 
     protected void stubCreateBase(Employee employee) {
-        when(employeeRepository.findById(employee.getId())).thenReturn(Optional.of(employee));
-        when(contractRepository.existsByContractNumber(any())).thenReturn(false);
-        when(contractRepository.save(any(EmploymentContract.class))).thenAnswer(inv -> {
-            EmploymentContract c = inv.getArgument(0);
-            if (c.getId() == null) c.setId(1L);
-            return c;
+        lenient().when(employeeRepository.existsById(employee.getId())).thenReturn(true);
+        lenient().when(employeeRepository.findById(employee.getId())).thenReturn(java.util.Optional.of(employee));
+        lenient().when(contractRepository.existsByContractNumber(any())).thenReturn(false);
+        lenient().when(contractRepository.save(any(EmploymentContract.class))).thenAnswer(inv -> {
+            EmploymentContract contract = inv.getArgument(0);
+            if (contract.getId() != null) {
+                return contract;
+            }
+            return EmploymentContract.rehydrate(
+                    1L, contract.getEmployeeId(), contract.getContractNumber(),
+                    contract.getStartDate(), contract.getEndDate(), contract.getContractType(),
+                    contract.getBaseSalary(), contract.getHourlyRate(), contract.getBonusPercent(),
+                    contract.getWorkHoursPerWeek(), contract.isMainJob()
+            );
         });
     }
 
     protected void stubMainJobCheck() {
-        when(contractRepository.findActiveMainOnDate(any(), any())).thenReturn(Optional.empty());
+        lenient().when(contractRepository.findOverlappingMainJob(any(), any(), any(), any()))
+                .thenReturn(java.util.Optional.empty());
     }
 
     protected void stubCreateSuccess(Employee employee) {
