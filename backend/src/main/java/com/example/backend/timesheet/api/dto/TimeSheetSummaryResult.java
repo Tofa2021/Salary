@@ -1,6 +1,6 @@
 package com.example.backend.timesheet.api.dto;
 
-import com.example.backend.timesheet.domain.model.TimeSheetEntryType;
+import com.example.backend.timesheet.domain.model.TimeSheetEntryType; // TODO deps on domain???
 
 import java.math.BigDecimal;
 import java.time.LocalDate;

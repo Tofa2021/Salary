@@ -7,4 +7,5 @@ public enum TimeSheetEntryType {
     SICK,
     VACATION,
     DAY_OFF,
+    HOLIDAY, // TODO add holiday time sheet accounting
 }
