@@ -20,8 +20,8 @@ public class EmploymentContractFacadeImpl implements EmploymentContractFacade {
 
     @Override
     @Transactional
-    public EmploymentContractResult create(Long employeeId, CreateEmploymentContractCommand request) {
-        return employmentContractService.create(employeeId, request);
+    public EmploymentContractResult create(CreateEmploymentContractCommand request) {
+        return employmentContractService.create(request);
     }
 
     @Override

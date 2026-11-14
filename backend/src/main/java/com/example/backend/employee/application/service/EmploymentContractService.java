@@ -26,7 +26,8 @@ public class EmploymentContractService {
     private final MainJobPolicy mainJobPolicy;
     private final Clock clock;
 
-    public EmploymentContractResult create(Long employeeId, CreateEmploymentContractCommand command) {
+    public EmploymentContractResult create(CreateEmploymentContractCommand command) {
+        Long employeeId = command.employeeId();
         if (!employeeRepository.existsById(employeeId)) {
             throw new EmployeeNotFoundException(employeeId);
         }
