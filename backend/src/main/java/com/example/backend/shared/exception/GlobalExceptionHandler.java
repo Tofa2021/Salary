@@ -1,6 +1,6 @@
 package com.example.backend.shared.exception;
 
-import com.example.backend.auth.exception.UnauthorizedException;
+import com.example.backend.auth.domain.exception.UnauthorizedException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;

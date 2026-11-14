@@ -1,8 +1,8 @@
 package com.example.backend.shared.config;
 
-import com.example.backend.auth.model.User;
-import com.example.backend.auth.model.UserRole;
-import com.example.backend.auth.repository.UserRepository;
+import com.example.backend.auth.domain.model.User;
+import com.example.backend.auth.domain.model.UserRole;
+import com.example.backend.auth.domain.port.UserRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -10,7 +10,6 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class AdminBootstrap implements CommandLineRunner {
-
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
@@ -30,7 +29,7 @@ public class AdminBootstrap implements CommandLineRunner {
         if (userRepository.existsByUsername(adminUsername)) {
             return;
         }
-        User admin = new User(adminUsername, passwordEncoder.encode(adminPassword), UserRole.ADMIN);
+        User admin = User.create(adminUsername, passwordEncoder.encode(adminPassword), UserRole.ADMIN);
         userRepository.save(admin);
     }
 }
