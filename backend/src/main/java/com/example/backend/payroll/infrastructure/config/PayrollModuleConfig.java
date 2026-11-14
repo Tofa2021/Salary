@@ -2,6 +2,7 @@ package com.example.backend.payroll.infrastructure.config;
 
 import com.example.backend.employee.api.EmployeeLookup;
 import com.example.backend.payroll.application.service.BonusRuleService;
+import com.example.backend.payroll.application.service.TariffRateService;
 import com.example.backend.payroll.application.usecase.*;
 import com.example.backend.payroll.domain.accrual.policy.BonusPolicy;
 import com.example.backend.payroll.domain.accrual.policy.HolidayPolicy;
@@ -27,6 +28,7 @@ import com.example.backend.payroll.domain.statutory.policy.IncomeTaxPolicy;
 import com.example.backend.payroll.domain.statutory.policy.SocialContributionPolicy;
 import com.example.backend.payroll.domain.statutory.port.StatutoryRateRepository;
 import com.example.backend.payroll.domain.statutory.service.StatutoryCalculator;
+import com.example.backend.position.api.PositionLookup;
 import com.example.backend.timesheet.api.TimeSheetLookup;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -218,5 +220,14 @@ public class PayrollModuleConfig {
     @Bean
     public BonusRuleService bonusRuleService(BonusRuleRepository bonusRuleRepository) {
         return new BonusRuleService(bonusRuleRepository);
+    }
+
+    @Bean
+    public TariffRateService tariffRateService(
+            TariffRateRepository repo,
+            RateCalculationStrategyRegistry registry,
+            PositionLookup positionLookup
+    ) {
+        return new TariffRateService(repo, registry, positionLookup);
     }
 }

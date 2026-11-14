@@ -87,4 +87,18 @@ public class TariffRate {
     public boolean appliesTo(LocalDate date) {
         return validPeriod.contains(date);
     }
+
+    public void changeAmount(Money amount) {
+        if (amount.isNegative()) {
+            throw new IllegalArgumentException("amount cannot be negative");
+        }
+        this.amount = amount;
+    }
+
+    public void changePeriod(DateRange validPeriod) {
+        if (validPeriod == null) {
+            throw new InvalidRateException("validPeriod is required");
+        }
+        this.validPeriod = validPeriod;
+    }
 }
