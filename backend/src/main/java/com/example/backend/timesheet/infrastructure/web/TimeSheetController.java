@@ -8,13 +8,13 @@ import com.example.backend.timesheet.api.dto.CreateTimeSheetCommand;
 import com.example.backend.timesheet.api.dto.TimeSheetEntryCommand;
 import com.example.backend.timesheet.api.dto.TimeSheetResult;
 import com.example.backend.timesheet.api.dto.TimeSheetSummaryResult;
-import com.example.backend.timesheet.infrastructure.web.dto.GetByPeriodTimeSheetRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -48,17 +48,21 @@ public class TimeSheetController {
     @GetMapping("/by-period")
     @ResponseStatus(HttpStatus.OK)
     public PageResult<TimeSheetResult> getByPeriod(
-            @RequestBody GetByPeriodTimeSheetRequest request,
+            @RequestParam LocalDate start,
+            @RequestParam LocalDate end,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size
     ) {
-        return timeSheetFacade.getByPeriod(request.start(), request.end(), PageRequest.of(page, size));
+        return timeSheetFacade.getByPeriod(start, end, PageRequest.of(page, size));
     }
 
     @GetMapping("/hours-summaries")
     @ResponseStatus(HttpStatus.OK)
-    public List<TimeSheetSummaryResult> getSummaries(@RequestBody GetByPeriodTimeSheetRequest request) {
-        return timeSheetFacade.findHoursSummaries(request.start(), request.end());
+    public List<TimeSheetSummaryResult> getSummaries(
+            @RequestParam LocalDate start,
+            @RequestParam LocalDate end
+    ) {
+        return timeSheetFacade.findHoursSummaries(start, end);
     }
 
     @PostMapping("/{id}/approve")
