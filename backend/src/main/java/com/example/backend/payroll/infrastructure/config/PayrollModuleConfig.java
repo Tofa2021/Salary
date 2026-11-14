@@ -1,6 +1,7 @@
 package com.example.backend.payroll.infrastructure.config;
 
 import com.example.backend.employee.api.EmployeeLookup;
+import com.example.backend.payroll.application.service.BonusRuleService;
 import com.example.backend.payroll.application.usecase.*;
 import com.example.backend.payroll.domain.accrual.policy.BonusPolicy;
 import com.example.backend.payroll.domain.accrual.policy.HolidayPolicy;
@@ -212,5 +213,10 @@ public class PayrollModuleConfig {
     @Bean
     public RecalculatePayrollUseCase recalculatePayrollUseCase(PayrollRepository payrollRepository, CalculatePayrollUseCase calculatePayroll) {
         return new RecalculatePayrollUseCase(payrollRepository, calculatePayroll);
+    }
+
+    @Bean
+    public BonusRuleService bonusRuleService(BonusRuleRepository bonusRuleRepository) {
+        return new BonusRuleService(bonusRuleRepository);
     }
 }
