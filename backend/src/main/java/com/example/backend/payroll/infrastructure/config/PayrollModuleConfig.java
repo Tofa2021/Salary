@@ -146,12 +146,12 @@ public class PayrollModuleConfig {
     }
 
     @Bean
-    public NightShiftPolicy nightShiftPolicy(PayrollPolicyProperties props) {
+    public NightShiftPolicy payrollNightShiftPolicy(PayrollPolicyProperties props) {
         return new NightShiftPolicy(Percentage.of(props.getNightShift().getNightRatePercent()));
     }
 
     @Bean
-    public OvertimePolicy overtimePolicy(PayrollPolicyProperties props) {
+    public OvertimePolicy payrollOvertimePolicy(PayrollPolicyProperties props) {
         return new OvertimePolicy(props.getOvertime().getFirstTwoMultiplier(), props.getOvertime().getSubsequentMultiplier());
     }
 

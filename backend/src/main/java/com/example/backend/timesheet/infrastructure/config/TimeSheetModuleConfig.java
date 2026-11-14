@@ -12,12 +12,12 @@ import java.time.Clock;
 @Configuration
 public class TimeSheetModuleConfig {
     @Bean
-    public NightShiftPolicy nightShiftPolicy() {
+    public NightShiftPolicy timeSheetNightShiftPolicy() {
         return new NightShiftPolicy();
     }
 
     @Bean
-    public OvertimePolicy overtimePolicy() {
+    public OvertimePolicy timeSheetOvertimePolicy() {
         return new OvertimePolicy();
     }
 
