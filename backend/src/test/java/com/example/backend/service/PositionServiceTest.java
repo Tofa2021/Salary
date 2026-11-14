@@ -1,7 +1,5 @@
 package com.example.backend.service;
 
-import com.example.backend.payroll.api.TariffRateLookup;
-import com.example.backend.payroll.exception.tariffrate.TariffRateNotFoundException;
 import com.example.backend.position.Position;
 import com.example.backend.position.PositionService;
 import com.example.backend.position.SpringDataPositionRepository;
@@ -20,7 +18,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -34,9 +31,6 @@ import static org.mockito.Mockito.*;
 class PositionServiceTest {
     @Mock
     private SpringDataPositionRepository springDataPositionRepository;
-
-    @Mock
-    private TariffRateLookup tariffRateLookup;
 
     @InjectMocks
     private PositionService positionService;
@@ -371,59 +365,6 @@ class PositionServiceTest {
     }
 
     @Test
-    void calculateBaseSalary_Success() {
-        Position position = new Position(1L, "A", 2, new BigDecimal("2.48"), "Old requirements");
-        LocalDate date = LocalDate.of(2025, 3, 15);
-        when(springDataPositionRepository.findById(1L)).thenReturn(Optional.of(position));
-        when(tariffRateLookup.getBaseRateOnDate(date)).thenReturn(new BigDecimal("250.00"));
-
-        BigDecimal result = positionService.calculateBaseSalary(1L, date);
-
-        assertThat(result).isEqualByComparingTo("620.00");
-    }
-
-    @Test
-    void calculateBaseSalary_CoefficientOne_Success() {
-        Position position = new Position(1L, "A", 2, BigDecimal.ONE, "Old requirements");
-        LocalDate date = LocalDate.of(2025, 3, 15);
-        when(springDataPositionRepository.findById(1L)).thenReturn(Optional.of(position));
-        when(tariffRateLookup.getBaseRateOnDate(date)).thenReturn(new BigDecimal("250.00"));
-
-        BigDecimal result = positionService.calculateBaseSalary(1L, date);
-
-        assertThat(result).isEqualByComparingTo("250.00");
-    }
-
-    @Test
-    void calculateBaseSalary_RoundsToTwoDecimals() {
-        Position position = new Position(1L, "A", 2, new BigDecimal("2.333"), "Old requirements");
-        LocalDate date = LocalDate.of(2025, 3, 15);
-        when(springDataPositionRepository.findById(1L)).thenReturn(Optional.of(position));
-        when(tariffRateLookup.getBaseRateOnDate(date)).thenReturn(new BigDecimal("250.00"));
-
-        BigDecimal result = positionService.calculateBaseSalary(1L, date);
-
-        assertThat(result).isEqualByComparingTo("583.25");
-        assertThat(result.scale()).isEqualTo(2);
-    }
-
-    @Test
-    void calculateBaseSalary_DifferentDates_DifferentBaseRates() {
-        Position position = new Position(1L, "A", 2, new BigDecimal("2.48"), "Old requirements");
-        LocalDate jan = LocalDate.of(2025, 1, 15);
-        LocalDate may = LocalDate.of(2025, 5, 15);
-        when(springDataPositionRepository.findById(1L)).thenReturn(Optional.of(position));
-        when(tariffRateLookup.getBaseRateOnDate(jan)).thenReturn(new BigDecimal("250.00"));
-        when(tariffRateLookup.getBaseRateOnDate(may)).thenReturn(new BigDecimal("270.00"));
-
-        BigDecimal janSalary = positionService.calculateBaseSalary(1L, jan);
-        BigDecimal maySalary = positionService.calculateBaseSalary(1L, may);
-
-        assertThat(janSalary).isEqualByComparingTo("620.00");
-        assertThat(maySalary).isEqualByComparingTo("669.60");
-    }
-
-    @Test
     void delete_Success() {
         Position position = new Position(1L, "A", 2, new BigDecimal("1.23"), "Requirements");
         when(springDataPositionRepository.findById(1L)).thenReturn(Optional.of(position));
@@ -431,28 +372,6 @@ class PositionServiceTest {
         positionService.delete(1L);
 
         verify(springDataPositionRepository).delete(position);
-    }
-
-    @Test
-    void calculateBaseSalary_PositionNotFound_Throws() {
-        LocalDate date = LocalDate.now();
-        when(springDataPositionRepository.findById(1L)).thenReturn(Optional.empty());
-
-        assertThatThrownBy(() -> positionService.calculateBaseSalary(1L, date))
-                .isInstanceOf(PositionNotFoundException.class);
-
-        verify(tariffRateLookup, never()).getBaseRateOnDate(date);
-    }
-
-    @Test
-    void calculateBaseSalary_noTariffRate_throws() {
-        Position position = new Position(1L, "A", 2, new BigDecimal("1.23"), "Requirements");
-        LocalDate date = LocalDate.of(2020, 1, 1);
-        when(springDataPositionRepository.findById(1L)).thenReturn(Optional.of(position));
-        when(tariffRateLookup.getBaseRateOnDate(date)).thenThrow(new TariffRateNotFoundException("No tariff rate effective date " + date));
-
-        assertThatThrownBy(() -> positionService.calculateBaseSalary(1L, date))
-                .isInstanceOf(TariffRateNotFoundException.class);
     }
 
     @Test

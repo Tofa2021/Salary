@@ -1,6 +1,5 @@
 package com.example.backend.position;
 
-import com.example.backend.payroll.api.TariffRateLookup;
 import com.example.backend.position.api.dto.PositionCommand;
 import com.example.backend.position.api.dto.PositionResult;
 import com.example.backend.position.exception.InvalidPositionNameException;
@@ -12,8 +11,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -21,7 +18,6 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class PositionService {
     private final SpringDataPositionRepository springDataPositionRepository;
-    private final TariffRateLookup tariffRateLookup;
 
     @Transactional
     public PositionResult create(PositionCommand request) {
@@ -84,13 +80,6 @@ public class PositionService {
         }
 
         return toResult(springDataPositionRepository.save(position));
-    }
-
-    @Transactional(readOnly = true)
-    public BigDecimal calculateBaseSalary(Long positionId, LocalDate date) {
-        Position position = findById(positionId);
-        BigDecimal baseRate = tariffRateLookup.getBaseRateOnDate(date);
-        return baseRate.multiply(position.getTariffCoefficient()).setScale(2, RoundingMode.HALF_UP);
     }
 
     private void checkTariffCategory(int tariffCategory) {
