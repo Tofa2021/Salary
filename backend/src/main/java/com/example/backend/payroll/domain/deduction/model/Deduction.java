@@ -77,4 +77,31 @@ public class Deduction {
     public boolean appliesTo(LocalDate date) {
         return validPeriod.contains(date);
     }
+
+    public void changeValue(DeductionType type, String description, Percentage percentage, Money fixedAmount, Base base) {
+        if (type == null) {
+            throw new InvalidDeductionException("type is required");
+        }
+        if (percentage == null && fixedAmount == null) {
+            throw new InvalidDeductionException("percentage or fixedAmount is required");
+        }
+        if (percentage != null && fixedAmount != null) {
+            throw new InvalidDeductionException("only one of percentage/fixedAmount");
+        }
+        if (percentage != null && base == null) {
+            throw new InvalidDeductionException("base required for percentage");
+        }
+        this.type = type;
+        this.description = description;
+        this.percentage = percentage;
+        this.fixedAmount = fixedAmount;
+        this.base = base;
+    }
+
+    public void changePeriod(DateRange validPeriod) {
+        if (validPeriod == null) {
+            throw new InvalidDeductionException("validPeriod is required");
+        }
+        this.validPeriod = validPeriod;
+    }
 }

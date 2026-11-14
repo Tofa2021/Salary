@@ -12,6 +12,7 @@ import org.springframework.stereotype.Repository;
 import java.time.LocalDate;
 import java.util.Currency;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 @RequiredArgsConstructor
@@ -32,6 +33,11 @@ public class JpaDeductionRepository implements DeductionRepository {
     @Override
     public void delete(Deduction deduction) {
         springDataDeductionRepository.delete(toEntity(deduction));
+    }
+
+    @Override
+    public Optional<Deduction> findById(Long id) {
+        return springDataDeductionRepository.findById(id).map(this::toDomain);
     }
 
     private Deduction toDomain(DeductionJpaEntity entity) {
