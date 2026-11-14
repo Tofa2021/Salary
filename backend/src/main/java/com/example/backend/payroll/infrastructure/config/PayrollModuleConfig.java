@@ -3,6 +3,7 @@ package com.example.backend.payroll.infrastructure.config;
 import com.example.backend.employee.api.EmployeeLookup;
 import com.example.backend.payroll.application.service.BonusRuleService;
 import com.example.backend.payroll.application.service.TariffRateService;
+import com.example.backend.payroll.application.service.WorkNormService;
 import com.example.backend.payroll.application.usecase.*;
 import com.example.backend.payroll.domain.accrual.policy.BonusPolicy;
 import com.example.backend.payroll.domain.accrual.policy.HolidayPolicy;
@@ -229,5 +230,10 @@ public class PayrollModuleConfig {
             PositionLookup positionLookup
     ) {
         return new TariffRateService(repo, registry, positionLookup);
+    }
+
+    @Bean
+    public WorkNormService workNormService(WorkNormRepository workNormRepository) {
+        return new WorkNormService(workNormRepository);
     }
 }

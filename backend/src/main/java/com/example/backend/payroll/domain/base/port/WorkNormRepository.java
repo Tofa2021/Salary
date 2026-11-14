@@ -8,4 +8,6 @@ public interface WorkNormRepository {
     Optional<WorkNorm> findByYearAndMonth(int year, int month);
 
     WorkNorm save(WorkNorm norm);
+
+    void delete(WorkNorm norm);
 }
