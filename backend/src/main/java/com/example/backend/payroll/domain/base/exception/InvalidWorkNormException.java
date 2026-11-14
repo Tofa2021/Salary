@@ -1,6 +1,8 @@
 package com.example.backend.payroll.domain.base.exception;
 
-public class InvalidWorkNormException extends RuntimeException {
+import com.example.backend.shared.exception.InvalidStateException;
+
+public class InvalidWorkNormException extends InvalidStateException {
     public InvalidWorkNormException(String message) {
         super(message);
     }
