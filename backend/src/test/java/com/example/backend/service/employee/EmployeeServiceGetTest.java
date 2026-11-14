@@ -22,7 +22,7 @@ class EmployeeServiceGetTest extends BaseEmployeeServiceTest {
         Employee employee = employee(1L, "T-001");
         when(employeeRepository.findById(1L)).thenReturn(Optional.of(employee));
 
-        EmployeeResult result = employeeService.getById(1L);
+        EmployeeResult result = employeeQueryService.getById(1L);
 
         assertEmployeeResult(result, employee);
     }
@@ -31,7 +31,7 @@ class EmployeeServiceGetTest extends BaseEmployeeServiceTest {
     void getById_NotFound_Throws() {
         when(employeeRepository.findById(1L)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> employeeService.getById(1L))
+        assertThatThrownBy(() -> employeeQueryService.getById(1L))
                 .isInstanceOf(EmployeeNotFoundException.class)
                 .hasMessageContaining("1");
     }
@@ -41,7 +41,7 @@ class EmployeeServiceGetTest extends BaseEmployeeServiceTest {
         Employee employee = employee(1L, "T-001");
         when(employeeRepository.findByPersonnelNumber("T-001")).thenReturn(Optional.of(employee));
 
-        EmployeeResult result = employeeService.getByPersonnelNumber("T-001");
+        EmployeeResult result = employeeQueryService.getByPersonnelNumber("T-001");
 
         assertEmployeeResult(result, employee);
     }
@@ -50,7 +50,7 @@ class EmployeeServiceGetTest extends BaseEmployeeServiceTest {
     void getByPersonnelNumber_NotFound_Throws() {
         when(employeeRepository.findByPersonnelNumber("T-001")).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> employeeService.getByPersonnelNumber("T-001"))
+        assertThatThrownBy(() -> employeeQueryService.getByPersonnelNumber("T-001"))
                 .isInstanceOf(EmployeeNotFoundException.class)
                 .hasMessageContaining("T-001");
     }
@@ -62,7 +62,7 @@ class EmployeeServiceGetTest extends BaseEmployeeServiceTest {
         PageResult<Employee> page = PageResult.of(employees, 0, 2, 57);
         when(employeeRepository.findAll(request)).thenReturn(page);
 
-        PageResult<EmployeeResult> result = employeeService.getAll(request);
+        PageResult<EmployeeResult> result = employeeQueryService.getAll(request);
 
         assertThat(result.items()).hasSize(2);
         assertThat(result.totalElements()).isEqualTo(57);
@@ -75,7 +75,7 @@ class EmployeeServiceGetTest extends BaseEmployeeServiceTest {
         PageRequest request = PageRequest.of(100, 20);
         when(employeeRepository.findAll(request)).thenReturn(PageResult.empty(100, 20));
 
-        PageResult<EmployeeResult> result = employeeService.getAll(request);
+        PageResult<EmployeeResult> result = employeeQueryService.getAll(request);
 
         assertThat(result.items()).isEmpty();
         assertThat(result.totalElements()).isZero();

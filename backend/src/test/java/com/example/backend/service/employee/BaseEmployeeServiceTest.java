@@ -5,6 +5,7 @@ import com.example.backend.department.api.dto.DepartmentResult;
 import com.example.backend.employee.api.dto.CreateEmployeeCommand;
 import com.example.backend.employee.api.dto.EmployeeResult;
 import com.example.backend.employee.api.dto.UpdateEmployeeCommand;
+import com.example.backend.employee.application.service.EmployeeQueryService;
 import com.example.backend.employee.application.service.EmployeeService;
 import com.example.backend.employee.domain.model.Employee;
 import com.example.backend.employee.domain.model.EmploymentType;
@@ -35,6 +36,8 @@ abstract class BaseEmployeeServiceTest {
     protected PositionLookup positionLookup;
     @InjectMocks
     protected EmployeeService employeeService;
+    @InjectMocks
+    protected EmployeeQueryService employeeQueryService;
 
     protected Employee employee(Long id, String personnelNumber) {
         return employee(id, personnelNumber, null, 1L);

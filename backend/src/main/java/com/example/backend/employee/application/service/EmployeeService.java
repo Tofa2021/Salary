@@ -20,7 +20,6 @@ import com.example.backend.shared.pagination.PageResult;
 import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDate;
-import java.util.Optional;
 
 @RequiredArgsConstructor
 public class EmployeeService {
@@ -57,20 +56,6 @@ public class EmployeeService {
         );
 
         return toResult(employeeRepository.save(employee));
-    }
-
-    public EmployeeResult getById(Long id) {
-        return toResult(findEmployee(id));
-    }
-
-    public EmployeeResult getByPersonnelNumber(String personnelNumber) {
-        Employee employee = employeeRepository.findByPersonnelNumber(personnelNumber)
-                .orElseThrow(() -> new EmployeeNotFoundException(personnelNumber));
-        return toResult(employee);
-    }
-
-    public PageResult<EmployeeResult> getAll(PageRequest pageRequest) {
-        return employeeRepository.findAll(pageRequest).map(this::toResult);
     }
 
     public PageResult<EmployeeResult> getByDepartment(Long departmentId, PageRequest pageRequest) {
@@ -164,14 +149,6 @@ public class EmployeeService {
         DepartmentResult newDepartmentResult = findDepartmentResult(departmentId);
         employee.addToDepartment(newDepartmentResult.id());
         employeeRepository.save(employee);
-    }
-
-    public boolean existsByDepartmentId(Long departmentId) {
-        return employeeRepository.existsByDepartmentId(departmentId);
-    }
-
-    public Optional<EmployeeResult> findByIdOptional(Long id) {
-        return employeeRepository.findById(id).map(this::toResult);
     }
 
     private EmployeeResult toResult(Employee employee) {

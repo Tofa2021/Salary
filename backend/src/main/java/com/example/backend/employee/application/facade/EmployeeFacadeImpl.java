@@ -5,6 +5,7 @@ import com.example.backend.employee.api.dto.CreateEmployeeCommand;
 import com.example.backend.employee.api.dto.DismissCommand;
 import com.example.backend.employee.api.dto.EmployeeResult;
 import com.example.backend.employee.api.dto.UpdateEmployeeCommand;
+import com.example.backend.employee.application.service.EmployeeQueryService;
 import com.example.backend.employee.application.service.EmployeeService;
 import com.example.backend.shared.pagination.PageRequest;
 import com.example.backend.shared.pagination.PageResult;
@@ -18,6 +19,7 @@ import java.time.LocalDate;
 @RequiredArgsConstructor
 public class EmployeeFacadeImpl implements EmployeeFacade {
     private final EmployeeService employeeService;
+    private final EmployeeQueryService employeeQueryService;
 
     @Override
     @Transactional
@@ -28,19 +30,19 @@ public class EmployeeFacadeImpl implements EmployeeFacade {
     @Override
     @Transactional(readOnly = true)
     public EmployeeResult getById(Long id) {
-        return employeeService.getById(id);
+        return employeeQueryService.getById(id);
     }
 
     @Override
     @Transactional(readOnly = true)
     public EmployeeResult getByPersonnelNumber(String personnelNumber) {
-        return employeeService.getByPersonnelNumber(personnelNumber);
+        return employeeQueryService.getByPersonnelNumber(personnelNumber);
     }
 
     @Override
     @Transactional(readOnly = true)
     public PageResult<EmployeeResult> getAll(PageRequest pageRequest) {
-        return employeeService.getAll(pageRequest);
+        return employeeQueryService.getAll(pageRequest);
     }
 
     @Override
