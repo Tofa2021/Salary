@@ -61,4 +61,11 @@ public class StatutoryRate {
         }
         return gross.isGreaterThan(threshold) ? gross.subtract(threshold) : Money.zero(gross.currency());
     }
+
+    public void changeRate(Percentage rate, Money threshold) {
+    }
+
+    public void changePeriod(DateRange dateRange) {
+
+    }
 }

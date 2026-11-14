@@ -1,4 +1,4 @@
-package com.example.backend.payroll.api.dto;
+package com.example.backend.payroll.api.dto.payroll;
 
 public record CancelPayrollCommand(Long payrollId) {
 }

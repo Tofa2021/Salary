@@ -1,10 +1,7 @@
 package com.example.backend.payroll.infrastructure.config;
 
 import com.example.backend.employee.api.EmployeeLookup;
-import com.example.backend.payroll.application.service.BonusRuleService;
-import com.example.backend.payroll.application.service.DeductionService;
-import com.example.backend.payroll.application.service.TariffRateService;
-import com.example.backend.payroll.application.service.WorkNormService;
+import com.example.backend.payroll.application.service.*;
 import com.example.backend.payroll.application.usecase.*;
 import com.example.backend.payroll.domain.accrual.policy.BonusPolicy;
 import com.example.backend.payroll.domain.accrual.policy.HolidayPolicy;
@@ -241,5 +238,15 @@ public class PayrollModuleConfig {
     @Bean
     public DeductionService deductionService(DeductionRepository deductionRepository, EmployeeLookup employeeLookup) {
         return new DeductionService(deductionRepository, employeeLookup);
+    }
+
+    @Bean
+    public StatutoryRateService statutoryRateService(StatutoryRateRepository repository) {
+        return new StatutoryRateService(repository);
+    }
+
+    @Bean
+    public EmployerContributionService employerContributionService(EmployerContributionRepository repository) {
+        return new EmployerContributionService(repository);
     }
 }

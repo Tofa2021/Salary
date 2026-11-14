@@ -1,9 +1,9 @@
 package com.example.backend.payroll.application.facade;
 
 import com.example.backend.payroll.api.PayrollApprovalFacade;
-import com.example.backend.payroll.api.dto.ApprovePayrollCommand;
-import com.example.backend.payroll.api.dto.CancelPayrollCommand;
-import com.example.backend.payroll.api.dto.PayrollResult;
+import com.example.backend.payroll.api.dto.payroll.ApprovePayrollCommand;
+import com.example.backend.payroll.api.dto.payroll.CancelPayrollCommand;
+import com.example.backend.payroll.api.dto.payroll.PayrollResult;
 import com.example.backend.payroll.application.usecase.ApprovePayrollUseCase;
 import com.example.backend.payroll.application.usecase.CancelPayrollUseCase;
 import lombok.RequiredArgsConstructor;

@@ -5,7 +5,11 @@ import com.example.backend.payroll.domain.shared.model.Money;
 import com.example.backend.payroll.domain.shared.model.Percentage;
 import com.example.backend.payroll.domain.statutory.model.StatutoryRate;
 import com.example.backend.payroll.domain.statutory.port.StatutoryRateRepository;
+import com.example.backend.shared.pagination.PageRequest;
+import com.example.backend.shared.pagination.PageResult;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
@@ -25,6 +29,39 @@ public class JpaStatutoryRateRepository implements StatutoryRateRepository {
     @Override
     public StatutoryRate save(StatutoryRate rate) {
         return toDomain(springDataStatutoryRateRepository.save(toEntity(rate)));
+    }
+
+    @Override
+    public boolean existsOverlapping(String code, DateRange period, Long excludeId) {
+        return springDataStatutoryRateRepository.existsOverlapping(code, period.from(), period.to(), excludeId);
+    }
+
+    @Override
+    public PageResult<StatutoryRate> findByCode(String code, PageRequest page) {
+        return toPageResult(springDataStatutoryRateRepository.findByCode(code, toPageable(page)));
+    }
+
+    @Override
+    public Optional<StatutoryRate> findById(Long id) {
+        return springDataStatutoryRateRepository.findById(id).map(this::toDomain);
+    }
+
+    @Override
+    public void delete(StatutoryRate rate) {
+        springDataStatutoryRateRepository.delete(toEntity(rate));
+    }
+
+    private Pageable toPageable(PageRequest request) {
+        return org.springframework.data.domain.PageRequest.of(request.page(), request.size());
+    }
+
+    private PageResult<StatutoryRate> toPageResult(Page<StatutoryRateJpaEntity> page) {
+        return new PageResult<>(
+                page.getContent().stream().map(this::toDomain).toList(),
+                page.getNumber(),
+                page.getSize(),
+                page.getTotalElements()
+        );
     }
 
     private StatutoryRate toDomain(StatutoryRateJpaEntity entity) {

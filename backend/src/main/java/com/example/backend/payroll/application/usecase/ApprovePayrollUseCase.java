@@ -1,6 +1,6 @@
 package com.example.backend.payroll.application.usecase;
 
-import com.example.backend.payroll.api.dto.ApprovePayrollCommand;
+import com.example.backend.payroll.api.dto.payroll.ApprovePayrollCommand;
 import com.example.backend.payroll.domain.core.exception.PayrollNotFoundException;
 import com.example.backend.payroll.domain.core.model.Payroll;
 import com.example.backend.payroll.domain.core.port.PayrollRepository;

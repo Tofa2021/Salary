@@ -1,7 +1,7 @@
 package com.example.backend.payroll.application.usecase;
 
-import com.example.backend.payroll.api.dto.CalculatePayrollCommand;
-import com.example.backend.payroll.api.dto.RecalculatePayrollCommand;
+import com.example.backend.payroll.api.dto.payroll.CalculatePayrollCommand;
+import com.example.backend.payroll.api.dto.payroll.RecalculatePayrollCommand;
 import com.example.backend.payroll.domain.core.exception.PayrollAlreadyApprovedException;
 import com.example.backend.payroll.domain.core.exception.PayrollNotFoundException;
 import com.example.backend.payroll.domain.core.model.Payroll;

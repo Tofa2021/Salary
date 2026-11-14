@@ -4,7 +4,7 @@ import com.example.backend.auth.api.CurrentUser;
 import com.example.backend.payroll.api.PayrollApprovalFacade;
 import com.example.backend.payroll.api.PayrollCalculationFacade;
 import com.example.backend.payroll.api.PayrollQueryFacade;
-import com.example.backend.payroll.api.dto.*;
+import com.example.backend.payroll.api.dto.payroll.*;
 import com.example.backend.payroll.domain.shared.model.Period;
 import com.example.backend.payroll.infrastructure.web.dto.CalculatePayrollRequest;
 import lombok.RequiredArgsConstructor;
