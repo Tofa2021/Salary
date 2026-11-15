@@ -4,6 +4,7 @@ import com.example.backend.payroll.domain.deduction.model.Deduction;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 public interface DeductionRepository {
     List<Deduction> findActiveByEmployeeOnDate(Long employeeId, LocalDate date);
@@ -11,4 +12,6 @@ public interface DeductionRepository {
     Deduction save(Deduction deduction);
 
     void delete(Deduction deduction);
+
+    Optional<Deduction> findById(Long id);
 }

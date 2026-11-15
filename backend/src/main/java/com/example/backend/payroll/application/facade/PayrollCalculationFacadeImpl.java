@@ -1,9 +1,9 @@
 package com.example.backend.payroll.application.facade;
 
 import com.example.backend.payroll.api.PayrollCalculationFacade;
-import com.example.backend.payroll.api.dto.CalculatePayrollCommand;
-import com.example.backend.payroll.api.dto.PayrollResult;
-import com.example.backend.payroll.api.dto.RecalculatePayrollCommand;
+import com.example.backend.payroll.api.dto.payroll.CalculatePayrollCommand;
+import com.example.backend.payroll.api.dto.payroll.PayrollResult;
+import com.example.backend.payroll.api.dto.payroll.RecalculatePayrollCommand;
 import com.example.backend.payroll.application.usecase.CalculatePayrollUseCase;
 import com.example.backend.payroll.application.usecase.RecalculatePayrollUseCase;
 import com.example.backend.payroll.domain.core.model.Payroll;

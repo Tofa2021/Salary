@@ -1,7 +1,7 @@
 package com.example.backend.payroll.application.facade;
 
 import com.example.backend.payroll.api.PayrollQueryFacade;
-import com.example.backend.payroll.api.dto.PayrollResult;
+import com.example.backend.payroll.api.dto.payroll.PayrollResult;
 import com.example.backend.payroll.application.usecase.GetPayrollUseCase;
 import com.example.backend.payroll.domain.shared.model.Period;
 import lombok.RequiredArgsConstructor;

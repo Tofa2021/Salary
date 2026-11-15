@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 
 public record CreateEmploymentContractCommand(
+        Long employeeId,
         String contractNumber,
         LocalDate startDate,
         LocalDate endDate,

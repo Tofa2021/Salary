@@ -7,11 +7,12 @@ import com.example.backend.position.exception.InvalidTariffCategoryException;
 import com.example.backend.position.exception.InvalidTariffCoefficientException;
 import com.example.backend.position.exception.PositionNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -35,8 +36,8 @@ public class PositionService {
     }
 
     @Transactional(readOnly = true)
-    public List<PositionResult> getAll() {
-        return springDataPositionRepository.findAll().stream().map(this::toResult).toList();
+    public Page<PositionResult> getAll(int page, int size) {
+        return springDataPositionRepository.findAll(PageRequest.of(page, size)).map(this::toResult);
     }
 
     @Transactional(readOnly = true)

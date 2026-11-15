@@ -61,4 +61,22 @@ public class StatutoryRate {
         }
         return gross.isGreaterThan(threshold) ? gross.subtract(threshold) : Money.zero(gross.currency());
     }
+
+    public void changeRate(Percentage rate, Money threshold) {
+        if (rate == null) {
+            throw new InvalidStatutoryRateException("rate is required");
+        }
+        if (threshold != null && threshold.isNegative()) {
+            throw new InvalidStatutoryRateException("threshold >= 0");
+        }
+        this.rate = rate;
+        this.threshold = threshold;
+    }
+
+    public void changePeriod(DateRange validPeriod) {
+        if (validPeriod == null) {
+            throw new InvalidStatutoryRateException("validPeriod is required");
+        }
+        this.validPeriod = validPeriod;
+    }
 }

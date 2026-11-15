@@ -5,7 +5,11 @@ import com.example.backend.payroll.domain.accrual.port.BonusRuleRepository;
 import com.example.backend.payroll.domain.shared.model.DateRange;
 import com.example.backend.payroll.domain.shared.model.Money;
 import com.example.backend.payroll.domain.shared.model.Percentage;
+import com.example.backend.shared.pagination.PageRequest;
+import com.example.backend.shared.pagination.PageResult;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
@@ -28,6 +32,34 @@ public class JpaBonusRuleRepository implements BonusRuleRepository {
     @Override
     public BonusRule save(BonusRule rule) {
         return toDomain(bonusRuleSpringDataRepository.save(toEntity(rule)));
+    }
+
+    @Override
+    public Optional<BonusRule> findById(Long id) {
+        return bonusRuleSpringDataRepository.findById(id).map(this::toDomain);
+    }
+
+    @Override
+    public PageResult<BonusRule> findAll(PageRequest pageRequest) {
+        return toPageResult(bonusRuleSpringDataRepository.findAll(toPageable(pageRequest)));
+    }
+
+    @Override
+    public void delete(BonusRule rule) {
+        bonusRuleSpringDataRepository.delete(toEntity(rule));
+    }
+
+    private Pageable toPageable(PageRequest request) {
+        return org.springframework.data.domain.PageRequest.of(request.page(), request.size());
+    }
+
+    private PageResult<BonusRule> toPageResult(Page<BonusRuleJpaEntity> page) {
+        return new PageResult<>(
+                page.getContent().stream().map(this::toDomain).toList(),
+                page.getNumber(),
+                page.getSize(),
+                page.getTotalElements()
+        );
     }
 
     private BonusRule toDomain(BonusRuleJpaEntity entity) {

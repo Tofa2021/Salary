@@ -2,7 +2,7 @@ package com.example.backend.payroll.application.usecase;
 
 import com.example.backend.employee.api.EmployeeLookup;
 import com.example.backend.employee.api.dto.EmployeeResult;
-import com.example.backend.payroll.api.dto.CalculatePayrollCommand;
+import com.example.backend.payroll.api.dto.payroll.CalculatePayrollCommand;
 import com.example.backend.payroll.domain.accrual.model.BonusRule;
 import com.example.backend.payroll.domain.accrual.port.BonusRuleRepository;
 import com.example.backend.payroll.domain.base.model.TariffRate;

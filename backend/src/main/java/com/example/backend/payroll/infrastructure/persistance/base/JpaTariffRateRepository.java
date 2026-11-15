@@ -5,7 +5,11 @@ import com.example.backend.payroll.domain.base.port.TariffRateRepository;
 import com.example.backend.payroll.domain.base.rate.RateCalculationStrategyRegistry;
 import com.example.backend.payroll.domain.shared.model.DateRange;
 import com.example.backend.payroll.domain.shared.model.Money;
+import com.example.backend.shared.pagination.PageRequest;
+import com.example.backend.shared.pagination.PageResult;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
@@ -24,8 +28,41 @@ public class JpaTariffRateRepository implements TariffRateRepository {
     }
 
     @Override
+    public Optional<TariffRate> findById(Long id) {
+        return springDataTariffRateRepository.findById(id).map(this::toDomain);
+    }
+
+    @Override
+    public PageResult<TariffRate> findByPositionId(Long positionId, PageRequest page) {
+        return toPageResult(springDataTariffRateRepository.findByPositionId(positionId, toPageable(page)));
+    }
+
+    @Override
+    public boolean existsOverlapping(Long positionId, DateRange period, Long excludeId) {
+        return springDataTariffRateRepository.existsOverlapping(positionId, period.from(), period.to(), excludeId);
+    }
+
+    @Override
     public TariffRate save(TariffRate rate) {
         return toDomain(springDataTariffRateRepository.save(toEntity(rate)));
+    }
+
+    @Override
+    public void delete(TariffRate rate) {
+        springDataTariffRateRepository.delete(toEntity(rate));
+    }
+
+    private Pageable toPageable(PageRequest request) {
+        return org.springframework.data.domain.PageRequest.of(request.page(), request.size());
+    }
+
+    private PageResult<TariffRate> toPageResult(Page<TariffRateJpaEntity> page) {
+        return new PageResult<>(
+                page.getContent().stream().map(this::toDomain).toList(),
+                page.getNumber(),
+                page.getSize(),
+                page.getTotalElements()
+        );
     }
 
     private TariffRate toDomain(TariffRateJpaEntity entity) {

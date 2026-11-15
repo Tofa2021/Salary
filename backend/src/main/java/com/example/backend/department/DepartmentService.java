@@ -6,11 +6,12 @@ import com.example.backend.department.api.dto.DepartmentResult;
 import com.example.backend.department.api.dto.UpdateDepartmentCommand;
 import com.example.backend.department.exception.*;
 import com.example.backend.employee.api.EmployeeLookup;
+import com.example.backend.shared.pagination.PageRequest;
+import com.example.backend.shared.pagination.PageResult;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -49,8 +50,9 @@ public class DepartmentService {
     }
 
     @Transactional(readOnly = true)
-    public List<DepartmentResult> getAll() {
-        return departmentRepository.findAll().stream().map(DepartmentResult::fromDepartment).toList();
+    public PageResult<DepartmentResult> getAll(PageRequest request) {
+        var page = departmentRepository.findAll(org.springframework.data.domain.PageRequest.of(request.page(), request.size()));
+        return PageResult.of(page.stream().map(DepartmentResult::fromDepartment).toList(), page.getNumber(), page.getSize(), page.getTotalElements());
     }
 
     @Transactional

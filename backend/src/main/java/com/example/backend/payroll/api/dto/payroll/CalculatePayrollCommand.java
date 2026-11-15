@@ -1,4 +1,4 @@
-package com.example.backend.payroll.api.dto;
+package com.example.backend.payroll.api.dto.payroll;
 
 import com.example.backend.payroll.domain.shared.model.Period;
 

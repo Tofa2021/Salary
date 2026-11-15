@@ -1,6 +1,7 @@
 package com.example.backend.payroll.infrastructure.config;
 
 import com.example.backend.employee.api.EmployeeLookup;
+import com.example.backend.payroll.application.service.*;
 import com.example.backend.payroll.application.usecase.*;
 import com.example.backend.payroll.domain.accrual.policy.BonusPolicy;
 import com.example.backend.payroll.domain.accrual.policy.HolidayPolicy;
@@ -26,6 +27,7 @@ import com.example.backend.payroll.domain.statutory.policy.IncomeTaxPolicy;
 import com.example.backend.payroll.domain.statutory.policy.SocialContributionPolicy;
 import com.example.backend.payroll.domain.statutory.port.StatutoryRateRepository;
 import com.example.backend.payroll.domain.statutory.service.StatutoryCalculator;
+import com.example.backend.position.api.PositionLookup;
 import com.example.backend.timesheet.api.TimeSheetLookup;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -212,5 +214,39 @@ public class PayrollModuleConfig {
     @Bean
     public RecalculatePayrollUseCase recalculatePayrollUseCase(PayrollRepository payrollRepository, CalculatePayrollUseCase calculatePayroll) {
         return new RecalculatePayrollUseCase(payrollRepository, calculatePayroll);
+    }
+
+    @Bean
+    public BonusRuleService bonusRuleService(BonusRuleRepository bonusRuleRepository) {
+        return new BonusRuleService(bonusRuleRepository);
+    }
+
+    @Bean
+    public TariffRateService tariffRateService(
+            TariffRateRepository repo,
+            RateCalculationStrategyRegistry registry,
+            PositionLookup positionLookup
+    ) {
+        return new TariffRateService(repo, registry, positionLookup);
+    }
+
+    @Bean
+    public WorkNormService workNormService(WorkNormRepository workNormRepository) {
+        return new WorkNormService(workNormRepository);
+    }
+
+    @Bean
+    public DeductionService deductionService(DeductionRepository deductionRepository, EmployeeLookup employeeLookup) {
+        return new DeductionService(deductionRepository, employeeLookup);
+    }
+
+    @Bean
+    public StatutoryRateService statutoryRateService(StatutoryRateRepository repository) {
+        return new StatutoryRateService(repository);
+    }
+
+    @Bean
+    public EmployerContributionService employerContributionService(EmployerContributionRepository repository) {
+        return new EmployerContributionService(repository);
     }
 }

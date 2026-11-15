@@ -22,6 +22,11 @@ public class JpaWorkNormRepository implements WorkNormRepository {
         return toDomain(springDataWorkNormRepository.save(toEntity(norm)));
     }
 
+    @Override
+    public void delete(WorkNorm norm) {
+        springDataWorkNormRepository.delete(toEntity(norm));
+    }
+
     private WorkNorm toDomain(WorkNormJpaEntity entity) {
         return new WorkNorm(entity.getYear(), entity.getMonth(), entity.getNormHours());
     }

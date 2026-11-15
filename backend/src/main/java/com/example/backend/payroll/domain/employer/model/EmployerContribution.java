@@ -47,4 +47,18 @@ public class EmployerContribution {
     public boolean appliesTo(LocalDate date) {
         return validPeriod.contains(date);
     }
+
+    public void changeRate(Percentage rate) {
+        if (rate == null) {
+            throw new InvalidEmployerContributionException("rate is required");
+        }
+        this.rate = rate;
+    }
+
+    public void changePeriod(DateRange validPeriod) {
+        if (validPeriod == null) {
+            throw new InvalidEmployerContributionException("validPeriod is required");
+        }
+        this.validPeriod = validPeriod;
+    }
 }

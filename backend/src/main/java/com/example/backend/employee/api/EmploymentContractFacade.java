@@ -8,7 +8,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 public interface EmploymentContractFacade {
-    EmploymentContractResult create(Long employeeId, CreateEmploymentContractCommand request);
+    EmploymentContractResult create(CreateEmploymentContractCommand request);
 
     EmploymentContractResult getById(Long id);
 

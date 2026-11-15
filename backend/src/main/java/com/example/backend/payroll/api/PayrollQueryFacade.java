@@ -1,6 +1,6 @@
 package com.example.backend.payroll.api;
 
-import com.example.backend.payroll.api.dto.PayrollResult;
+import com.example.backend.payroll.api.dto.payroll.PayrollResult;
 import com.example.backend.payroll.domain.shared.model.Period;
 
 import java.util.List;
