@@ -5,7 +5,6 @@ import com.example.backend.employee.api.dto.CreateEmploymentContractCommand;
 import com.example.backend.employee.api.dto.EmploymentContractResult;
 import com.example.backend.employee.api.dto.UpdateEmploymentContractCommand;
 import com.example.backend.employee.infrastructure.web.dto.ExtendContractRequest;
-import com.example.backend.employee.infrastructure.web.dto.GetExpiringContractRequest;
 import com.example.backend.employee.infrastructure.web.dto.TerminateContractRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -52,8 +51,8 @@ public class EmploymentContractController {
 
     @GetMapping("/expiring")
     @ResponseStatus(HttpStatus.OK)
-    public List<EmploymentContractResult> findExpiring(@RequestBody GetExpiringContractRequest request) {
-        return employmentContractFacade.findExpiring(request.days());
+    public List<EmploymentContractResult> findExpiring(@RequestParam int days) {
+        return employmentContractFacade.findExpiring(days);
     }
 
     @GetMapping
